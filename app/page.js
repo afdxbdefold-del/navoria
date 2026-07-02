@@ -61,13 +61,13 @@ export default function HomePage() {
         </div>
         <div className="mx-auto max-w-5xl px-4 pt-16 pb-10 text-center sm:px-6 sm:pt-24">
           <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white/70 px-3 py-1 text-xs font-medium text-sky-700">
-            <ShieldCheck className="h-3.5 w-3.5" /> Vertrauenswürdige Praxis-Informationen aus öffentlichen Quellen
+            <ShieldCheck className="h-3.5 w-3.5" /> Werbefrei · Verifiziert · Für Patienten gemacht
           </div>
           <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
-            Den passenden Arzt <span className="bg-gradient-to-r from-sky-600 to-teal-500 bg-clip-text text-transparent">einfach finden.</span>
+            Ihr nächster Arzt. <span className="bg-gradient-to-r from-sky-600 to-teal-500 bg-clip-text text-transparent">Ohne Umwege.</span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600 sm:text-lg">
-            Navoria hilft Ihnen, passende Ärzte und Praxen in Ihrer Nähe zu finden. Mit Adresse, Telefon, Website, Öffnungszeiten und Karte.
+            Adresse, Telefon, Öffnungszeiten und Bewertungen – alles auf einer Seite. Übersichtlich, aktuell, ohne Werbebanner.
           </p>
 
           {/* Suchbox */}
@@ -109,8 +109,8 @@ export default function HomePage() {
           <div className="flex items-center gap-2 text-sm font-semibold text-sky-700">
             <Sparkles className="h-4 w-4" /> Symptom-Assistent
           </div>
-          <h2 className="mt-1 text-2xl font-semibold text-slate-900">Nicht sicher, welchen Arzt Sie brauchen?</h2>
-          <p className="mt-1 text-sm text-slate-600">Beschreiben Sie Ihre Beschwerden – wir schlagen passende Fachrichtungen vor.</p>
+          <h2 className="mt-1 text-2xl font-semibold text-slate-900">Sagen Sie uns, was fehlt. Wir sagen Ihnen, wer hilft.</h2>
+          <p className="mt-1 text-sm text-slate-600">Kein Fachbegriff nötig – einfach Beschwerden eintippen, wir finden die passende Fachrichtung.</p>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
             <input
               value={symptomInput}
@@ -182,9 +182,9 @@ export default function HomePage() {
       <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            { title: 'Ruhige, klare Suche', desc: 'Kein Anzeigenlabyrinth. Nur relevante Praxisinformationen – übersichtlich präsentiert.' },
-            { title: 'Aktuelle Daten', desc: 'Datenstand pro Profil sichtbar. Quelle: Google Places und öffentliche Praxisinformationen.' },
-            { title: 'Datenschutz zuerst', desc: 'Keine Gesundheitsdaten dauerhaft gespeichert. Anfragen werden nicht personenbezogen protokolliert.' },
+            { title: 'Ergebnisse, keine Anzeigen', desc: 'Wer oben steht, gehört dorthin. Kein bezahltes Ranking, keine Sponsored Slots, keine Werbebanner.' },
+            { title: 'Datenstand transparent', desc: 'Jedes Profil zeigt, wann wir es zuletzt geprüft haben. Kein Rätselraten über veraltete Telefonnummern.' },
+            { title: 'Ihre Suche gehört Ihnen', desc: 'Keine Cookies, keine Tracker, keine Weitergabe. Was Sie eingeben, verlässt dieses Gerät nicht.' },
           ].map((f) => (
             <div key={f.title} className="card-soft p-6">
               <h3 className="text-base font-semibold text-slate-900">{f.title}</h3>

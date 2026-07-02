@@ -2,9 +2,9 @@ import './globals.css';
 import { Toaster } from 'sonner';
 
 export const metadata = {
-  title: 'Navoria – Ärzte & Praxen in Deutschland finden',
-  description: 'Navoria hilft Ihnen, passende Ärzte und Praxen in Ihrer Nähe zu finden. Mit Adresse, Telefonnummer, Website, Öffnungszeiten und Karte.',
-  keywords: ['Arztsuche', 'Arzt', 'Praxis', 'Zahnarzt', 'Facharzt', 'Deutschland', 'Navoria'],
+  title: 'Navoria – Ihr nächster Arzt. Ohne Umwege.',
+  description: 'Ärzte und Praxen in Deutschland finden – werbefrei, übersichtlich, aktuell. Adresse, Telefon, Öffnungszeiten und Bewertungen auf einer Seite.',
+  keywords: ['Arztsuche', 'Arzt finden', 'Praxis', 'Zahnarzt', 'Facharzt', 'Deutschland', 'Navoria'],
 };
 
 export default function RootLayout({ children }) {
@@ -33,7 +33,7 @@ function Header() {
           </div>
           <div className="flex flex-col leading-none">
             <span className="text-lg font-semibold tracking-tight text-slate-900">Navoria</span>
-            <span className="text-[10px] font-medium text-slate-500">Ärzte finden. Klar. Ruhig.</span>
+            <span className="text-[10px] font-medium text-slate-500">Der klare Weg zum Arzt.</span>
           </div>
         </a>
         <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
@@ -60,7 +60,7 @@ function Footer() {
               </div>
               <span className="font-semibold text-slate-900">Navoria</span>
             </div>
-            <p className="mt-3 text-sm text-slate-500">Navoria führt Patienten zum passenden Arzt.</p>
+            <p className="mt-3 text-sm text-slate-500">Navigation zum passenden Arzt.</p>
           </div>
           <div>
             <h4 className="text-sm font-semibold text-slate-900">Suchen</h4>
