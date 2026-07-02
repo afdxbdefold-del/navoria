@@ -119,7 +119,7 @@ function Dashboard({ token, onLogout }) {
     e.preventDefault();
     if (!city.trim() && !query.trim()) { toast.error('Bitte Ort oder Suchbegriff angeben'); return; }
     setImporting(true);
-    toast.info('Import gestartet … Bitte warten (Google Places kann bis zu 60s dauern).');
+    toast.info('Import gestartet … Bitte warten (kann bis zu 60s dauern).');
     try {
       const r = await fetch('/api/admin/sync', {
         method: 'POST',
@@ -141,7 +141,7 @@ function Dashboard({ token, onLogout }) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Admin · Dashboard</h1>
-          <p className="text-sm text-slate-500">Datenbestand verwalten und Google Places importieren.</p>
+          <p className="text-sm text-slate-500">Datenbestand verwalten und Praxisdaten aus externen Verzeichnissen importieren.</p>
         </div>
         <div className="flex gap-2">
           <a href="/admin/kampagnen" className="btn-primary">Bulk-Kampagne</a>
@@ -161,7 +161,7 @@ function Dashboard({ token, onLogout }) {
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1fr]">
         {/* Import Formular */}
         <div className="card-soft p-6">
-          <h2 className="text-lg font-semibold text-slate-900">Neuer Import aus Google Places</h2>
+          <h2 className="text-lg font-semibold text-slate-900">Neuer Praxis-Import</h2>
           <p className="text-sm text-slate-500">Manuell angestoßen. Sprache: Deutsch. Land: Deutschland.</p>
           <form onSubmit={startImport} className="mt-4 space-y-3">
             <div className="grid gap-3 sm:grid-cols-2">

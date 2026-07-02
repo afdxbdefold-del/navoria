@@ -79,7 +79,7 @@ export default async function ProfilePage({ params }) {
                 <span className="flex items-center gap-1 text-amber-600">
                   <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
                   <span className="font-semibold text-slate-800">{d.rating.toFixed(1)}</span>
-                  <span className="text-slate-500">({d.user_rating_count || 0} Bewertungen bei Google)</span>
+                  <span className="text-slate-500">({d.user_rating_count || 0} Bewertungen)</span>
                 </span>
               )}
             </div>
@@ -97,7 +97,7 @@ export default async function ProfilePage({ params }) {
               )}
               {d.google_maps_url && (
                 <a href={d.google_maps_url} target="_blank" rel="noreferrer" className="btn-secondary">
-                  <ExternalLink className="mr-2 h-4 w-4" /> Route bei Google Maps
+                  <ExternalLink className="mr-2 h-4 w-4" /> Route berechnen
                 </a>
               )}
             </div>
@@ -128,7 +128,7 @@ export default async function ProfilePage({ params }) {
                   </li>
                 ))}
               </ul>
-              <p className="mt-3 text-xs text-slate-400">Öffnungszeiten laut Google. Bitte im Zweifel telefonisch bestätigen.</p>
+              <p className="mt-3 text-xs text-slate-400">Öffnungszeiten laut externem Verzeichnis. Bitte im Zweifel telefonisch bestätigen.</p>
             </div>
           )}
 
@@ -137,7 +137,7 @@ export default async function ProfilePage({ params }) {
             <div className="flex items-start gap-3">
               <ShieldAlert className="mt-0.5 h-5 w-5 text-amber-500" />
               <div className="text-sm text-slate-600">
-                <p>Diese Praxis-Information wurde aus öffentlich verfügbaren Quellen (Google Places) zusammengestellt. Navoria trifft keine medizinische Aussage über die Qualität der Praxis oder Behandlung. Bewertungen stammen von Google-Nutzern.</p>
+                <p>Diese Praxis-Information wurde aus öffentlich verfügbaren Quellen zusammengestellt. Navoria trifft keine medizinische Aussage über die Qualität der Praxis oder Behandlung. Bewertungen stammen von externen Verzeichnissen.</p>
                 <p className="mt-2">Navoria ersetzt keine ärztliche Diagnose. Bei akuten Beschwerden rufen Sie 112.</p>
               </div>
             </div>
@@ -151,11 +151,11 @@ export default async function ProfilePage({ params }) {
               {lastSynced && (
                 <div className="flex justify-between"><dt className="text-slate-500">Zuletzt aktualisiert</dt><dd className="text-slate-800">{lastSynced}</dd></div>
               )}
-              <div className="flex justify-between"><dt className="text-slate-500">Quelle</dt><dd className="text-slate-800">Google Places</dd></div>
+              <div className="flex justify-between"><dt className="text-slate-500">Quelle</dt><dd className="text-slate-800">Öffentliche Verzeichnisse</dd></div>
               {d.postal_code && <div className="flex justify-between"><dt className="text-slate-500">PLZ</dt><dd className="text-slate-800">{d.postal_code}</dd></div>}
               {d.city && <div className="flex justify-between"><dt className="text-slate-500">Stadt</dt><dd className="text-slate-800">{d.city}</dd></div>}
             </dl>
-            <p className="mt-4 text-[11px] leading-relaxed text-slate-400">Attribution: Praxis-Informationen basieren auf Daten von Google und öffentlichen Quellen. Alle Rechte bei den jeweiligen Inhabern.</p>
+            <p className="mt-4 text-[11px] leading-relaxed text-slate-400">Praxis-Informationen basieren auf öffentlichen Quellen. Alle Rechte bei den jeweiligen Inhabern.</p>
           </div>
 
           <Link href={`/suche?ort=${encodeURIComponent(d.city || '')}${d.specialty_guess ? `&q=${encodeURIComponent(d.specialty_guess)}` : ''}`} className="card-soft mt-4 block p-5 hover:shadow-md">

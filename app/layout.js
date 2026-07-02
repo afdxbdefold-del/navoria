@@ -86,7 +86,7 @@ function Footer() {
               <li><a className="hover:text-sky-600" href="/impressum">Impressum</a></li>
               <li><a className="hover:text-sky-600" href="/datenschutz">Datenschutz</a></li>
             </ul>
-            <p className="mt-4 text-xs text-slate-400">Datenquelle: Google Places / öffentliche Praxisinformationen. Powered by Google.</p>
+            <p className="mt-4 text-xs text-slate-400">Datenquelle: öffentliche Praxisinformationen und externe Karten-/Verzeichnisdienste.</p>
           </div>
         </div>
         <div className="mt-8 border-t border-slate-200 pt-6 text-center text-xs text-slate-400">
