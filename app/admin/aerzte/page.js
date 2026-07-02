@@ -116,7 +116,6 @@ export default function AdminDoctorsPage() {
                     </div>
                     <p className="mt-1 text-sm text-slate-600">{d.formatted_address}</p>
                     <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
-                      {d.rating != null && <span className="inline-flex items-center gap-1 text-amber-600"><Star className="h-3 w-3 fill-amber-500 text-amber-500" />{d.rating.toFixed(1)} ({d.user_rating_count || 0})</span>}
                       {d.phone_national && <span className="inline-flex items-center gap-1"><Phone className="h-3 w-3" /> {d.phone_national}</span>}
                       {d.website_url && <a href={d.website_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-sky-700"><Globe className="h-3 w-3" /> Website</a>}
                     </div>

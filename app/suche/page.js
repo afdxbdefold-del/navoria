@@ -82,27 +82,7 @@ function SearchContent() {
               <label className="label">Sortierung</label>
               <select value={sort} onChange={(e) => setSort(e.target.value)} className="input mt-1.5">
                 <option value="relevance">Relevanz</option>
-                <option value="rating">Bewertung</option>
-                <option value="reviews">Anzahl Bewertungen</option>
                 <option value="completeness">Profil-Vollständigkeit</option>
-              </select>
-            </div>
-            <div>
-              <label className="label">Mindest-Bewertung</label>
-              <select value={minRating} onChange={(e) => setMinRating(parseFloat(e.target.value))} className="input mt-1.5">
-                <option value="0">Alle</option>
-                <option value="3">3.0+</option>
-                <option value="4">4.0+</option>
-                <option value="4.5">4.5+</option>
-              </select>
-            </div>
-            <div>
-              <label className="label">Min. Anzahl Bewertungen</label>
-              <select value={minReviews} onChange={(e) => setMinReviews(parseInt(e.target.value, 10))} className="input mt-1.5">
-                <option value="0">Alle</option>
-                <option value="5">5+</option>
-                <option value="20">20+</option>
-                <option value="50">50+</option>
               </select>
             </div>
             <div className="space-y-2">
@@ -151,37 +131,30 @@ function SearchContent() {
 function ResultCard({ d }) {
   const cityPath = d.city_slug || 'stadt';
   return (
-    <article className="card-soft p-5 transition hover:shadow-md">
-      <div className="flex items-start justify-between gap-4">
+    <article className="card-soft p-4 sm:p-5 transition hover:shadow-md">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="truncate text-lg font-semibold text-slate-900">
+            <h3 className="text-base sm:text-lg font-semibold text-slate-900 break-words">
               <a href={`/praxis/${cityPath}/${d.slug}`} className="hover:text-sky-700">{d.name}</a>
             </h3>
             {d.specialty_guess && <span className="chip border-sky-100 bg-sky-50 text-sky-700">{d.specialty_guess}</span>}
             {d.is_verified && <span className="chip border-emerald-100 bg-emerald-50 text-emerald-700">verifiziert</span>}
           </div>
-          <p className="mt-1 text-sm text-slate-600">{d.formatted_address || [d.street, d.postal_code, d.city].filter(Boolean).join(', ')}</p>
+          <p className="mt-1 text-sm text-slate-600 break-words">{d.formatted_address || [d.street, d.postal_code, d.city].filter(Boolean).join(', ')}</p>
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-            {d.rating != null && (
-              <span className="flex items-center gap-1 text-amber-600">
-                <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
-                <span className="font-semibold text-slate-800">{d.rating.toFixed(1)}</span>
-                <span className="text-slate-500">({d.user_rating_count || 0} Bewertungen)</span>
-              </span>
-            )}
             {(d.phone_national || d.phone_international) && (
-              <a href={`tel:${d.phone_international || d.phone_national}`} className="flex items-center gap-1 text-slate-600 hover:text-sky-700"><Phone className="h-4 w-4" /> {d.phone_national || d.phone_international}</a>
+              <a href={`tel:${d.phone_international || d.phone_national}`} className="flex items-center gap-1 text-slate-600 hover:text-sky-700 break-all"><Phone className="h-4 w-4 shrink-0" /> {d.phone_national || d.phone_international}</a>
             )}
             {d.website_url && (
               <a href={d.website_url} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-slate-600 hover:text-sky-700"><Globe className="h-4 w-4" /> Website</a>
             )}
           </div>
         </div>
-        <div className="flex shrink-0 flex-col items-end gap-2">
-          <a href={`/praxis/${cityPath}/${d.slug}`} className="btn-secondary">Profil <ArrowRight className="ml-1 h-4 w-4" /></a>
+        <div className="flex shrink-0 flex-row gap-2 sm:flex-col sm:items-end">
+          <a href={`/praxis/${cityPath}/${d.slug}`} className="btn-secondary flex-1 sm:flex-none">Profil <ArrowRight className="ml-1 h-4 w-4" /></a>
           {d.google_maps_url && (
-            <a href={d.google_maps_url} target="_blank" rel="noreferrer" className="btn-secondary"><ExternalLink className="mr-1 h-4 w-4" /> Route</a>
+            <a href={d.google_maps_url} target="_blank" rel="noreferrer" className="btn-secondary flex-1 sm:flex-none"><ExternalLink className="mr-1 h-4 w-4" /> Route</a>
           )}
         </div>
       </div>

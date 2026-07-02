@@ -138,12 +138,12 @@ function Dashboard({ token, onLogout }) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Admin · Dashboard</h1>
           <p className="text-sm text-slate-500">Datenbestand verwalten und Praxisdaten aus externen Verzeichnissen importieren.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <a href="/admin/kampagnen" className="btn-primary">Bulk-Kampagne</a>
           <a href="/admin/aerzte" className="btn-secondary">Praxen verwalten</a>
           <button onClick={loadAll} className="btn-secondary"><RefreshCw className={`mr-1.5 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} /> Aktualisieren</button>

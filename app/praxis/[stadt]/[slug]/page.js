@@ -46,7 +46,6 @@ export default async function ProfilePage({ params }) {
     } : undefined,
     telephone: d.phone_international || d.phone_national || undefined,
     url: d.website_url || undefined,
-    aggregateRating: d.rating ? { '@type': 'AggregateRating', ratingValue: d.rating, reviewCount: d.user_rating_count || 0 } : undefined,
     geo: d.latitude && d.longitude ? { '@type': 'GeoCoordinates', latitude: d.latitude, longitude: d.longitude } : undefined,
   };
 
@@ -84,32 +83,22 @@ export default async function ProfilePage({ params }) {
               {d.primary_type && <span className="chip">{d.primary_type}</span>}
               {d.business_status === 'OPERATIONAL' && <span className="chip border-emerald-100 bg-emerald-50 text-emerald-700">Aktiv</span>}
             </div>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">{d.name}</h1>
-            <p className="mt-2 flex items-center gap-2 text-slate-600"><MapPin className="h-4 w-4" /> {d.formatted_address}</p>
+            <h1 className="mt-3 text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 break-words">{d.name}</h1>
+            <p className="mt-2 flex items-start gap-2 text-slate-600 break-words"><MapPin className="h-4 w-4 shrink-0 mt-0.5" /> {d.formatted_address}</p>
 
-            <div className="mt-5 flex flex-wrap items-center gap-4 text-sm">
-              {d.rating != null && (
-                <span className="flex items-center gap-1 text-amber-600">
-                  <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
-                  <span className="font-semibold text-slate-800">{d.rating.toFixed(1)}</span>
-                  <span className="text-slate-500">({d.user_rating_count || 0} Bewertungen)</span>
-                </span>
-              )}
-            </div>
-
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               {(d.phone_national || d.phone_international) && (
-                <a href={`tel:${d.phone_international || d.phone_national}`} className="btn-primary">
-                  <Phone className="mr-2 h-4 w-4" /> {d.phone_national || d.phone_international}
+                <a href={`tel:${d.phone_international || d.phone_national}`} className="btn-primary justify-center break-all">
+                  <Phone className="mr-2 h-4 w-4 shrink-0" /> {d.phone_national || d.phone_international}
                 </a>
               )}
               {d.website_url && (
-                <a href={d.website_url} target="_blank" rel="noreferrer" className="btn-secondary">
+                <a href={d.website_url} target="_blank" rel="noreferrer" className="btn-secondary justify-center">
                   <Globe className="mr-2 h-4 w-4" /> Website
                 </a>
               )}
               {d.google_maps_url && (
-                <a href={d.google_maps_url} target="_blank" rel="noreferrer" className="btn-secondary">
+                <a href={d.google_maps_url} target="_blank" rel="noreferrer" className="btn-secondary justify-center">
                   <ExternalLink className="mr-2 h-4 w-4" /> Route berechnen
                 </a>
               )}

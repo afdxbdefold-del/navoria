@@ -93,30 +93,23 @@ export default async function CitySpecialtyPage({ params }) {
           </div>
         ) : (
           doctors.map((d) => (
-            <article key={d.google_place_id} className="card-soft p-5 transition hover:shadow-md">
-              <div className="flex items-start justify-between gap-4">
+            <article key={d.google_place_id} className="card-soft p-4 sm:p-5 transition hover:shadow-md">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <div className="min-w-0 flex-1">
-                  <h3 className="truncate text-lg font-semibold text-slate-900">
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-900 break-words">
                     <Link href={`/praxis/${stadt}/${d.slug}`} className="hover:text-sky-700">{d.name}</Link>
                   </h3>
-                  <p className="mt-1 flex items-center gap-1 text-sm text-slate-600"><MapPin className="h-3.5 w-3.5" /> {d.formatted_address}</p>
+                  <p className="mt-1 flex items-start gap-1 text-sm text-slate-600 break-words"><MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" /> {d.formatted_address}</p>
                   <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-                    {d.rating != null && (
-                      <span className="flex items-center gap-1 text-amber-600">
-                        <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
-                        <span className="font-semibold text-slate-800">{d.rating.toFixed(1)}</span>
-                        <span className="text-slate-500">({d.user_rating_count || 0})</span>
-                      </span>
-                    )}
                     {(d.phone_national || d.phone_international) && (
-                      <a href={`tel:${d.phone_international || d.phone_national}`} className="flex items-center gap-1 text-slate-600 hover:text-sky-700"><Phone className="h-4 w-4" /> {d.phone_national || d.phone_international}</a>
+                      <a href={`tel:${d.phone_international || d.phone_national}`} className="flex items-center gap-1 text-slate-600 hover:text-sky-700 break-all"><Phone className="h-4 w-4 shrink-0" /> {d.phone_national || d.phone_international}</a>
                     )}
                     {d.website_url && (
                       <a href={d.website_url} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-slate-600 hover:text-sky-700"><Globe className="h-4 w-4" /> Website</a>
                     )}
                   </div>
                 </div>
-                <Link href={`/praxis/${stadt}/${d.slug}`} className="btn-secondary shrink-0">Profil <ArrowRight className="ml-1 h-4 w-4" /></Link>
+                <Link href={`/praxis/${stadt}/${d.slug}`} className="btn-secondary shrink-0 self-start">Profil <ArrowRight className="ml-1 h-4 w-4" /></Link>
               </div>
             </article>
           ))
