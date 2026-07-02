@@ -1,0 +1,254 @@
+import { NextResponse } from 'next/server';
+import { v4 as uuidv4 } from 'uuid';
+import { getCollection } from '@/lib/mongodb';
+import { runImport } from '@/lib/services/placesImport';
+import { suggestSpecialtiesForSymptom } from '@/lib/services/symptomMapping';
+import { slugify } from '@/lib/services/specialtyDetection';
+import { createSession, requireAdmin } from '@/lib/auth';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+function json(data, init = {}) {
+  return NextResponse.json(data, { ...init, headers: { ...corsHeaders, ...(init.headers || {}) } });
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
+
+function stripId(doc) {
+  if (!doc) return doc;
+  const { _id, source_payload_json, ...rest } = doc;
+  return rest;
+}
+
+// Haversine distance in km
+function distanceKm(lat1, lon1, lat2, lon2) {
+  if ([lat1, lon1, lat2, lon2].some((v) => v == null)) return null;
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+function profileCompleteness(d) {
+  let s = 0;
+  if (d.phone_national || d.phone_international) s += 1;
+  if (d.website_url) s += 1;
+  if (d.opening_hours_json) s += 1;
+  if (d.rating != null) s += 1;
+  if (d.specialty_guess) s += 1;
+  return s;
+}
+
+async function handleGet(request, pathParts) {
+  const url = new URL(request.url);
+  const params = url.searchParams;
+
+  // GET /api/ - health
+  if (pathParts.length === 0) {
+    return json({ ok: true, service: 'Navoria API' });
+  }
+
+  // GET /api/search
+  if (pathParts[0] === 'search') {
+    const q = (params.get('q') || '').trim();
+    const ort = (params.get('ort') || '').trim();
+    const sort = params.get('sort') || 'relevance';
+    const minRating = parseFloat(params.get('minRating') || '0');
+    const minReviews = parseInt(params.get('minReviews') || '0', 10);
+    const withWebsite = params.get('withWebsite') === '1';
+    const withPhone = params.get('withPhone') === '1';
+    const hasHours = params.get('hasHours') === '1';
+    const limit = Math.min(parseInt(params.get('limit') || '30', 10), 100);
+    const skip = parseInt(params.get('skip') || '0', 10);
+
+    const col = await getCollection('doctor_places');
+
+    const filter = { is_active: true };
+    const andClauses = [];
+
+    if (q) {
+      const rx = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      andClauses.push({
+        $or: [
+          { name: rx },
+          { specialty_guess: rx },
+          { category_label: rx },
+          { primary_type: rx },
+          { formatted_address: rx },
+          { types: rx },
+        ],
+      });
+    }
+    if (ort) {
+      const ortRx = new RegExp(ort.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      andClauses.push({
+        $or: [
+          { city: ortRx },
+          { city_slug: slugify(ort) },
+          { postal_code: ortRx },
+          { formatted_address: ortRx },
+        ],
+      });
+    }
+    if (minRating > 0) andClauses.push({ rating: { $gte: minRating } });
+    if (minReviews > 0) andClauses.push({ user_rating_count: { $gte: minReviews } });
+    if (withWebsite) andClauses.push({ website_url: { $ne: null } });
+    if (withPhone) andClauses.push({ $or: [{ phone_national: { $ne: null } }, { phone_international: { $ne: null } }] });
+    if (hasHours) andClauses.push({ opening_hours_json: { $ne: null } });
+    if (andClauses.length) filter.$and = andClauses;
+
+    const total = await col.countDocuments(filter);
+    let docs = await col.find(filter).limit(500).toArray();
+
+    // Ranking
+    docs = docs.map((d) => ({
+      ...d,
+      _completeness: profileCompleteness(d),
+    }));
+
+    if (sort === 'rating') {
+      docs.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    } else if (sort === 'reviews') {
+      docs.sort((a, b) => (b.user_rating_count || 0) - (a.user_rating_count || 0));
+    } else if (sort === 'completeness') {
+      docs.sort((a, b) => b._completeness - a._completeness);
+    } else {
+      // relevance: rating * log(reviews+1) * completeness
+      docs.sort((a, b) => {
+        const sa = (a.rating || 0) * Math.log((a.user_rating_count || 0) + 1) + a._completeness * 0.2;
+        const sb = (b.rating || 0) * Math.log((b.user_rating_count || 0) + 1) + b._completeness * 0.2;
+        return sb - sa;
+      });
+    }
+
+    const paged = docs.slice(skip, skip + limit).map(stripId);
+    return json({ total, results: paged });
+  }
+
+  // GET /api/doctor/:slug
+  if (pathParts[0] === 'doctor' && pathParts[1]) {
+    const col = await getCollection('doctor_places');
+    const doc = await col.findOne({ slug: pathParts[1] });
+    if (!doc) return json({ error: 'Nicht gefunden' }, { status: 404 });
+    return json(stripId(doc));
+  }
+
+  // GET /api/cities
+  if (pathParts[0] === 'cities') {
+    const col = await getCollection('cities');
+    const cities = await col.find({}).sort({ doctor_count: -1 }).limit(50).toArray();
+    return json(cities.map(stripId));
+  }
+
+  // GET /api/symptom-suggest?q=rückenschmerzen
+  if (pathParts[0] === 'symptom-suggest') {
+    const q = params.get('q') || '';
+    const specialties = suggestSpecialtiesForSymptom(q);
+    return json({ query: q, specialties });
+  }
+
+  // GET /api/admin/stats
+  if (pathParts[0] === 'admin' && pathParts[1] === 'stats') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const docs = await getCollection('doctor_places');
+    const jobs = await getCollection('sync_jobs');
+    const cities = await getCollection('cities');
+    const [doctorCount, cityCount, jobCount, lastJob] = await Promise.all([
+      docs.countDocuments({ is_active: true }),
+      cities.countDocuments({}),
+      jobs.countDocuments({}),
+      jobs.find({}).sort({ started_at: -1 }).limit(1).toArray(),
+    ]);
+    return json({
+      doctor_count: doctorCount,
+      city_count: cityCount,
+      job_count: jobCount,
+      last_job: lastJob[0] ? stripId(lastJob[0]) : null,
+    });
+  }
+
+  // GET /api/admin/jobs
+  if (pathParts[0] === 'admin' && pathParts[1] === 'jobs') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const jobs = await getCollection('sync_jobs');
+    const list = await jobs.find({}).sort({ started_at: -1 }).limit(50).toArray();
+    return json(list.map(stripId));
+  }
+
+  // GET /api/admin/logs?job_id=...
+  if (pathParts[0] === 'admin' && pathParts[1] === 'logs') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const jobId = params.get('job_id');
+    const logs = await getCollection('sync_job_logs');
+    const filter = jobId ? { job_id: jobId } : {};
+    const list = await logs.find(filter).sort({ created_at: -1 }).limit(200).toArray();
+    return json(list.map(stripId));
+  }
+
+  return json({ error: 'Not found' }, { status: 404 });
+}
+
+async function handlePost(request, pathParts) {
+  let body = {};
+  try { body = await request.json(); } catch { body = {}; }
+
+  // POST /api/admin/login
+  if (pathParts[0] === 'admin' && pathParts[1] === 'login') {
+    const { email, password } = body;
+    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+      const { token, expiresAt } = await createSession();
+      return json({ ok: true, token, expires_at: expiresAt });
+    }
+    return json({ error: 'Falsche Zugangsdaten' }, { status: 401 });
+  }
+
+  // POST /api/admin/sync
+  if (pathParts[0] === 'admin' && pathParts[1] === 'sync') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const { city, query, placeType, maxResults } = body;
+    try {
+      const result = await runImport({
+        city: (city || '').trim(),
+        query: (query || '').trim(),
+        placeType: placeType || null,
+        maxResults: Math.min(parseInt(maxResults || 20, 10), 60),
+      });
+      return json({ ok: true, job: result });
+    } catch (err) {
+      return json({ error: String(err.message || err) }, { status: 500 });
+    }
+  }
+
+  return json({ error: 'Not found' }, { status: 404 });
+}
+
+export async function GET(request, { params }) {
+  const resolved = await params;
+  const pathParts = resolved.path || [];
+  try {
+    return await handleGet(request, pathParts);
+  } catch (err) {
+    console.error('GET error', err);
+    return json({ error: String(err.message || err) }, { status: 500 });
+  }
+}
+
+export async function POST(request, { params }) {
+  const resolved = await params;
+  const pathParts = resolved.path || [];
+  try {
+    return await handlePost(request, pathParts);
+  } catch (err) {
+    console.error('POST error', err);
+    return json({ error: String(err.message || err) }, { status: 500 });
+  }
+}
