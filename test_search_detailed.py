@@ -5,8 +5,9 @@ Detailed search tests for Navoria.de
 
 import requests
 import json
+import os
 
-BASE_URL = "https://a041470a-db26-4142-b08e-bb68e52ca95a.preview.emergentagent.com/api"
+BASE_URL = os.environ.get('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000') + '/api'
 
 print("="*80)
 print("DETAILED SEARCH TESTS")
