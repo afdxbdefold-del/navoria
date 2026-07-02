@@ -1,6 +1,6 @@
 import './globals.css';
 import { Toaster } from 'sonner';
-import Script from 'next/script';
+import ConsentBanner, { ConsentResetLink } from '@/components/ConsentBanner';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
 const ADSENSE_CLIENT = 'ca-pub-8583619451045805';
@@ -91,15 +91,10 @@ export default function RootLayout({ children }) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       </head>
       <body className="min-h-screen bg-white text-slate-900 antialiased">
-        <Script
-          async
-          strategy="afterInteractive"
-          crossOrigin="anonymous"
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-        />
         <Header />
         <main>{children}</main>
         <Footer />
+        <ConsentBanner />
         <Toaster position="top-center" richColors />
       </body>
     </html>
@@ -171,6 +166,7 @@ function Footer() {
             <ul className="mt-3 space-y-2 text-sm text-slate-600">
               <li><a className="hover:text-sky-600" href="/impressum">Impressum</a></li>
               <li><a className="hover:text-sky-600" href="/datenschutz">Datenschutz</a></li>
+              <li><ConsentResetLink className="hover:text-sky-600" /></li>
             </ul>
             <p className="mt-4 text-xs text-slate-400">Datenquelle: öffentliche Praxisinformationen und externe Karten-/Verzeichnisdienste.</p>
           </div>

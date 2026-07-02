@@ -70,14 +70,61 @@ export default function DatenschutzPage() {
         </div>
 
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">5. Cookies</h2>
+          <h2 className="text-lg font-semibold text-slate-900">5. Cookies und Zustimmung</h2>
           <p className="mt-2">
-            Auf den öffentlichen Seiten von Navoria setzen wir keine Marketing- oder Tracking-Cookies
-            ein. Ausschließlich im geschützten Administrationsbereich (<code>/admin</code>) wird zur
-            Anmeldung ein technisch notwendiger Sitzungs-Token im lokalen Speicher (localStorage) Ihres
-            Browsers abgelegt. Dieser dient allein der Authentifizierung angemeldeter Redaktions-Accounts
-            und wird beim Abmelden gelöscht.
+            Beim ersten Besuch von Navoria fragen wir Sie über einen Consent-Banner, ob Sie
+            der Nutzung von Werbe-Cookies zustimmen möchten. Sie haben die Wahl zwischen:
           </p>
+          <ul className="mt-3 list-disc space-y-1 pl-6">
+            <li><b>Nur notwendige</b> – es werden keine Werbe- oder Tracking-Cookies gesetzt, und Google AdSense wird nicht geladen.</li>
+            <li><b>Alle akzeptieren</b> – Google AdSense wird geladen und darf Cookies für personalisierte Anzeigen setzen (Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO).</li>
+          </ul>
+          <p className="mt-3">
+            Ihre Entscheidung wird lokal in Ihrem Browser (localStorage-Schlüssel <code>navoria_consent_v1</code>) gespeichert.
+            Sie können Ihre Einwilligung jederzeit über den Link „Cookie-Einstellungen ändern" im Footer widerrufen; künftig
+            geladene Seiten laden AdSense dann nicht mehr.
+          </p>
+          <p className="mt-3">
+            Im geschützten Administrationsbereich (<code>/admin</code>) wird zur Anmeldung ein technisch notwendiger
+            Sitzungs-Token ebenfalls im lokalen Speicher (localStorage) Ihres Browsers abgelegt. Dieser dient allein der
+            Authentifizierung angemeldeter Redaktions-Accounts und wird beim Abmelden gelöscht.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">5a. Google AdSense (nur bei Einwilligung)</h2>
+          <p className="mt-2">
+            Wenn Sie im Consent-Banner „Alle akzeptieren" wählen, integrieren wir das Werbe-Netzwerk
+            Google AdSense zur Anzeige von Werbeanzeigen. Anbieter ist die Google Ireland Limited,
+            Gordon House, Barrow Street, Dublin 4, Irland (im Folgenden „Google").
+          </p>
+          <p className="mt-3">
+            Google AdSense verwendet Cookies (u.&nbsp;a. <code>__gads</code>, <code>__gpi</code>, <code>NID</code>) und
+            vergleichbare Technologien (Web Beacons), um Werbeanzeigen personalisiert auszuspielen, Anzeigen-Betrug zu
+            verhindern und die Wirksamkeit der Anzeigen zu messen. Dabei können folgende Daten an Google übermittelt werden:
+            IP-Adresse (gekürzt), Browsertyp und -version, aufgerufene Seiten, Verweildauer, Klicks, Gerätetyp.
+          </p>
+          <p className="mt-3">
+            <b>Rechtsgrundlage:</b> Ihre ausdrückliche Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO
+            und § 25 Abs. 1 TDDDG (früher TTDSG). Ohne diese Einwilligung wird das AdSense-Script <b>nicht</b> geladen.
+          </p>
+          <p className="mt-3">
+            <b>Datenübermittlung in Drittländer:</b> Google verarbeitet Daten teilweise in den USA. Google LLC ist unter dem
+            EU-US Data Privacy Framework zertifiziert und bietet damit ein anerkanntes Schutzniveau.
+          </p>
+          <p className="mt-3">
+            <b>Widerruf & Einstellungen:</b>
+          </p>
+          <ul className="mt-2 list-disc space-y-1 pl-6">
+            <li>Über den Link „Cookie-Einstellungen ändern" im Footer können Sie Ihre Einwilligung jederzeit widerrufen.</li>
+            <li>Direkt bei Google unter{' '}
+              <a href="https://adssettings.google.com/" target="_blank" rel="noreferrer" className="text-sky-700 hover:underline">adssettings.google.com</a>{' '}
+              können Sie personalisierte Werbung ganz deaktivieren.
+            </li>
+            <li>Weitere Informationen: {' '}
+              <a href="https://policies.google.com/technologies/ads?hl=de" target="_blank" rel="noreferrer" className="text-sky-700 hover:underline">policies.google.com/technologies/ads</a>.
+            </li>
+          </ul>
         </div>
 
         <div>
