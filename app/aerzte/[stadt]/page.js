@@ -52,7 +52,7 @@ export default async function CityPage({ params }) {
       </nav>
 
       <h1 className="text-4xl font-semibold tracking-tight text-slate-900">Ärzte in {cityName} finden</h1>
-      <p className="mt-3 max-w-2xl text-slate-600">{doctors.length} Praxen in unserer Datenbasis für {cityName}. Werbefrei, mit vollständigen Kontaktdaten.</p>
+      <p className="mt-3 max-w-2xl text-slate-600">{doctors.length} Praxen in unserer Datenbasis für {cityName} – mit vollständigen Kontaktdaten.</p>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[240px_1fr]">
         {/* Sidebar: Fachrichtungen dieser Stadt */}

@@ -51,7 +51,7 @@ export default async function CitySpecialtyPage({ params }) {
       </nav>
 
       <h1 className="text-4xl font-semibold tracking-tight text-slate-900">{spec.plural} in {cityName} finden</h1>
-      <p className="mt-3 max-w-2xl text-slate-600">{doctors.length} {spec.plural} in unserer Datenbasis für {cityName}. Alle Angaben aus öffentlichen Quellen – werbefrei.</p>
+      <p className="mt-3 max-w-2xl text-slate-600">{doctors.length} {spec.plural} in unserer Datenbasis für {cityName}. Alle Angaben aus öffentlichen Quellen.</p>
 
       {/* Related specialties in this city */}
       <div className="mt-6 flex flex-wrap gap-2">

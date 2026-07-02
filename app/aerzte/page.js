@@ -20,7 +20,7 @@ export default async function AerzteHubPage() {
         <Link href="/" className="hover:text-sky-700">Start</Link> <span>/</span> <span className="text-slate-700">Ärzte</span>
       </nav>
       <h1 className="text-4xl font-semibold tracking-tight text-slate-900">Ärzte finden in Deutschland</h1>
-      <p className="mt-3 max-w-2xl text-slate-600">Direkteinstieg nach Stadt oder Fachrichtung. Alle Angaben aus öffentlichen Quellen. Werbefrei und übersichtlich.</p>
+      <p className="mt-3 max-w-2xl text-slate-600">Direkteinstieg nach Stadt oder Fachrichtung. Alle Angaben aus öffentlichen Quellen.</p>
 
       <section className="mt-10">
         <h2 className="flex items-center gap-2 text-xl font-semibold text-slate-900"><MapPin className="h-5 w-5 text-sky-600" /> Nach Stadt</h2>

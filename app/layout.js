@@ -3,7 +3,7 @@ import { Toaster } from 'sonner';
 
 export const metadata = {
   title: 'Navoria – Ihr nächster Arzt. Ohne Umwege.',
-  description: 'Ärzte und Praxen in Deutschland finden – werbefrei, übersichtlich, aktuell. Adresse, Telefon, Öffnungszeiten und Bewertungen auf einer Seite.',
+  description: 'Ärzte und Praxen in Deutschland finden. Adresse, Telefon, Öffnungszeiten und Bewertungen kompakt auf einer Seite.',
   keywords: ['Arztsuche', 'Arzt finden', 'Praxis', 'Zahnarzt', 'Facharzt', 'Deutschland', 'Navoria'],
 };
 

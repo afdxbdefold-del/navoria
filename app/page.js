@@ -67,7 +67,7 @@ export default function HomePage() {
             Ihr nächster Arzt. <span className="bg-gradient-to-r from-sky-600 to-teal-500 bg-clip-text text-transparent">Ohne Umwege.</span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600 sm:text-lg">
-            Adresse, Telefon, Öffnungszeiten und Bewertungen – alles auf einer Seite. Übersichtlich, aktuell, ohne Werbebanner.
+            Adresse, Telefon, Öffnungszeiten und Bewertungen – alles auf einer Seite. Übersichtlich und aktuell.
           </p>
 
           {/* Suchbox */}
@@ -182,9 +182,9 @@ export default function HomePage() {
       <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            { title: 'Ergebnisse, keine Anzeigen', desc: 'Wer oben steht, gehört dorthin. Kein bezahltes Ranking, keine Sponsored Slots, keine Werbebanner.' },
+            { title: 'Alles auf einer Seite', desc: 'Adresse, Telefon, Website, Öffnungszeiten, Bewertungen und Karte – kompakt und übersichtlich pro Praxis.' },
             { title: 'Datenstand transparent', desc: 'Jedes Profil zeigt, wann wir es zuletzt geprüft haben. Kein Rätselraten über veraltete Telefonnummern.' },
-            { title: 'Ihre Suche gehört Ihnen', desc: 'Keine Cookies, keine Tracker, keine Weitergabe. Was Sie eingeben, verlässt dieses Gerät nicht.' },
+            { title: 'Symptom-Assistent', desc: 'Sie wissen nicht, welche Fachrichtung passt? Beschreiben Sie kurz Ihre Beschwerden – wir schlagen passende Ärzte vor.' },
           ].map((f) => (
             <div key={f.title} className="card-soft p-6">
               <h3 className="text-base font-semibold text-slate-900">{f.title}</h3>
