@@ -39,6 +39,7 @@ function Header() {
         <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
           <a href="/" className="hover:text-sky-600">Start</a>
           <a href="/suche" className="hover:text-sky-600">Suche</a>
+          <a href="/aerzte" className="hover:text-sky-600">Ärzte-Verzeichnis</a>
           <a href="/admin" className="hover:text-sky-600">Admin</a>
         </nav>
       </div>

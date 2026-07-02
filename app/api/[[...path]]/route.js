@@ -184,6 +184,28 @@ async function handleGet(request, pathParts) {
     return json(list.map(stripId));
   }
 
+  // GET /api/admin/doctors?q=&ort=&limit=
+  if (pathParts[0] === 'admin' && pathParts[1] === 'doctors' && !pathParts[2]) {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const qQ = (params.get('q') || '').trim();
+    const ortQ = (params.get('ort') || '').trim();
+    const limit = Math.min(parseInt(params.get('limit') || '50', 10), 200);
+    const col = await getCollection('doctor_places');
+    const filter = {};
+    const and = [];
+    if (qQ) {
+      const rx = new RegExp(qQ.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      and.push({ $or: [{ name: rx }, { specialty_guess: rx }, { primary_type: rx }] });
+    }
+    if (ortQ) {
+      const rx = new RegExp(ortQ.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      and.push({ $or: [{ city: rx }, { city_slug: slugify(ortQ) }, { postal_code: rx }, { formatted_address: rx }] });
+    }
+    if (and.length) filter.$and = and;
+    const docs = await col.find(filter).sort({ updated_at: -1 }).limit(limit).toArray();
+    return json({ results: docs.map(stripId) });
+  }
+
   // GET /api/admin/logs?job_id=...
   if (pathParts[0] === 'admin' && pathParts[1] === 'logs') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
@@ -231,6 +253,32 @@ async function handlePost(request, pathParts) {
   return json({ error: 'Not found' }, { status: 404 });
 }
 
+async function handlePut(request, pathParts) {
+  let body = {};
+  try { body = await request.json(); } catch { body = {}; }
+
+  // PUT /api/admin/doctors/:id
+  if (pathParts[0] === 'admin' && pathParts[1] === 'doctors' && pathParts[2]) {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const id = pathParts[2];
+    const col = await getCollection('doctor_places');
+    const allowed = {};
+    if (body.specialty_guess !== undefined) {
+      allowed.specialty_guess = body.specialty_guess === '' ? null : body.specialty_guess;
+      allowed.specialty_confidence = 1.0; // manuell = maximale Confidence
+    }
+    if (typeof body.is_verified === 'boolean') allowed.is_verified = body.is_verified;
+    if (typeof body.is_active === 'boolean') allowed.is_active = body.is_active;
+    if (Object.keys(allowed).length === 0) return json({ error: 'Keine Felder' }, { status: 400 });
+    allowed.updated_at = new Date();
+    const res = await col.findOneAndUpdate({ id }, { $set: allowed }, { returnDocument: 'after' });
+    if (!res) return json({ error: 'Nicht gefunden' }, { status: 404 });
+    return json({ ok: true, doctor: stripId(res) });
+  }
+
+  return json({ error: 'Not found' }, { status: 404 });
+}
+
 export async function GET(request, { params }) {
   const resolved = await params;
   const pathParts = resolved.path || [];
@@ -249,6 +297,17 @@ export async function POST(request, { params }) {
     return await handlePost(request, pathParts);
   } catch (err) {
     console.error('POST error', err);
+    return json({ error: String(err.message || err) }, { status: 500 });
+  }
+}
+
+export async function PUT(request, { params }) {
+  const resolved = await params;
+  const pathParts = resolved.path || [];
+  try {
+    return await handlePut(request, pathParts);
+  } catch (err) {
+    console.error('PUT error', err);
     return json({ error: String(err.message || err) }, { status: 500 });
   }
 }
