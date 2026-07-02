@@ -1,7 +1,9 @@
 import './globals.css';
 import { Toaster } from 'sonner';
+import Script from 'next/script';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
+const ADSENSE_CLIENT = 'ca-pub-8583619451045805';
 
 export const metadata = {
   metadataBase: new URL(BASE_URL),
@@ -84,10 +86,17 @@ export default function RootLayout({ children }) {
   return (
     <html lang="de">
       <head>
+        <meta name="google-adsense-account" content={ADSENSE_CLIENT} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       </head>
       <body className="min-h-screen bg-white text-slate-900 antialiased">
+        <Script
+          async
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+        />
         <Header />
         <main>{children}</main>
         <Footer />
