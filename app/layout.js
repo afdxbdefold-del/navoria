@@ -40,7 +40,6 @@ function Header() {
           <a href="/" className="hover:text-sky-600">Start</a>
           <a href="/suche" className="hover:text-sky-600">Suche</a>
           <a href="/aerzte" className="hover:text-sky-600">Ärzte-Verzeichnis</a>
-          <a href="/admin" className="hover:text-sky-600">Admin</a>
         </nav>
       </div>
     </header>
