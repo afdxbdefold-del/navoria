@@ -184,6 +184,23 @@ async function handleGet(request, pathParts) {
     return json(list.map(stripId));
   }
 
+  // GET /api/admin/campaigns
+  if (pathParts[0] === 'admin' && pathParts[1] === 'campaigns' && !pathParts[2]) {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const col = await getCollection('campaigns');
+    const list = await col.find({}).sort({ created_at: -1 }).limit(20).toArray();
+    return json(list.map(stripId));
+  }
+
+  // GET /api/admin/campaigns/:id
+  if (pathParts[0] === 'admin' && pathParts[1] === 'campaigns' && pathParts[2]) {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const col = await getCollection('campaigns');
+    const c = await col.findOne({ id: pathParts[2] });
+    if (!c) return json({ error: 'Nicht gefunden' }, { status: 404 });
+    return json(stripId(c));
+  }
+
   // GET /api/admin/doctors?q=&ort=&limit=
   if (pathParts[0] === 'admin' && pathParts[1] === 'doctors' && !pathParts[2]) {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
@@ -231,6 +248,21 @@ async function handlePost(request, pathParts) {
       return json({ ok: true, token, expires_at: expiresAt });
     }
     return json({ error: 'Falsche Zugangsdaten' }, { status: 401 });
+  }
+
+  // POST /api/admin/campaigns - Bulk-Import-Kampagne starten
+  if (pathParts[0] === 'admin' && pathParts[1] === 'campaigns') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const { cities, specialtySlugs, maxPerQuery } = body;
+    if (!Array.isArray(cities) || cities.length === 0) return json({ error: 'Keine Städte ausgewählt' }, { status: 400 });
+    if (!Array.isArray(specialtySlugs) || specialtySlugs.length === 0) return json({ error: 'Keine Fachrichtungen ausgewählt' }, { status: 400 });
+    try {
+      const { createCampaign } = await import('@/lib/services/campaignWorker');
+      const campaign = await createCampaign({ cities, specialtySlugs, maxPerQuery: Math.min(parseInt(maxPerQuery || 60, 10), 60) });
+      return json({ ok: true, campaign: stripId(campaign) });
+    } catch (err) {
+      return json({ error: String(err.message || err) }, { status: 500 });
+    }
   }
 
   // POST /api/admin/sync
