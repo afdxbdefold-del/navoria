@@ -1,15 +1,92 @@
 import './globals.css';
 import { Toaster } from 'sonner';
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
+
 export const metadata = {
-  title: 'Navoria – Ihr nächster Arzt. Ohne Umwege.',
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: 'Navoria – Ihr nächster Arzt. Ohne Umwege.',
+    template: '%s | Navoria',
+  },
   description: 'Ärzte und Praxen in Deutschland finden. Adresse, Telefon, Öffnungszeiten und Bewertungen kompakt auf einer Seite.',
-  keywords: ['Arztsuche', 'Arzt finden', 'Praxis', 'Zahnarzt', 'Facharzt', 'Deutschland', 'Navoria'],
+  keywords: ['Arztsuche', 'Arzt finden', 'Praxis', 'Zahnarzt', 'Facharzt', 'Hausarzt', 'Deutschland', 'Navoria', 'Praxis finden', 'Ärzteverzeichnis'],
+  authors: [{ name: 'Navoria' }],
+  applicationName: 'Navoria',
+  creator: 'Navoria',
+  publisher: 'Navoria',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'de_DE',
+    url: BASE_URL,
+    siteName: 'Navoria',
+    title: 'Navoria – Ihr nächster Arzt. Ohne Umwege.',
+    description: 'Ärzte und Praxen in Deutschland finden. Adresse, Telefon, Öffnungszeiten und Bewertungen kompakt auf einer Seite.',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Navoria – Ihr nächster Arzt. Ohne Umwege.',
+    description: 'Ärzte und Praxen in Deutschland finden.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+    },
+  },
+  formatDetection: {
+    telephone: true,
+    address: true,
+    email: false,
+  },
+};
+
+export const viewport = {
+  themeColor: '#0EA5E9',
+  colorScheme: 'light',
+  width: 'device-width',
+  initialScale: 1,
+};
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Navoria',
+  url: BASE_URL,
+  inLanguage: 'de-DE',
+  description: 'Ärzte und Praxen in Deutschland finden. Navoria ist ein öffentliches Verzeichnis für Arzt-, Zahnarzt- und Facharztpraxen.',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: { '@type': 'EntryPoint', urlTemplate: `${BASE_URL}/suche?q={search_term_string}` },
+    'query-input': 'required name=search_term_string',
+  },
+};
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Navoria',
+  url: BASE_URL,
+  logo: `${BASE_URL}/icon.svg`,
+  slogan: 'Ihr nächster Arzt. Ohne Umwege.',
+  sameAs: [],
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="de">
+      <head>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+      </head>
       <body className="min-h-screen bg-white text-slate-900 antialiased">
         <Header />
         <main>{children}</main>

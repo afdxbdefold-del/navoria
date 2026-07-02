@@ -43,8 +43,31 @@ export default async function CityPage({ params }) {
     if (d.specialty_guess) bySpecialty[d.specialty_guess] = (bySpecialty[d.specialty_guess] || 0) + 1;
   });
 
+  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const collectionSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `Ärzte in ${cityName}`,
+    description: `Übersicht von Ärzten und Praxen in ${cityName}.`,
+    url: `${base}/aerzte/${stadt}`,
+    inLanguage: 'de-DE',
+    isPartOf: { '@type': 'WebSite', name: 'Navoria', url: base },
+    numberOfItems: doctors.length,
+  };
+  const breadcrumb = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Start', item: `${base}/` },
+      { '@type': 'ListItem', position: 2, name: 'Ärzte', item: `${base}/aerzte` },
+      { '@type': 'ListItem', position: 3, name: cityName, item: `${base}/aerzte/${stadt}` },
+    ],
+  };
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <nav className="mb-4 text-xs text-slate-500">
         <Link href="/" className="hover:text-sky-700">Start</Link> <span>/</span>
         <Link href="/aerzte" className="hover:text-sky-700"> Ärzte</Link> <span>/</span>

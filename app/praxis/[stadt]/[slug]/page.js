@@ -50,9 +50,22 @@ export default async function ProfilePage({ params }) {
     geo: d.latitude && d.longitude ? { '@type': 'GeoCoordinates', latitude: d.latitude, longitude: d.longitude } : undefined,
   };
 
+  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const breadcrumb = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Start', item: `${base}/` },
+      { '@type': 'ListItem', position: 2, name: 'Ärzte', item: `${base}/aerzte` },
+      ...(d.city ? [{ '@type': 'ListItem', position: 3, name: d.city, item: `${base}/aerzte/${d.city_slug}` }] : []),
+      { '@type': 'ListItem', position: d.city ? 4 : 3, name: d.name, item: `${base}/praxis/${d.city_slug}/${d.slug}` },
+    ],
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
 
       <nav className="mb-4 flex items-center gap-2 text-xs text-slate-500">
         <Link href="/" className="hover:text-sky-700">Start</Link>
