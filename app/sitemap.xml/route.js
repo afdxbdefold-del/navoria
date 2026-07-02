@@ -1,6 +1,8 @@
 import { getCollection } from '@/lib/mongodb';
 import { SPECIALTIES } from '@/lib/specialties';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
   const citiesCol = await getCollection('cities');

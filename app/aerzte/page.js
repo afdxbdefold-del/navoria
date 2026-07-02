@@ -8,7 +8,8 @@ export const metadata = {
   description: 'Übersicht aller Standorte und Fachrichtungen bei Navoria. Ihr direkter Einstieg zur passenden Praxis in Deutschland.',
 };
 
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function AerzteHubPage() {
   const citiesCol = await getCollection('cities');
