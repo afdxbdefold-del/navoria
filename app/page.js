@@ -61,7 +61,7 @@ export default function HomePage() {
         </div>
         <div className="mx-auto max-w-5xl px-4 pt-16 pb-10 text-center sm:px-6 sm:pt-24">
           <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white/70 px-3 py-1 text-xs font-medium text-sky-700">
-            <ShieldCheck className="h-3.5 w-3.5" /> Werbefrei · Verifiziert · Für Patienten gemacht
+            <ShieldCheck className="h-3.5 w-3.5" /> Für Patienten gemacht
           </div>
           <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
             Ihr nächster Arzt. <span className="bg-gradient-to-r from-sky-600 to-teal-500 bg-clip-text text-transparent">Ohne Umwege.</span>
