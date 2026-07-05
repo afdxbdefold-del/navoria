@@ -187,16 +187,19 @@ async function handleGet(request, pathParts) {
   // GET /api/admin/campaigns
   if (pathParts[0] === 'admin' && pathParts[1] === 'campaigns' && !pathParts[2]) {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    // Self-heal: markiere hängende Kampagnen (>5min ohne Heartbeat) automatisch als aborted
+    try { const { healStuckCampaigns } = await import('@/lib/services/campaignWorker'); await healStuckCampaigns(); } catch {}
     const col = await getCollection('campaigns');
-    const list = await col.find({}).sort({ created_at: -1 }).limit(20).toArray();
+    // queries-Array ist groß - beim Listing weglassen
+    const list = await col.find({}, { projection: { queries: 0 } }).sort({ created_at: -1 }).limit(20).toArray();
     return json(list.map(stripId));
   }
 
   // GET /api/admin/campaigns/:id
-  if (pathParts[0] === 'admin' && pathParts[1] === 'campaigns' && pathParts[2]) {
+  if (pathParts[0] === 'admin' && pathParts[1] === 'campaigns' && pathParts[2] && !pathParts[3]) {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
     const col = await getCollection('campaigns');
-    const c = await col.findOne({ id: pathParts[2] });
+    const c = await col.findOne({ id: pathParts[2] }, { projection: { queries: 0 } });
     if (!c) return json({ error: 'Nicht gefunden' }, { status: 404 });
     return json(stripId(c));
   }
@@ -248,6 +251,30 @@ async function handlePost(request, pathParts) {
       return json({ ok: true, token, expires_at: expiresAt });
     }
     return json({ error: 'Falsche Zugangsdaten' }, { status: 401 });
+  }
+
+  // POST /api/admin/campaigns/:id/abort
+  if (pathParts[0] === 'admin' && pathParts[1] === 'campaigns' && pathParts[2] && pathParts[3] === 'abort') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    try {
+      const { abortCampaign } = await import('@/lib/services/campaignWorker');
+      await abortCampaign(pathParts[2]);
+      return json({ ok: true });
+    } catch (err) {
+      return json({ error: String(err.message || err) }, { status: 500 });
+    }
+  }
+
+  // POST /api/admin/campaigns/:id/resume
+  if (pathParts[0] === 'admin' && pathParts[1] === 'campaigns' && pathParts[2] && pathParts[3] === 'resume') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    try {
+      const { resumeCampaign } = await import('@/lib/services/campaignWorker');
+      await resumeCampaign(pathParts[2]);
+      return json({ ok: true });
+    } catch (err) {
+      return json({ error: String(err.message || err) }, { status: 500 });
+    }
   }
 
   // POST /api/admin/campaigns - Bulk-Import-Kampagne starten

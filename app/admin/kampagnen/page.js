@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { ArrowLeft, Play, Loader2, CheckCircle2, AlertTriangle, RefreshCw, Rocket, MapPin, Stethoscope, Clock, TrendingUp } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertTriangle, RefreshCw, Play, Pause, RotateCw, Rocket, MapPin, Stethoscope, Clock, TrendingUp, ArrowLeft } from 'lucide-react';
 import { TOP_100_CITIES } from '@/lib/germanCities';
 import { SPECIALTIES } from '@/lib/specialties';
 
@@ -59,7 +59,9 @@ export default function KampagnenPage() {
           clearInterval(pollRef.current);
           pollRef.current = null;
           loadCampaigns();
-          toast.success(`Kampagne fertig: ${data.inserted} neu, ${data.updated} aktualisiert`);
+          if (data.status === 'succeeded') toast.success(`Kampagne fertig: ${data.inserted} neu, ${data.updated} aktualisiert`);
+          else if (data.status === 'aborted') toast.info(`Kampagne abgebrochen (${data.done_queries}/${data.total_queries} Queries fertig).`);
+          else if (data.status === 'failed') toast.error(`Kampagne fehlgeschlagen`);
         }
       } catch {}
     }, 2500);
@@ -91,6 +93,25 @@ export default function KampagnenPage() {
     setStarting(false);
   };
 
+  const abortCampaign = async (id) => {
+    if (!confirm('Kampagne wirklich abbrechen? Der bisherige Fortschritt bleibt erhalten.')) return;
+    try {
+      const r = await fetch(`/api/admin/campaigns/${id}/abort`, { method: 'POST', headers: auth });
+      if (!r.ok) throw new Error((await r.json()).error || 'Fehler');
+      toast.success('Abbruch angefordert – Worker beendet nach der aktuellen Query.');
+      setTimeout(loadCampaigns, 1500);
+    } catch (e) { toast.error(String(e.message || e)); }
+  };
+
+  const resumeCampaign = async (id) => {
+    try {
+      const r = await fetch(`/api/admin/campaigns/${id}/resume`, { method: 'POST', headers: auth });
+      if (!r.ok) throw new Error((await r.json()).error || 'Fehler');
+      toast.success('Kampagne wird fortgesetzt.');
+      loadCampaigns();
+    } catch (e) { toast.error(String(e.message || e)); }
+  };
+
   if (!token) return null;
 
   return (
@@ -107,9 +128,23 @@ export default function KampagnenPage() {
       {/* Aktive Kampagne */}
       {activeCampaign && (
         <div className="card-soft mt-6 border-sky-100 bg-sky-50/30 p-6">
-          <div className="flex items-center gap-2 text-sm font-semibold text-sky-800">
-            {activeCampaign.status === 'running' ? <Loader2 className="h-4 w-4 animate-spin" /> : activeCampaign.status === 'succeeded' ? <CheckCircle2 className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
-            {activeCampaign.status === 'running' ? 'Kampagne läuft …' : 'Zuletzt abgeschlossen'}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-sky-800">
+              {activeCampaign.status === 'running' ? <Loader2 className="h-4 w-4 animate-spin" /> : activeCampaign.status === 'succeeded' ? <CheckCircle2 className="h-4 w-4" /> : activeCampaign.status === 'aborted' ? <Pause className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
+              {activeCampaign.status === 'running' ? 'Kampagne läuft …' : activeCampaign.status === 'aborted' ? 'Kampagne abgebrochen' : 'Zuletzt abgeschlossen'}
+            </div>
+            <div className="flex gap-2">
+              {activeCampaign.status === 'running' && (
+                <button onClick={() => abortCampaign(activeCampaign.id)} className="inline-flex items-center rounded-xl border border-rose-200 bg-white px-4 py-2 text-sm font-medium text-rose-700 transition hover:bg-rose-50">
+                  <Pause className="mr-1.5 h-4 w-4" /> Abbrechen
+                </button>
+              )}
+              {activeCampaign.status === 'aborted' && activeCampaign.done_queries < activeCampaign.total_queries && (
+                <button onClick={() => resumeCampaign(activeCampaign.id)} className="inline-flex items-center rounded-xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700">
+                  <RotateCw className="mr-1.5 h-4 w-4" /> Fortsetzen ({activeCampaign.total_queries - activeCampaign.done_queries} offen)
+                </button>
+              )}
+            </div>
           </div>
           <div className="mt-2 text-lg font-semibold text-slate-900">{activeCampaign.name}</div>
           <div className="mt-3">
@@ -222,7 +257,7 @@ export default function KampagnenPage() {
           <div className="divide-y divide-slate-100">
             {campaigns.map((c) => (
               <div key={c.id} className="p-4">
-                <div className="flex items-center justify-between gap-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 text-sm">
                       <StatusBadge status={c.status} />
@@ -235,6 +270,18 @@ export default function KampagnenPage() {
                       <span>Aktualisiert: <b className="text-sky-700">{c.updated}</b></span>
                       <span>Fehler: <b className="text-rose-700">{c.errors}</b></span>
                     </div>
+                  </div>
+                  <div className="flex gap-2 shrink-0">
+                    {c.status === 'running' && (
+                      <button onClick={() => abortCampaign(c.id)} className="inline-flex items-center rounded-xl border border-rose-200 bg-white px-3 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-50">
+                        <Pause className="mr-1 h-3 w-3" /> Abbrechen
+                      </button>
+                    )}
+                    {(c.status === 'aborted' || c.status === 'failed') && c.done_queries < c.total_queries && (
+                      <button onClick={() => resumeCampaign(c.id)} className="inline-flex items-center rounded-xl bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-sky-700">
+                        <RotateCw className="mr-1 h-3 w-3" /> Fortsetzen
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -258,5 +305,6 @@ function Stat({ label, value, color = 'text-slate-900' }) {
 function StatusBadge({ status }) {
   if (status === 'succeeded') return <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700"><CheckCircle2 className="h-3 w-3" /> fertig</span>;
   if (status === 'failed') return <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-xs font-medium text-rose-700"><AlertTriangle className="h-3 w-3" /> Fehler</span>;
+  if (status === 'aborted') return <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700"><Pause className="h-3 w-3" /> abgebrochen</span>;
   return <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2 py-0.5 text-xs font-medium text-sky-700"><Loader2 className="h-3 w-3 animate-spin" /> läuft</span>;
 }
