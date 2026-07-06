@@ -20,7 +20,7 @@ export default function AdminDuplikatePage() {
 }
 
 function DuplicatesView({ token }) {
-  const [type, setType] = useState('address'); // 'address' | 'name'
+  const [type, setType] = useState('safe'); // 'safe' | 'similar_name' | 'address'
   const [cityFilter, setCityFilter] = useState('');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -162,7 +162,11 @@ function DuplicatesView({ token }) {
           icon={Layers}
           label="Duplikat-Gruppen"
           value={data.total_groups}
-          hint={type === 'address' ? 'Adressen mit >1 Eintrag' : 'Name+Stadt-Kombinationen mit >1 Eintrag'}
+          hint={
+            type === 'safe' ? 'Sichere Duplikate: selbes Google-Place-ID, Adresse+Telefon oder Adresse+Website'
+            : type === 'similar_name' ? 'Selbe Adresse UND ähnlicher Name (>60% Überlappung)'
+            : 'Selbe Adresse – ⚠️ Ärztehäuser können hier auftauchen!'
+          }
         />
         <StatCard
           icon={AlertTriangle}
@@ -180,20 +184,58 @@ function DuplicatesView({ token }) {
         />
       </div>
 
+      {/* Modus-Beschreibung */}
+      {type === 'safe' && (
+        <div className="mt-6 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 text-sm text-emerald-900">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+          <div>
+            <b>Hohe Konfidenz — sicher zu verwerfen.</b> Diese Gruppen basieren auf mindestens einem starken Signal:
+            <span className="ml-1 inline-flex flex-wrap gap-1">
+              <span className="rounded bg-white px-1.5 py-0.5 text-[11px] font-mono">selbes Google-Place-ID</span>
+              <span className="rounded bg-white px-1.5 py-0.5 text-[11px] font-mono">Adresse + Telefon</span>
+              <span className="rounded bg-white px-1.5 py-0.5 text-[11px] font-mono">Adresse + Website</span>
+            </span>
+            <span className="ml-1">Ärztehäuser werden korrekt getrennt behandelt.</span>
+          </div>
+        </div>
+      )}
+      {type === 'similar_name' && (
+        <div className="mt-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/60 p-4 text-sm text-amber-900">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <div>
+            <b>Mittlere Konfidenz — sorgfältig prüfen.</b> Selbe Adresse und ≥60% Wortüberlappung im Namen. Meist echte Duplikate (Import-Varianten wie „Dr. Meyer“ vs. „Praxis Dr. Meyer“), aber Restrisiko für Namens-Zufälle in Ärztehäusern.
+          </div>
+        </div>
+      )}
+      {type === 'address' && (
+        <div className="mt-6 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50/60 p-4 text-sm text-rose-900">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <div>
+            <b>⚠️ Niedrige Konfidenz — Ärztehaus-Falle!</b> Nur Adressen-Match, ohne weiteres Signal. In Ärztehäusern sitzen mehrere legitim unterschiedliche Praxen an derselben Adresse und werden hier fälschlich als Duplikate angezeigt. Nur mit manueller Prüfung verwerfen.
+          </div>
+        </div>
+      )}
+
       {/* Tab-Umschalter + Filter */}
-      <div className="mt-6 flex flex-wrap items-center gap-2">
+      <div className="mt-4 flex flex-wrap items-center gap-2">
         <div className="inline-flex rounded-lg border border-slate-200 bg-white p-1">
           <button
-            onClick={() => setType('address')}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${type === 'address' ? 'bg-sky-100 text-sky-800' : 'text-slate-600 hover:text-slate-900'}`}
+            onClick={() => setType('safe')}
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${type === 'safe' ? 'bg-emerald-100 text-emerald-800' : 'text-slate-600 hover:text-slate-900'}`}
           >
-            <MapPin className="mr-1 inline h-3.5 w-3.5" /> Gleiche Adresse
+            <CheckCircle2 className="mr-1 inline h-3.5 w-3.5" /> Sichere Duplikate
           </button>
           <button
-            onClick={() => setType('name')}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${type === 'name' ? 'bg-sky-100 text-sky-800' : 'text-slate-600 hover:text-slate-900'}`}
+            onClick={() => setType('similar_name')}
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${type === 'similar_name' ? 'bg-amber-100 text-amber-800' : 'text-slate-600 hover:text-slate-900'}`}
           >
-            <Sparkles className="mr-1 inline h-3.5 w-3.5" /> Gleicher Name + Stadt
+            <Sparkles className="mr-1 inline h-3.5 w-3.5" /> Ähnlicher Name
+          </button>
+          <button
+            onClick={() => setType('address')}
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${type === 'address' ? 'bg-rose-100 text-rose-800' : 'text-slate-600 hover:text-slate-900'}`}
+          >
+            <MapPin className="mr-1 inline h-3.5 w-3.5" /> Nur Adresse
           </button>
         </div>
 
@@ -329,21 +371,46 @@ function StatCard({ icon: Icon, label, value, hint, tone }) {
   );
 }
 
+function reasonLabels(reasons) {
+  const map = {
+    'place_id': { label: 'Google-Place-ID', tone: 'emerald' },
+    'address+phone': { label: 'Adresse + Telefon', tone: 'emerald' },
+    'address+website': { label: 'Adresse + Website', tone: 'emerald' },
+    'address+similar_name': { label: 'Adresse + ähnlicher Name', tone: 'amber' },
+    'address_only': { label: 'Nur Adresse', tone: 'rose' },
+  };
+  return (reasons || []).map((r) => map[r] || { label: r, tone: 'slate' });
+}
+
 function GroupCard({ group, type, selectedIds, onToggle, onApplySuggestion, onClearGroup }) {
   const selectedInGroup = (group.docs || []).filter((d) => selectedIds.has(d.id)).length;
   const suggestionApplied = (group.docs || []).every((d) =>
     d.is_suggested_discard ? selectedIds.has(d.id) : !selectedIds.has(d.id)
   );
+  const labels = reasonLabels(group.reasons);
 
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-slate-50/70 px-4 py-3">
         <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-white px-2 py-0.5 text-xs font-semibold text-rose-700">
-              {group.count}× {type === 'name' ? 'gleicher Name' : 'gleiche Adresse'}
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs font-semibold text-slate-700">
+              {group.count}× dupliziert
             </span>
+            {labels.map((r, i) => (
+              <span
+                key={i}
+                className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${
+                  r.tone === 'emerald' ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                  : r.tone === 'amber' ? 'border-amber-200 bg-amber-50 text-amber-800'
+                  : r.tone === 'rose' ? 'border-rose-200 bg-rose-50 text-rose-700'
+                  : 'border-slate-200 bg-white text-slate-600'
+                }`}
+              >
+                {r.label}
+              </span>
+            ))}
             {selectedInGroup > 0 && (
               <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">
                 {selectedInGroup} markiert
@@ -351,7 +418,7 @@ function GroupCard({ group, type, selectedIds, onToggle, onApplySuggestion, onCl
             )}
           </div>
           <p className="mt-1 truncate text-sm font-medium text-slate-800" title={group.label}>
-            {type === 'address' ? <MapPin className="mr-1 inline h-3.5 w-3.5 text-slate-400" /> : <Sparkles className="mr-1 inline h-3.5 w-3.5 text-slate-400" />}
+            <MapPin className="mr-1 inline h-3.5 w-3.5 text-slate-400" />
             {group.label || '(keine Adresse)'}
           </p>
         </div>

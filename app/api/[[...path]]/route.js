@@ -297,66 +297,49 @@ async function handleGet(request, pathParts) {
     return json({ items: list, match_count: matchCount, all_cities: allCities, limit, offset, ...totals });
   }
 
-  // GET /api/admin/duplicates?type=address|name&limit=&offset=
-  //   Findet Gruppen mit >1 aktivem Eintrag an derselben Adresse ODER mit identischem Namen in derselben Stadt.
-  //   Fügt jeder Gruppe automatisch einen Vorschlag hinzu: der "beste" Eintrag wird behalten (is_suggested_keep),
-  //   alle anderen werden zum Verwerfen vorgeschlagen (is_suggested_discard).
+  // GET /api/admin/duplicates?type=safe|similar_name|address&limit=&offset=&city=
+  //   Findet Duplikat-Gruppen. Drei Modi mit unterschiedlicher Konfidenz:
+  //     safe          – sehr hohe Konfidenz: selbe google_place_id ODER Adresse+Telefon
+  //                     ODER Adresse+Website-Domain (Ärztehaus-safe: schließt legitime
+  //                     Mehrfach-Praxen an einer Adresse aus)
+  //     similar_name  – mittlere Konfidenz: selbe Adresse UND ähnlicher Name (>60% Overlap)
+  //     address       – niedrige Konfidenz: nur selbe Adresse (⚠️ enthält Ärztehäuser!)
   if (pathParts[0] === 'admin' && pathParts[1] === 'duplicates') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
-    const type = params.get('type') === 'name' ? 'name' : 'address';
+    const rawType = params.get('type') || 'safe';
+    const type = ['safe', 'similar_name', 'address'].includes(rawType) ? rawType : 'safe';
     const limit = Math.min(parseInt(params.get('limit') || '100', 10), 500);
     const offset = Math.max(parseInt(params.get('offset') || '0', 10), 0);
     const cityFilter = (params.get('city') || '').trim();
 
     const col = await getCollection('doctor_places');
-    const matchStage = { is_active: { $ne: false } };
-    if (cityFilter) matchStage.city = cityFilter;
 
-    let groupId;
-    if (type === 'name') {
-      matchStage.name = { $exists: true, $ne: null, $ne: '' };
-      matchStage.city_slug = { $exists: true, $ne: null, $ne: '' };
-      groupId = { name_key: { $toLower: { $trim: { input: '$name' } } }, city_slug: '$city_slug' };
-    } else {
-      matchStage.formatted_address = { $exists: true, $ne: null, $ne: '' };
-      groupId = { addr_key: { $toLower: { $trim: { input: '$formatted_address' } } } };
-    }
-
-    const docShape = {
-      id: '$id', name: '$name', slug: '$slug', city: '$city', city_slug: '$city_slug',
-      formatted_address: '$formatted_address', rating: '$rating',
-      user_rating_count: '$user_rating_count', website_url: '$website_url',
-      is_verified: '$is_verified', specialty_guess: '$specialty_guess',
-      phone_national: '$phone_national', google_place_id: '$google_place_id',
-      google_maps_url: '$google_maps_url', opening_hours_json: '$opening_hours_json',
-      created_at: '$created_at', updated_at: '$updated_at',
+    // Hilfsfunktionen (JavaScript-seitig, weil MongoDB-Aggregation für diese Logik zu spröde ist)
+    const normPhone = (p) => {
+      if (!p) return '';
+      const digits = String(p).replace(/\D/g, '');
+      // Deutsche Nummern: +49 → 0-Prefix behandeln; nimm die letzten 10 Ziffern
+      return digits.slice(-10);
     };
-
-    // Zwei Aggregations parallel: Gesamt-Match-Count und die aktuelle Seite
-    const pipelineBase = [
-      { $match: matchStage },
-      { $group: { _id: groupId, count: { $sum: 1 }, docs: { $push: docShape } } },
-      { $match: { count: { $gt: 1 } } },
-    ];
-    const [totalGroupsAgg, groupsPage, totalDupesAgg] = await Promise.all([
-      col.aggregate([...pipelineBase, { $count: 'n' }]).toArray(),
-      col.aggregate([
-        ...pipelineBase,
-        { $sort: { count: -1, '_id': 1 } },
-        { $skip: offset },
-        { $limit: limit },
-      ]).toArray(),
-      col.aggregate([
-        ...pipelineBase,
-        { $group: { _id: null, groups: { $sum: 1 }, total_docs: { $sum: '$count' } } },
-      ]).toArray(),
-    ]);
-
-    const totalGroups = totalGroupsAgg[0]?.n || 0;
-    const totalStats = totalDupesAgg[0] || { groups: 0, total_docs: 0 };
-
-    // Score-Funktion: bester Eintrag pro Gruppe
-    const score = (d) => {
+    const normWebsite = (url) => {
+      if (!url) return '';
+      try {
+        const u = new URL(url.startsWith('http') ? url : `https://${url}`);
+        return u.hostname.replace(/^www\./, '').toLowerCase();
+      } catch { return String(url).toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0]; }
+    };
+    const normAddress = (a) => (a || '').toLowerCase().trim().replace(/\s+/g, ' ');
+    const normName = (n) => {
+      // Entferne diakritische Zeichen, häufige Präfixe/Suffixe, um Kernnamen zu vergleichen
+      const s = (n || '').toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Umlaute weg
+        .replace(/\b(dr\.?|med\.?|prof\.?|praxis|praxen|mvz|hausarztpraxis|zahnarztpraxis|hausarzt|zahnarzt|kardiologe|orthopaede|orthopade|facharzt|fachärztin|allgemeinmedizin|dipl\.?)\b/g, ' ')
+        .replace(/[^a-z0-9 ]/g, ' ')
+        .replace(/\s+/g, ' ').trim();
+      return s;
+    };
+    // Konfidenz-Score einer Gruppe (welchen behalten wir)
+    const scoreDoc = (d) => {
       let s = 0;
       if (d.website_url) s += 5;
       if (d.is_verified) s += 3;
@@ -364,45 +347,192 @@ async function handleGet(request, pathParts) {
       if (d.opening_hours_json) s += 1;
       s += (d.rating || 0);
       s += Math.log((d.user_rating_count || 0) + 1) * 0.5;
-      return s;
+      return Math.round(s * 100) / 100;
+    };
+    // Wortüberlappungs-Metrik für Namen (Jaccard-Index)
+    const nameOverlap = (a, b) => {
+      const ta = new Set(normName(a).split(' ').filter((w) => w.length > 2));
+      const tb = new Set(normName(b).split(' ').filter((w) => w.length > 2));
+      if (ta.size === 0 || tb.size === 0) return 0;
+      const inter = [...ta].filter((w) => tb.has(w)).length;
+      const uni = new Set([...ta, ...tb]).size;
+      return inter / uni;
     };
 
-    const groups = groupsPage.map((g) => {
-      const docs = (g.docs || []).map((d) => ({ ...d, _score: Math.round(score(d) * 100) / 100 }));
+    // Basis-Filter: nur aktive Praxen, ggf. Stadt-Einschränkung
+    const baseMatch = { is_active: { $ne: false } };
+    if (cityFilter) baseMatch.city = cityFilter;
+
+    // Alle relevanten Praxen einmal laden (mit Feld-Projection)
+    const allDocs = await col.find(baseMatch, {
+      projection: {
+        _id: 0,
+        id: 1, name: 1, slug: 1, city: 1, city_slug: 1,
+        formatted_address: 1, rating: 1, user_rating_count: 1,
+        website_url: 1, is_verified: 1, specialty_guess: 1,
+        phone_national: 1, phone_international: 1, google_place_id: 1,
+        google_maps_url: 1, opening_hours_json: 1, primary_type: 1,
+      },
+    }).toArray();
+
+    // === Grouping-Logik je Modus ===
+    let rawGroups = []; // Array von Arrays: pro Gruppe die enthaltenen Doc-IDs
+
+    if (type === 'safe') {
+      // Drei parallele Gruppierungen, dann Union-Find zum Verschmelzen überlappender Signale
+      const parent = new Map();
+      const find = (x) => { while (parent.get(x) !== x) { parent.set(x, parent.get(parent.get(x))); x = parent.get(x); } return x; };
+      const union = (a, b) => { const ra = find(a), rb = find(b); if (ra !== rb) parent.set(ra, rb); };
+      allDocs.forEach((d) => parent.set(d.id, d.id));
+
+      // Signal 1: google_place_id (falls doppelt vergeben)
+      const byPlaceId = new Map();
+      for (const d of allDocs) {
+        if (!d.google_place_id) continue;
+        const k = d.google_place_id;
+        if (!byPlaceId.has(k)) byPlaceId.set(k, []);
+        byPlaceId.get(k).push(d);
+      }
+      // Signal 2: Adresse + Telefon
+      const byAddrPhone = new Map();
+      for (const d of allDocs) {
+        const addr = normAddress(d.formatted_address);
+        const phone = normPhone(d.phone_national) || normPhone(d.phone_international);
+        if (!addr || !phone) continue;
+        const k = `${addr}|${phone}`;
+        if (!byAddrPhone.has(k)) byAddrPhone.set(k, []);
+        byAddrPhone.get(k).push(d);
+      }
+      // Signal 3: Adresse + Website-Domain
+      const byAddrWeb = new Map();
+      for (const d of allDocs) {
+        const addr = normAddress(d.formatted_address);
+        const web = normWebsite(d.website_url);
+        if (!addr || !web) continue;
+        const k = `${addr}|${web}`;
+        if (!byAddrWeb.has(k)) byAddrWeb.set(k, []);
+        byAddrWeb.get(k).push(d);
+      }
+
+      // Union: merke, welches Signal welches Paar verbindet
+      const signalsPerDoc = new Map(); // docId → Set of reason codes
+      const addSignal = (id, reason) => {
+        if (!signalsPerDoc.has(id)) signalsPerDoc.set(id, new Set());
+        signalsPerDoc.get(id).add(reason);
+      };
+      for (const arr of byPlaceId.values()) {
+        if (arr.length < 2) continue;
+        for (let i = 1; i < arr.length; i += 1) union(arr[0].id, arr[i].id);
+        arr.forEach((d) => addSignal(d.id, 'place_id'));
+      }
+      for (const arr of byAddrPhone.values()) {
+        if (arr.length < 2) continue;
+        for (let i = 1; i < arr.length; i += 1) union(arr[0].id, arr[i].id);
+        arr.forEach((d) => addSignal(d.id, 'address+phone'));
+      }
+      for (const arr of byAddrWeb.values()) {
+        if (arr.length < 2) continue;
+        for (let i = 1; i < arr.length; i += 1) union(arr[0].id, arr[i].id);
+        arr.forEach((d) => addSignal(d.id, 'address+website'));
+      }
+
+      // Sammel Docs pro Root-ID
+      const clusters = new Map();
+      for (const d of allDocs) {
+        if (!signalsPerDoc.has(d.id)) continue; // gehört zu keinem Signal
+        const r = find(d.id);
+        if (!clusters.has(r)) clusters.set(r, []);
+        clusters.get(r).push(d);
+      }
+      rawGroups = [...clusters.values()].filter((g) => g.length > 1)
+        .map((docs) => ({ docs, reasons: [...new Set(docs.flatMap((d) => [...(signalsPerDoc.get(d.id) || [])]))] }));
+    } else if (type === 'similar_name') {
+      // Adresse gleich → Kandidaten. Innerhalb jeder Kandidatengruppe: Paare mit
+      // Namensüberlappung > 0.6 werden geclustert (Union-Find)
+      const byAddr = new Map();
+      for (const d of allDocs) {
+        const addr = normAddress(d.formatted_address);
+        if (!addr) continue;
+        if (!byAddr.has(addr)) byAddr.set(addr, []);
+        byAddr.get(addr).push(d);
+      }
+      const parent = new Map();
+      const find = (x) => { while (parent.get(x) !== x) { parent.set(x, parent.get(parent.get(x))); x = parent.get(x); } return x; };
+      const union = (a, b) => { const ra = find(a), rb = find(b); if (ra !== rb) parent.set(ra, rb); };
+      const inGroup = new Set();
+      allDocs.forEach((d) => parent.set(d.id, d.id));
+
+      for (const arr of byAddr.values()) {
+        if (arr.length < 2) continue;
+        for (let i = 0; i < arr.length; i += 1) {
+          for (let j = i + 1; j < arr.length; j += 1) {
+            if (nameOverlap(arr[i].name, arr[j].name) >= 0.6) {
+              union(arr[i].id, arr[j].id);
+              inGroup.add(arr[i].id);
+              inGroup.add(arr[j].id);
+            }
+          }
+        }
+      }
+      const clusters = new Map();
+      for (const d of allDocs) {
+        if (!inGroup.has(d.id)) continue;
+        const r = find(d.id);
+        if (!clusters.has(r)) clusters.set(r, []);
+        clusters.get(r).push(d);
+      }
+      rawGroups = [...clusters.values()].filter((g) => g.length > 1)
+        .map((docs) => ({ docs, reasons: ['address+similar_name'] }));
+    } else {
+      // 'address' - nur nach Adresse gruppieren (legacy / manuelle Prüfung)
+      const byAddr = new Map();
+      for (const d of allDocs) {
+        const addr = normAddress(d.formatted_address);
+        if (!addr) continue;
+        if (!byAddr.has(addr)) byAddr.set(addr, []);
+        byAddr.get(addr).push(d);
+      }
+      rawGroups = [...byAddr.values()].filter((g) => g.length > 1)
+        .map((docs) => ({ docs, reasons: ['address_only'] }));
+    }
+
+    // Sortiere Gruppen nach Größe absteigend
+    rawGroups.sort((a, b) => b.docs.length - a.docs.length);
+
+    const totalGroups = rawGroups.length;
+    const totalDocs = rawGroups.reduce((s, g) => s + g.docs.length, 0);
+    const redundant = rawGroups.reduce((s, g) => s + (g.docs.length - 1), 0);
+
+    // Für die Seite: nur die passende Slice
+    const pageGroups = rawGroups.slice(offset, offset + limit).map((g) => {
+      const docs = g.docs.map((d) => ({ ...d, _score: scoreDoc(d) }));
       docs.sort((a, b) => b._score - a._score || (b.user_rating_count || 0) - (a.user_rating_count || 0));
-      // Falls Gleichstand oben: nur einer wird als keep markiert (der erste)
       const enriched = docs.map((d, i) => ({
-        ...d,
-        is_suggested_keep: i === 0,
-        is_suggested_discard: i !== 0,
+        ...d, is_suggested_keep: i === 0, is_suggested_discard: i !== 0,
       }));
+      const first = enriched[0];
       return {
-        key: g._id,
-        count: g.count,
-        // Für die UI eine lesbare Header-Zeile
-        label: type === 'name'
-          ? `${enriched[0]?.name || ''} · ${enriched[0]?.city || g._id.city_slug || ''}`
-          : (enriched[0]?.formatted_address || ''),
+        count: g.docs.length,
+        reasons: g.reasons,
+        label: type === 'similar_name'
+          ? `${first?.name || ''} · ${first?.formatted_address || ''}`
+          : (first?.formatted_address || first?.name || ''),
         docs: enriched,
       };
     });
 
-    // Alle Städte für Filter-Dropdown (aus den betroffenen Duplikaten)
-    const affectedCities = await col.aggregate([
-      { $match: { is_active: { $ne: false }, city: { $ne: null } } },
-      { $group: { _id: type === 'name' ? { name_key: { $toLower: { $trim: { input: '$name' } } }, city_slug: '$city_slug', city: '$city' } : { addr_key: { $toLower: { $trim: { input: '$formatted_address' } } }, city: '$city' }, count: { $sum: 1 } } },
-      { $match: { count: { $gt: 1 } } },
-      { $group: { _id: '$_id.city' } },
-      { $sort: { _id: 1 } },
-    ]).toArray();
+    // Städte-Filter-Optionen: Städte mit mindestens einer Duplikat-Gruppe
+    const allCitiesSet = new Set();
+    rawGroups.forEach((g) => g.docs.forEach((d) => { if (d.city) allCitiesSet.add(d.city); }));
+    const allCities = [...allCitiesSet].sort();
 
     return json({
       type,
       total_groups: totalGroups,
-      total_duplicate_docs: totalStats.total_docs || 0,
-      redundant_count: Math.max(0, (totalStats.total_docs || 0) - (totalStats.groups || 0)), // wie viele könnten verworfen werden
-      groups,
-      all_cities: affectedCities.map((c) => c._id).filter(Boolean),
+      total_duplicate_docs: totalDocs,
+      redundant_count: redundant,
+      groups: pageGroups,
+      all_cities: allCities,
       limit,
       offset,
     });
