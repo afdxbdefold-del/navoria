@@ -157,11 +157,12 @@ export default function KampagnenPage() {
             </div>
             {activeCampaign.current_query && <p className="mt-2 text-xs text-slate-500">Aktuell: {activeCampaign.current_query}</p>}
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-5">
+          <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-6">
             <Stat label="Gefunden" value={activeCampaign.found} />
             <Stat label="Neu" value={activeCampaign.inserted} color="text-emerald-700" />
             <Stat label="Aktualisiert" value={activeCampaign.updated} color="text-sky-700" />
             <Stat label="Übersprungen" value={activeCampaign.skipped} />
+            <Stat label="Verworfene geblockt" value={activeCampaign.skipped_discarded || 0} color="text-amber-700" />
             <Stat label="Fehler" value={activeCampaign.errors} color={activeCampaign.errors > 0 ? 'text-rose-700' : ''} />
           </div>
           {activeCampaign.error_samples?.length > 0 && (
