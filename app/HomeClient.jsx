@@ -5,19 +5,32 @@ import { useRouter } from 'next/navigation';
 import { Search, MapPin, Stethoscope, Heart, Baby, Smile, Eye, Ear, Bone, Brain, Sparkles, ArrowRight, ShieldCheck, Info } from 'lucide-react';
 
 const POPULAR_SPECIALTIES = [
-  { name: 'Hausarzt', icon: Stethoscope, query: 'Hausarzt' },
-  { name: 'Zahnarzt', icon: Smile, query: 'Zahnarzt' },
-  { name: 'Kardiologe', icon: Heart, query: 'Kardiologe' },
-  { name: 'Orthopäde', icon: Bone, query: 'Orthopäde' },
-  { name: 'Hautarzt', icon: Sparkles, query: 'Hautarzt' },
-  { name: 'Frauenarzt', icon: Heart, query: 'Gynäkologe' },
-  { name: 'Kinderarzt', icon: Baby, query: 'Kinderarzt' },
-  { name: 'Augenarzt', icon: Eye, query: 'Augenarzt' },
-  { name: 'HNO-Arzt', icon: Ear, query: 'HNO' },
-  { name: 'Neurologe', icon: Brain, query: 'Neurologe' },
+  { name: 'Hausarzt', icon: Stethoscope, slug: 'hausarzt' },
+  { name: 'Zahnarzt', icon: Smile, slug: 'zahnarzt' },
+  { name: 'Kardiologe', icon: Heart, slug: 'kardiologe' },
+  { name: 'Orthopäde', icon: Bone, slug: 'orthopaede' },
+  { name: 'Hautarzt', icon: Sparkles, slug: 'hautarzt' },
+  { name: 'Frauenarzt', icon: Heart, slug: 'frauenarzt' },
+  { name: 'Kinderarzt', icon: Baby, slug: 'kinderarzt' },
+  { name: 'Augenarzt', icon: Eye, slug: 'augenarzt' },
+  { name: 'HNO-Arzt', icon: Ear, slug: 'hno-arzt' },
+  { name: 'Neurologe', icon: Brain, slug: 'neurologe' },
 ];
 
-const BIG_CITIES = ['Berlin', 'Hamburg', 'München', 'Köln', 'Frankfurt', 'Stuttgart', 'Düsseldorf', 'Leipzig', 'Dortmund', 'Bremen', 'Hannover', 'Nürnberg'];
+const BIG_CITIES = [
+  { name: 'Berlin', slug: 'berlin' },
+  { name: 'Hamburg', slug: 'hamburg' },
+  { name: 'München', slug: 'muenchen' },
+  { name: 'Köln', slug: 'koeln' },
+  { name: 'Frankfurt', slug: 'frankfurt-am-main' },
+  { name: 'Stuttgart', slug: 'stuttgart' },
+  { name: 'Düsseldorf', slug: 'duesseldorf' },
+  { name: 'Leipzig', slug: 'leipzig' },
+  { name: 'Dortmund', slug: 'dortmund' },
+  { name: 'Bremen', slug: 'bremen' },
+  { name: 'Hannover', slug: 'hannover' },
+  { name: 'Nürnberg', slug: 'nuernberg' },
+];
 
 export default function HomePage() {
   const router = useRouter();
@@ -127,11 +140,23 @@ export default function HomePage() {
               ) : (
                 <div className="flex flex-wrap gap-2">
                   <span className="text-sm text-slate-600">Vorschläge:</span>
-                  {symptomSuggestions.map((s) => (
-                    <a key={s} href={`/suche?q=${encodeURIComponent(s)}`} className="chip border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100">
-                      {s} <ArrowRight className="ml-1 h-3 w-3" />
-                    </a>
-                  ))}
+                  {symptomSuggestions.map((s) => {
+                    // Symptom-Vorschlag → Pillar-Seite wenn Slug bekannt, sonst Fallback in Suche
+                    const specSlug = {
+                      'Hausarzt': 'hausarzt', 'Zahnarzt': 'zahnarzt', 'Kardiologe': 'kardiologe',
+                      'Orthopäde': 'orthopaede', 'Hautarzt': 'hautarzt', 'Frauenarzt': 'frauenarzt',
+                      'Kinderarzt': 'kinderarzt', 'Augenarzt': 'augenarzt', 'HNO-Arzt': 'hno-arzt',
+                      'Urologe': 'urologe', 'Neurologe': 'neurologe', 'Psychiater': 'psychiater',
+                      'Psychotherapeut': 'psychotherapeut', 'Radiologe': 'radiologe', 'Internist': 'internist',
+                      'Chirurg': 'chirurg', 'Physiotherapeut': 'physiotherapeut',
+                    }[s];
+                    const href = specSlug ? `/aerzte/fachrichtung/${specSlug}` : `/suche?q=${encodeURIComponent(s)}`;
+                    return (
+                      <a key={s} href={href} className="chip border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100">
+                        {s} <ArrowRight className="ml-1 h-3 w-3" />
+                      </a>
+                    );
+                  })}
                 </div>
               )}
               <p className="mt-4 text-[11px] text-slate-400">Navoria ersetzt keine ärztliche Diagnose. Bei akuten oder lebensbedrohlichen Beschwerden rufen Sie 112.</p>
@@ -152,7 +177,7 @@ export default function HomePage() {
           {POPULAR_SPECIALTIES.map((s) => {
             const Icon = s.icon;
             return (
-              <a key={s.name} href={`/suche?q=${encodeURIComponent(s.query)}`} className="card-soft group flex items-center gap-3 p-4 transition hover:-translate-y-0.5 hover:shadow-md">
+              <a key={s.name} href={`/aerzte/fachrichtung/${s.slug}`} className="card-soft group flex items-center gap-3 p-4 transition hover:-translate-y-0.5 hover:shadow-md">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-600 transition group-hover:bg-sky-100">
                   <Icon className="h-5 w-5" />
                 </div>
@@ -171,8 +196,8 @@ export default function HomePage() {
         </div>
         <div className="flex flex-wrap gap-2">
           {BIG_CITIES.map((c) => (
-            <a key={c} href={`/suche?ort=${encodeURIComponent(c)}`} className="chip hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700">
-              <MapPin className="mr-1 h-3 w-3" /> {c}
+            <a key={c.slug} href={`/aerzte/${c.slug}`} className="chip hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700">
+              <MapPin className="mr-1 h-3 w-3" /> {c.name}
             </a>
           ))}
         </div>

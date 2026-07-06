@@ -101,6 +101,13 @@ export default async function CitySpecialtyPage({ params }) {
         ))}
       </div>
 
+      {/* Pillar-Backlink */}
+      <div className="mt-4">
+        <Link href={`/aerzte/fachrichtung/${fachrichtung}`} className="inline-flex items-center gap-1 text-sm font-medium text-sky-700 hover:underline">
+          Ratgeber: {spec.plural} in Deutschland – Aufgabe, Vorsorge & Praxen finden →
+        </Link>
+      </div>
+
       <div className="mt-8 space-y-3">
         {doctors.length === 0 ? (
           <div className="card-soft p-10 text-center">

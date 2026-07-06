@@ -167,19 +167,19 @@ function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-slate-900">Suchen</h4>
             <ul className="mt-3 space-y-2 text-sm text-slate-600">
-              <li><a className="hover:text-sky-600" href="/suche?q=Hausarzt">Hausarzt</a></li>
-              <li><a className="hover:text-sky-600" href="/suche?q=Zahnarzt">Zahnarzt</a></li>
-              <li><a className="hover:text-sky-600" href="/suche?q=Kardiologe">Kardiologe</a></li>
-              <li><a className="hover:text-sky-600" href="/suche?q=Orthop%C3%A4de">Orthopäde</a></li>
+              <li><a className="hover:text-sky-600" href="/aerzte/fachrichtung/hausarzt">Hausarzt</a></li>
+              <li><a className="hover:text-sky-600" href="/aerzte/fachrichtung/zahnarzt">Zahnarzt</a></li>
+              <li><a className="hover:text-sky-600" href="/aerzte/fachrichtung/kardiologe">Kardiologe</a></li>
+              <li><a className="hover:text-sky-600" href="/aerzte/fachrichtung/orthopaede">Orthopäde</a></li>
             </ul>
           </div>
           <div>
             <h4 className="text-sm font-semibold text-slate-900">Städte</h4>
             <ul className="mt-3 space-y-2 text-sm text-slate-600">
-              <li><a className="hover:text-sky-600" href="/suche?ort=Berlin">Berlin</a></li>
-              <li><a className="hover:text-sky-600" href="/suche?ort=Hamburg">Hamburg</a></li>
-              <li><a className="hover:text-sky-600" href="/suche?ort=M%C3%BCnchen">München</a></li>
-              <li><a className="hover:text-sky-600" href="/suche?ort=K%C3%B6ln">Köln</a></li>
+              <li><a className="hover:text-sky-600" href="/aerzte/berlin">Berlin</a></li>
+              <li><a className="hover:text-sky-600" href="/aerzte/hamburg">Hamburg</a></li>
+              <li><a className="hover:text-sky-600" href="/aerzte/muenchen">München</a></li>
+              <li><a className="hover:text-sky-600" href="/aerzte/koeln">Köln</a></li>
             </ul>
           </div>
           <div>

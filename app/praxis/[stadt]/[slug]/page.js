@@ -617,6 +617,11 @@ export default async function ProfilePage({ params }) {
               <Link href={`/aerzte/${d.city_slug}${specialtySlug ? `/${specialtySlug}` : ''}`} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-sky-700 hover:underline">
                 Alle anzeigen <ArrowRight className="h-3 w-3" />
               </Link>
+              {specialtySlug && specialtyEntry && (
+                <Link href={`/aerzte/fachrichtung/${specialtySlug}`} className="mt-2 block text-xs text-slate-500 hover:text-sky-700">
+                  Ratgeber: {specialtyEntry.plural} in Deutschland →
+                </Link>
+              )}
             </div>
           )}
 

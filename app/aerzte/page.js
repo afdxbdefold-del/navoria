@@ -46,7 +46,7 @@ export default async function AerzteHubPage() {
         <h2 className="flex items-center gap-2 text-xl font-semibold text-slate-900"><Stethoscope className="h-5 w-5 text-sky-600" /> Nach Fachrichtung</h2>
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           {SPECIALTIES.map((s) => (
-            <Link key={s.slug} href={`/suche?q=${encodeURIComponent(s.query)}`} className="card-soft p-4 transition hover:-translate-y-0.5 hover:shadow-md">
+            <Link key={s.slug} href={`/aerzte/fachrichtung/${s.slug}`} className="card-soft p-4 transition hover:-translate-y-0.5 hover:shadow-md">
               <span className="text-sm font-medium text-slate-900">{s.label}</span>
             </Link>
           ))}
