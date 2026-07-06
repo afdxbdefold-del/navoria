@@ -68,10 +68,16 @@ export async function generateMetadata({ params }) {
   const canonical = `/praxis/${d.city_slug}/${d.slug}`;
   const base = process.env.NEXT_PUBLIC_BASE_URL || '';
   const ogImage = `${base}${canonical}/opengraph-image${d.last_synced_at ? `?v=${new Date(d.last_synced_at).getTime()}` : ''}`;
+  // Praxen MIT eigener Website: noindex,follow – vermeidet Duplicate-Content, Praxis-Website rankt selbst.
+  // Praxen OHNE Website: normal indexieren – hier liefern wir echten Mehrwert (Auffindbarkeit).
+  const hasOwnWebsite = !!d.website_url;
   return {
     title,
     description,
     alternates: { canonical },
+    robots: hasOwnWebsite
+      ? { index: false, follow: true, googleBot: { index: false, follow: true } }
+      : { index: true, follow: true },
     openGraph: {
       title, description, type: 'profile', locale: 'de_DE', url: canonical,
       images: [{ url: ogImage, width: 1200, height: 630, alt: `${displayName} – ${cityText}` }],
