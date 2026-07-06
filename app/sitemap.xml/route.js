@@ -1,53 +1,42 @@
+// Sitemap-Index: verweist auf die eigentlichen Sub-Sitemaps.
+// Vorteile: keine 50k-URL-Grenze pro Datei, schnelleres Crawling durch Google
+// (Google überspringt Sub-Sitemaps mit unverändertem lastmod).
 import { getCollection } from '@/lib/mongodb';
-import { SPECIALTIES } from '@/lib/specialties';
 import { hasExternalWebsite } from '@/lib/ownUrl';
 
 export const dynamic = 'force-dynamic';
 
+const CHUNK_SIZE = 10000; // Praxen pro Sub-Sitemap; sicher unter Google's 50k Limit
+
 export async function GET() {
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
-  const citiesCol = await getCollection('cities');
   const doctorsCol = await getCollection('doctor_places');
-  const cities = await citiesCol.find({ doctor_count: { $gt: 0 } }).limit(200).toArray();
-  // Nur Praxen OHNE eigene externe Website in die Sitemap.
-  // Praxen deren "website_url" bereits auf Navoria zeigt (oder leer ist) bleiben drin.
-  // Praxen mit echter externer Website erhalten stattdessen noindex,follow.
+
+  // Anzahl der indexierbaren Praxen ermitteln um zu wissen, wie viele Chunks nötig sind
   const doctorsRaw = await doctorsCol.find(
     { is_active: true },
-    { projection: { slug: 1, city_slug: 1, updated_at: 1, website_url: 1 } }
-  ).limit(10000).toArray();
-  const doctors = doctorsRaw.filter((d) => !hasExternalWebsite(d.website_url)).slice(0, 5000);
+    { projection: { website_url: 1 } }
+  ).toArray();
+  const indexableCount = doctorsRaw.filter((d) => !hasExternalWebsite(d.website_url)).length;
+  const chunkCount = Math.max(1, Math.ceil(indexableCount / CHUNK_SIZE));
 
-  const urls = [];
-  urls.push(url(base, '', 1.0));
-  urls.push(url(base, '/aerzte', 0.9));
-  urls.push(url(base, '/aerzte/fachrichtung', 0.9));
-  urls.push(url(base, '/ueber-uns', 0.7));
-  urls.push(url(base, '/redaktionelle-standards', 0.6));
-  urls.push(url(base, '/korrekturen', 0.5));
-  urls.push(url(base, '/impressum', 0.3));
-  urls.push(url(base, '/datenschutz', 0.3));
-  // Fachrichtungs-Pillar-Seiten (Deutschland-weit)
-  for (const s of SPECIALTIES) {
-    urls.push(url(base, `/aerzte/fachrichtung/${s.slug}`, 0.8));
-  }
-  for (const c of cities) {
-    urls.push(url(base, `/aerzte/${c.slug}`, 0.8));
-    for (const s of SPECIALTIES) {
-      urls.push(url(base, `/aerzte/${c.slug}/${s.slug}`, 0.6));
-    }
-  }
-  for (const d of doctors) {
-    if (d.city_slug && d.slug) {
-      urls.push(url(base, `/praxis/${d.city_slug}/${d.slug}`, 0.7, d.updated_at));
-    }
+  const now = new Date().toISOString();
+  const sitemaps = [];
+  sitemaps.push(sitemap(base, '/sitemap-pages.xml', now));
+  sitemaps.push(sitemap(base, '/sitemap-cities.xml', now));
+  for (let i = 1; i <= chunkCount; i += 1) {
+    sitemaps.push(sitemap(base, `/sitemap-praxen/${i}`, now));
   }
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>`;
-  return new Response(xml, { headers: { 'Content-Type': 'application/xml' } });
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemaps.join('\n')}\n</sitemapindex>`;
+  return new Response(xml, {
+    headers: {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+    },
+  });
 }
 
-function url(base, path, priority, lastmod) {
-  const iso = lastmod ? new Date(lastmod).toISOString() : new Date().toISOString();
-  return `  <url><loc>${base}${path}</loc><lastmod>${iso}</lastmod><priority>${priority.toFixed(1)}</priority></url>`;
+function sitemap(base, path, lastmod) {
+  return `  <sitemap><loc>${base}${path}</loc><lastmod>${lastmod}</lastmod></sitemap>`;
 }
