@@ -24,9 +24,11 @@ function List({ token }) {
   const [show, setShow] = useState('unchecked');
   const [cityFilter, setCityFilter] = useState('');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
 
+  const PAGE_SIZE = 100;
   const authHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
 
   const load = async () => {
@@ -34,7 +36,8 @@ function List({ token }) {
     try {
       const q = new URLSearchParams({ show });
       if (cityFilter) q.set('city', cityFilter);
-      q.set('limit', '1000');
+      q.set('limit', String(PAGE_SIZE));
+      q.set('offset', String((page - 1) * PAGE_SIZE));
       const r = await fetch(`/api/admin/doctors-no-website?${q}`, { headers: authHeaders });
       if (r.status === 401) { toast.error('Sitzung abgelaufen'); window.location.href = '/admin'; return; }
       const data = await r.json();
@@ -50,7 +53,11 @@ function List({ token }) {
     } catch { toast.error('Fehler beim Laden'); }
     setLoading(false);
   };
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [show, cityFilter]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [show, cityFilter, page]);
+  // Filter-/View-Wechsel setzt Seite zurück
+  useEffect(() => { setPage(1); }, [show, cityFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(matchCount / PAGE_SIZE));
 
   const toggleChecked = async (doc) => {
     setBusyId(doc.id);
@@ -163,7 +170,9 @@ function List({ token }) {
           </select>
         )}
         {(matchCount > 0 && matchCount !== items.length) && (
-          <p className="self-center text-xs text-slate-400">Zeige {items.length} von {matchCount}</p>
+          <p className="self-center text-xs text-slate-400">
+            Zeige {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, matchCount)} von {matchCount}
+          </p>
         )}
       </div>
 
@@ -282,6 +291,57 @@ function List({ token }) {
           );
         })}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4">
+          <p className="text-sm text-slate-600">
+            Seite <b>{page}</b> von <b>{totalPages}</b>
+            <span className="ml-2 text-xs text-slate-400">({matchCount} Praxen gesamt)</span>
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage(1)}
+              disabled={page === 1 || loading}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+            >
+              « Erste
+            </button>
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1 || loading}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+            >
+              ‹ Zurück
+            </button>
+            <input
+              type="number"
+              min={1}
+              max={totalPages}
+              value={page}
+              onChange={(e) => {
+                const v = parseInt(e.target.value, 10);
+                if (!Number.isNaN(v) && v >= 1 && v <= totalPages) setPage(v);
+              }}
+              className="w-16 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-center text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+            />
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages || loading}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+            >
+              Weiter ›
+            </button>
+            <button
+              onClick={() => setPage(totalPages)}
+              disabled={page === totalPages || loading}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+            >
+              Letzte »
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
