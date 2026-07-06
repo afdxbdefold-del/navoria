@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, MapPin, Stethoscope, Heart, Baby, Smile, Eye, Ear, Bone, Brain, Sparkles, ArrowRight, ShieldCheck, Info } from 'lucide-react';
+import { Search, MapPin, Stethoscope, Heart, Baby, Smile, Eye, Ear, Bone, Brain, Sparkles, ArrowRight, ShieldCheck, Info, HeartPulse } from 'lucide-react';
 
 const POPULAR_SPECIALTIES = [
   { name: 'Hausarzt', icon: Stethoscope, slug: 'hausarzt' },
@@ -30,6 +30,22 @@ const BIG_CITIES = [
   { name: 'Bremen', slug: 'bremen' },
   { name: 'Hannover', slug: 'hannover' },
   { name: 'Nürnberg', slug: 'nuernberg' },
+];
+
+// Häufig gesuchte Symptome – Direct-Link zu den Ratgeber-Pillar-Pages /symptome/[slug]
+const POPULAR_SYMPTOMS = [
+  { label: 'Rückenschmerzen', slug: 'rueckenschmerzen' },
+  { label: 'Kopfschmerzen', slug: 'kopfschmerzen' },
+  { label: 'Bauchschmerzen', slug: 'bauchschmerzen' },
+  { label: 'Zahnschmerzen', slug: 'zahnschmerzen' },
+  { label: 'Halsschmerzen', slug: 'halsschmerzen' },
+  { label: 'Ohrenschmerzen', slug: 'ohrenschmerzen' },
+  { label: 'Fieber', slug: 'fieber' },
+  { label: 'Schwindel', slug: 'schwindel' },
+  { label: 'Hautausschlag', slug: 'hautausschlag' },
+  { label: 'Bluthochdruck', slug: 'bluthochdruck' },
+  { label: 'Schlafstörungen', slug: 'schlafstoerungen' },
+  { label: 'Herzstolpern', slug: 'herzstolpern' },
 ];
 
 export default function HomePage() {
@@ -162,6 +178,34 @@ export default function HomePage() {
               <p className="mt-4 text-[11px] text-slate-400">Navoria ersetzt keine ärztliche Diagnose. Bei akuten oder lebensbedrohlichen Beschwerden rufen Sie 112.</p>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Häufige Symptome – Ratgeber-Pillar-Pages */}
+      <section className="mx-auto max-w-6xl px-4 pt-12 pb-4 sm:px-6">
+        <div className="mb-6 flex items-end justify-between">
+          <div>
+            <h2 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
+              <HeartPulse className="h-5 w-5 text-sky-600" />
+              Häufige Beschwerden
+            </h2>
+            <p className="text-sm text-slate-500">Welcher Arzt hilft bei welchem Symptom? Redaktionell geprüfte Ratgeber.</p>
+          </div>
+          <a href="/symptome" className="hidden text-sm font-medium text-sky-700 hover:text-sky-800 sm:inline-flex sm:items-center sm:gap-1">
+            Alle Symptome <ArrowRight className="h-3.5 w-3.5" />
+          </a>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {POPULAR_SYMPTOMS.map((s) => (
+            <a
+              key={s.slug}
+              href={`/symptome/${s.slug}`}
+              className="chip border-sky-100 bg-sky-50 text-sky-700 hover:border-sky-300 hover:bg-sky-100"
+            >
+              {s.label}
+              <ArrowRight className="ml-1 h-3 w-3" />
+            </a>
+          ))}
         </div>
       </section>
 
