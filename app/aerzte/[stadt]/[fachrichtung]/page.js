@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getCollection } from '@/lib/mongodb';
 import { specialtyBySlug, SPECIALTIES } from '@/lib/specialties';
 import { Star, Phone, Globe, MapPin, ArrowRight } from 'lucide-react';
+import RatingBadge from '@/components/RatingBadge';
 
 export const revalidate = 300;
 
@@ -96,9 +97,14 @@ export default async function CitySpecialtyPage({ params }) {
             <article key={d.google_place_id} className="card-soft p-4 sm:p-5 transition hover:shadow-md">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-base sm:text-lg font-semibold text-slate-900 break-words">
-                    <Link href={`/praxis/${stadt}/${d.slug}`} className="hover:text-sky-700">{d.name}</Link>
-                  </h3>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-base sm:text-lg font-semibold text-slate-900 break-words">
+                      <Link href={`/praxis/${stadt}/${d.slug}`} className="hover:text-sky-700">{d.name}</Link>
+                    </h3>
+                    {d.rating != null && d.user_rating_count > 0 && (
+                      <RatingBadge rating={d.rating} count={d.user_rating_count} size="sm" />
+                    )}
+                  </div>
                   <p className="mt-1 flex items-start gap-1 text-sm text-slate-600 break-words"><MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" /> {d.formatted_address}</p>
                   <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
                     {(d.phone_national || d.phone_international) && (
@@ -113,6 +119,9 @@ export default async function CitySpecialtyPage({ params }) {
               </div>
             </article>
           ))
+        )}
+        {doctors.some((d) => d.rating != null && d.user_rating_count > 0) && (
+          <p className="pt-2 text-[11px] text-slate-400">Bewertungen von Google (öffentliche Google-Rezensionen)</p>
         )}
       </div>
     </div>

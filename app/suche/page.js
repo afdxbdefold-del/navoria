@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { Search, MapPin, Star, Phone, Globe, ExternalLink, Filter, Loader2, ArrowRight, List, Map as MapIcon } from 'lucide-react';
+import RatingBadge from '@/components/RatingBadge';
 
 const MapView = dynamic(() => import('@/components/MapView'), { ssr: false, loading: () => <div className="card-soft flex h-[600px] items-center justify-center text-slate-500"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Karte lädt …</div> });
 
@@ -120,7 +121,12 @@ function SearchContent() {
           ) : view === 'map' ? (
             <MapView doctors={results} />
           ) : (
-            <div className="space-y-3">{results.map((d) => <ResultCard key={d.google_place_id} d={d} />)}</div>
+            <>
+              <div className="space-y-3">{results.map((d) => <ResultCard key={d.google_place_id} d={d} />)}</div>
+              {results.some((d) => d.rating != null && d.user_rating_count > 0) && (
+                <p className="mt-6 text-[11px] text-slate-400">Bewertungen von Google (öffentliche Google-Rezensionen)</p>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -140,6 +146,9 @@ function ResultCard({ d }) {
             </h3>
             {d.specialty_guess && <span className="chip border-sky-100 bg-sky-50 text-sky-700">{d.specialty_guess}</span>}
             {d.is_verified && <span className="chip border-emerald-100 bg-emerald-50 text-emerald-700">verifiziert</span>}
+            {d.rating != null && d.user_rating_count > 0 && (
+              <RatingBadge rating={d.rating} count={d.user_rating_count} size="sm" />
+            )}
           </div>
           <p className="mt-1 text-sm text-slate-600 break-words">{d.formatted_address || [d.street, d.postal_code, d.city].filter(Boolean).join(', ')}</p>
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getCollection } from '@/lib/mongodb';
 import { SPECIALTIES } from '@/lib/specialties';
 import { Star, Phone, Globe, MapPin, ArrowRight } from 'lucide-react';
+import RatingBadge from '@/components/RatingBadge';
 
 export const revalidate = 300;
 
@@ -106,6 +107,9 @@ export default async function CityPage({ params }) {
           ) : (
             doctors.map((d) => <DoctorRow key={d.google_place_id} d={d} stadt={stadt} />)
           )}
+          {doctors.some((d) => d.rating != null && d.user_rating_count > 0) && (
+            <p className="pt-2 text-[11px] text-slate-400">Bewertungen von Google (öffentliche Google-Rezensionen)</p>
+          )}
         </div>
       </div>
     </div>
@@ -122,6 +126,9 @@ function DoctorRow({ d, stadt }) {
               <Link href={`/praxis/${stadt}/${d.slug}`} className="hover:text-sky-700">{d.name}</Link>
             </h3>
             {d.specialty_guess && <span className="chip border-sky-100 bg-sky-50 text-sky-700">{d.specialty_guess}</span>}
+            {d.rating != null && d.user_rating_count > 0 && (
+              <RatingBadge rating={d.rating} count={d.user_rating_count} size="sm" />
+            )}
           </div>
           <p className="mt-1 flex items-start gap-1 text-sm text-slate-600 break-words"><MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" /> {d.formatted_address}</p>
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">

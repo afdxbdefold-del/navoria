@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import CopyButton from '@/components/CopyButton';
 import CorrectionButton from '@/components/CorrectionButton';
+import RatingBadge from '@/components/RatingBadge';
 import FaqAccordion from '@/components/praxis/FaqAccordion';
 import MobileStickyCta from '@/components/praxis/MobileStickyCta';
 import { parseDisplayName } from '@/lib/doctorFormatter';
@@ -180,6 +181,15 @@ export default async function ProfilePage({ params }) {
     ...(d.city && { areaServed: { '@type': 'City', name: d.city } }),
     ...(paymentAccepted.length && { paymentAccepted: paymentAccepted.join(', ') }),
     ...(amenityFeatures.length && { amenityFeature: amenityFeatures }),
+    ...(d.rating != null && d.user_rating_count > 0 && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: Number(d.rating).toFixed(1),
+        reviewCount: Number(d.user_rating_count),
+        bestRating: '5',
+        worstRating: '1',
+      },
+    }),
     ...(d.is_verified && d.verified_at && {
       identifier: {
         '@type': 'PropertyValue',
@@ -265,6 +275,9 @@ export default async function ProfilePage({ params }) {
               <BadgeCheck className="h-3.5 w-3.5" /> Verifiziert
             </span>
           )}
+          {d.rating != null && (
+            <RatingBadge rating={d.rating} count={d.user_rating_count} size="md" showAttribution={false} />
+          )}
           {openNow === true && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800"><span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />Jetzt geöffnet</span>}
           {openNow === false && <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600"><span className="inline-block h-1.5 w-1.5 rounded-full bg-slate-400" />Aktuell geschlossen{nextOpen ? ` · öffnet ${nextOpen.dayLabel} ${String(nextOpen.hour).padStart(2, '0')}:${String(nextOpen.minute).padStart(2, '0')}` : ''}</span>}
         </div>
@@ -305,6 +318,9 @@ export default async function ProfilePage({ params }) {
             </a>
           )}
         </div>
+        {d.rating != null && d.user_rating_count > 0 && (
+          <p className="mt-3 text-[11px] text-slate-400">Bewertungen von Google (öffentliche Google-Rezensionen)</p>
+        )}
       </header>
 
       {/* 3. Datenstand / Aktualitätsbox */}
@@ -560,6 +576,12 @@ export default async function ProfilePage({ params }) {
               {d.city && <RowKv k="Stadt" v={d.city} />}
               {d.district && <RowKv k="Stadtteil" v={d.district} />}
               {d.postal_code && <RowKv k="PLZ" v={d.postal_code} />}
+              {d.rating != null && d.user_rating_count > 0 && (
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-500">Bewertung</dt>
+                  <dd><RatingBadge rating={d.rating} count={d.user_rating_count} size="sm" /></dd>
+                </div>
+              )}
               {lastSyncedText && <RowKv k="Zuletzt aktualisiert" v={lastSyncedText} />}
             </dl>
           </div>
