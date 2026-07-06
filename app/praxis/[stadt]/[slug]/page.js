@@ -12,6 +12,7 @@ import FaqAccordion from '@/components/praxis/FaqAccordion';
 import MobileStickyCta from '@/components/praxis/MobileStickyCta';
 import { parseDisplayName } from '@/lib/doctorFormatter';
 import { humanizePrimaryType } from '@/lib/specialtyLabels';
+import { hasExternalWebsite } from '@/lib/ownUrl';
 import { isOpenNow, nextOpening, buildWeekTable, toSchemaOpeningHours, todayLabel } from '@/lib/openingHours';
 import { buildProfileText } from '@/lib/profileText';
 import { buildFaqs } from '@/lib/faqBuilder';
@@ -68,9 +69,9 @@ export async function generateMetadata({ params }) {
   const canonical = `/praxis/${d.city_slug}/${d.slug}`;
   const base = process.env.NEXT_PUBLIC_BASE_URL || '';
   const ogImage = `${base}${canonical}/opengraph-image${d.last_synced_at ? `?v=${new Date(d.last_synced_at).getTime()}` : ''}`;
-  // Praxen MIT eigener Website: noindex,follow – vermeidet Duplicate-Content, Praxis-Website rankt selbst.
-  // Praxen OHNE Website: normal indexieren – hier liefern wir echten Mehrwert (Auffindbarkeit).
-  const hasOwnWebsite = !!d.website_url;
+  // Praxen MIT eigener EXTERNER Website: noindex,follow – vermeidet Duplicate-Content, Praxis-Website rankt selbst.
+  // Praxen OHNE Website (oder mit Navoria-URL als Website): normal indexieren – hier liefern wir echten Mehrwert.
+  const hasOwnWebsite = hasExternalWebsite(d.website_url);
   return {
     title,
     description,

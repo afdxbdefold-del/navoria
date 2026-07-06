@@ -1,5 +1,6 @@
 import { getCollection } from '@/lib/mongodb';
 import { SPECIALTIES } from '@/lib/specialties';
+import { hasExternalWebsite } from '@/lib/ownUrl';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,20 +9,14 @@ export async function GET() {
   const citiesCol = await getCollection('cities');
   const doctorsCol = await getCollection('doctor_places');
   const cities = await citiesCol.find({ doctor_count: { $gt: 0 } }).limit(200).toArray();
-  // Nur Praxen OHNE eigene Website in die Sitemap aufnehmen.
-  // Rationale: Praxen mit eigener Website ranken selbst – wir erzeugen sonst Duplicate-Content.
-  // Praxen mit Website erhalten stattdessen ein noindex,follow Meta-Tag (siehe /praxis/[stadt]/[slug]/page.js).
-  const doctors = await doctorsCol.find(
-    {
-      is_active: true,
-      $or: [
-        { website_url: { $exists: false } },
-        { website_url: null },
-        { website_url: '' },
-      ],
-    },
-    { projection: { slug: 1, city_slug: 1, updated_at: 1 } }
-  ).limit(5000).toArray();
+  // Nur Praxen OHNE eigene externe Website in die Sitemap.
+  // Praxen deren "website_url" bereits auf Navoria zeigt (oder leer ist) bleiben drin.
+  // Praxen mit echter externer Website erhalten stattdessen noindex,follow.
+  const doctorsRaw = await doctorsCol.find(
+    { is_active: true },
+    { projection: { slug: 1, city_slug: 1, updated_at: 1, website_url: 1 } }
+  ).limit(10000).toArray();
+  const doctors = doctorsRaw.filter((d) => !hasExternalWebsite(d.website_url)).slice(0, 5000);
 
   const urls = [];
   urls.push(url(base, '', 1.0));
