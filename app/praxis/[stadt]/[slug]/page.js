@@ -18,7 +18,24 @@ export async function generateMetadata({ params }) {
   const cityText = d.city || stadt;
   const title = `${d.name} in ${cityText} | Adresse, Telefon & Öffnungszeiten | Navoria`;
   const description = `Informationen zu ${d.name}${d.specialty_guess ? ' (' + d.specialty_guess + ')' : ''} in ${cityText}. Adresse: ${d.formatted_address || ''}. Mit Telefon, Website und Kartenlink.`;
-  return { title, description };
+  const canonical = `/praxis/${d.city_slug}/${d.slug}`;
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      type: 'profile',
+      locale: 'de_DE',
+      url: canonical,
+    },
+    twitter: {
+      card: 'summary',
+      title,
+      description,
+    },
+  };
 }
 
 export default async function ProfilePage({ params }) {
@@ -33,23 +50,66 @@ export default async function ProfilePage({ params }) {
       ? `https://www.google.com/maps?q=${encodeURIComponent(d.formatted_address)}&hl=de&z=15&output=embed`
       : null;
 
+  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const profileUrl = `${base}/praxis/${d.city_slug}/${d.slug}`;
+
+  // Präziser @type nach Kategorie
+  const typeFor = (pt) => {
+    if (pt === 'dentist' || pt === 'dental_clinic') return 'Dentist';
+    if (pt === 'pharmacy') return 'Pharmacy';
+    if (pt === 'hospital' || pt === 'general_hospital') return 'Hospital';
+    if (pt === 'physiotherapist') return ['MedicalBusiness', 'Physiotherapy'];
+    // Wenn wir eine spezifische Fachrichtung erkannt haben und die Praxis wie eine Einzelpraxis wirkt
+    if (d.specialty_guess && d.specialty_guess !== 'Krankenhaus') return ['MedicalBusiness', 'Physician'];
+    return 'MedicalBusiness';
+  };
+
+  // Öffnungszeiten in schema.org OpeningHoursSpecification umwandeln
+  // Google Places days: 0=Sonntag, 1=Montag, ..., 6=Samstag
+  const daysMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const hhmm = (h, m) => `${String(h ?? 0).padStart(2, '0')}:${String(m ?? 0).padStart(2, '0')}`;
+  const openingHoursSpec = (() => {
+    const periods = d.opening_hours_json?.periods;
+    if (!Array.isArray(periods) || periods.length === 0) return undefined;
+    return periods
+      .filter((p) => p?.open && p?.close)
+      .map((p) => ({
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: `https://schema.org/${daysMap[p.open.day] || 'Monday'}`,
+        opens: hhmm(p.open.hour, p.open.minute),
+        closes: hhmm(p.close.hour, p.close.minute),
+      }));
+  })();
+
   const schema = {
     '@context': 'https://schema.org',
-    '@type': d.primary_type === 'dentist' || d.primary_type === 'dental_clinic' ? 'Dentist' : d.primary_type === 'pharmacy' ? 'Pharmacy' : 'MedicalBusiness',
+    '@type': typeFor(d.primary_type),
+    '@id': profileUrl,
     name: d.name,
+    url: profileUrl,
+    mainEntityOfPage: profileUrl,
+    ...(d.specialty_guess && { medicalSpecialty: d.specialty_guess }),
+    ...(d.website_url && { sameAs: [d.website_url] }),
     address: d.formatted_address ? {
       '@type': 'PostalAddress',
       streetAddress: d.street || undefined,
       postalCode: d.postal_code || undefined,
       addressLocality: d.city || undefined,
-      addressCountry: d.country || 'DE',
+      addressRegion: d.state || undefined,
+      addressCountry: d.country === 'Deutschland' ? 'DE' : (d.country || 'DE'),
     } : undefined,
     telephone: d.phone_international || d.phone_national || undefined,
-    url: d.website_url || undefined,
-    geo: d.latitude && d.longitude ? { '@type': 'GeoCoordinates', latitude: d.latitude, longitude: d.longitude } : undefined,
+    ...(d.website_url && { url: d.website_url }),
+    ...(d.google_maps_url && { hasMap: d.google_maps_url }),
+    ...(d.latitude != null && d.longitude != null && {
+      geo: { '@type': 'GeoCoordinates', latitude: d.latitude, longitude: d.longitude },
+    }),
+    ...(openingHoursSpec && openingHoursSpec.length > 0 && { openingHoursSpecification: openingHoursSpec }),
+    ...(d.city && { areaServed: { '@type': 'City', name: d.city } }),
+    ...(d.business_status === 'OPERATIONAL' ? { isAccessibleForFree: true } : {}),
+    inLanguage: 'de-DE',
   };
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
   const breadcrumb = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -57,7 +117,7 @@ export default async function ProfilePage({ params }) {
       { '@type': 'ListItem', position: 1, name: 'Start', item: `${base}/` },
       { '@type': 'ListItem', position: 2, name: 'Ärzte', item: `${base}/aerzte` },
       ...(d.city ? [{ '@type': 'ListItem', position: 3, name: d.city, item: `${base}/aerzte/${d.city_slug}` }] : []),
-      { '@type': 'ListItem', position: d.city ? 4 : 3, name: d.name, item: `${base}/praxis/${d.city_slug}/${d.slug}` },
+      { '@type': 'ListItem', position: d.city ? 4 : 3, name: d.name, item: profileUrl },
     ],
   };
 
