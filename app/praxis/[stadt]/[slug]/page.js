@@ -19,6 +19,8 @@ export async function generateMetadata({ params }) {
   const title = `${d.name} in ${cityText} | Adresse, Telefon & Öffnungszeiten | Navoria`;
   const description = `Informationen zu ${d.name}${d.specialty_guess ? ' (' + d.specialty_guess + ')' : ''} in ${cityText}. Adresse: ${d.formatted_address || ''}. Mit Telefon, Website und Kartenlink.`;
   const canonical = `/praxis/${d.city_slug}/${d.slug}`;
+  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const ogImage = `${base}${canonical}/opengraph-image${d.last_synced_at ? `?v=${new Date(d.last_synced_at).getTime()}` : ''}`;
   return {
     title,
     description,
@@ -29,11 +31,13 @@ export async function generateMetadata({ params }) {
       type: 'profile',
       locale: 'de_DE',
       url: canonical,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: `${d.name} – ${cityText}` }],
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title,
       description,
+      images: [ogImage],
     },
   };
 }
@@ -52,6 +56,9 @@ export default async function ProfilePage({ params }) {
 
   const base = process.env.NEXT_PUBLIC_BASE_URL || '';
   const profileUrl = `${base}/praxis/${d.city_slug}/${d.slug}`;
+  // Next.js generiert dynamisch ein PNG (1200x630) via opengraph-image.js
+  // Cache-Buster über last_synced_at, damit Social Media Crawler eine frische Version bekommen.
+  const ogImageUrl = `${profileUrl}/opengraph-image${d.last_synced_at ? `?v=${new Date(d.last_synced_at).getTime()}` : ''}`;
 
   // Präziser @type nach Kategorie
   const typeFor = (pt) => {
@@ -88,6 +95,8 @@ export default async function ProfilePage({ params }) {
     name: d.name,
     url: profileUrl,
     mainEntityOfPage: profileUrl,
+    image: ogImageUrl,
+    logo: `${base}/icon.svg`,
     ...(d.specialty_guess && { medicalSpecialty: d.specialty_guess }),
     ...(d.website_url && { sameAs: [d.website_url] }),
     address: d.formatted_address ? {
