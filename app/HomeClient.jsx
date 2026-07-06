@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, MapPin, Stethoscope, Heart, Baby, Smile, Eye, Ear, Bone, Brain, Sparkles, ArrowRight, ShieldCheck, Info, HeartPulse } from 'lucide-react';
+import { Search, MapPin, Stethoscope, Heart, Baby, Smile, Eye, Ear, Bone, Brain, Sparkles, ArrowRight, ShieldCheck, Info, HeartPulse, BookOpen } from 'lucide-react';
 
 const POPULAR_SPECIALTIES = [
   { name: 'Hausarzt', icon: Stethoscope, slug: 'hausarzt' },
@@ -253,7 +253,7 @@ export default function HomePage() {
       </section>
 
       {/* USPs */}
-      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
+      <section className="mx-auto max-w-6xl px-4 pb-12 sm:px-6">
         <div className="grid gap-4 md:grid-cols-3">
           {[
             { title: 'Alles auf einer Seite', desc: 'Adresse, Telefon, Website, Öffnungszeiten, Bewertungen und Karte – kompakt und übersichtlich pro Praxis.' },
@@ -265,6 +265,26 @@ export default function HomePage() {
               <p className="mt-1 text-sm text-slate-600">{f.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Ratgeber-CTA */}
+      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
+        <div className="card-soft flex flex-col items-start justify-between gap-4 bg-gradient-to-br from-sky-50 to-white p-6 sm:flex-row sm:items-center sm:p-8">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
+              <BookOpen className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-semibold text-slate-900">Patienten-Ratgeber</h3>
+              <p className="mt-1 text-sm text-slate-600">
+                Facharzt-Termin schneller bekommen, Zweitmeinung einholen, was zahlt die Kasse – kurz und konkret erklärt.
+              </p>
+            </div>
+          </div>
+          <a href="/ratgeber" className="btn-primary whitespace-nowrap">
+            Ratgeber ansehen <ArrowRight className="ml-1.5 h-4 w-4" />
+          </a>
         </div>
       </section>
     </div>
