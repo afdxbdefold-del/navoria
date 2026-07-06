@@ -21,6 +21,8 @@ async function loadDoctor(slug) {
   const col = await getCollection('doctor_places');
   const doc = await col.findOne({ slug });
   if (!doc) return null;
+  // Verworfene Praxen werden von der öffentlichen Seite ausgeblendet
+  if (doc.is_active === false) return null;
   const { _id, source_payload_json, ...rest } = doc;
   return rest;
 }
