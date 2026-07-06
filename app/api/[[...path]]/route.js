@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import { getCollection } from '@/lib/mongodb';
-import { runImport } from '@/lib/services/placesImport';
+import { runImport, resyncOneDoctor, backfillMissingFields } from '@/lib/services/placesImport';
 import { suggestSpecialtiesForSymptom } from '@/lib/services/symptomMapping';
 import { slugify } from '@/lib/services/specialtyDetection';
 import { createSession, requireAdmin } from '@/lib/auth';
@@ -304,6 +304,34 @@ async function handlePost(request, pathParts) {
         maxResults: Math.min(parseInt(maxResults || 20, 10), 60),
       });
       return json({ ok: true, job: result });
+    } catch (err) {
+      return json({ error: String(err.message || err) }, { status: 500 });
+    }
+  }
+
+  // POST /api/admin/doctors/:id/resync – Einzel-Praxis neu synchronisieren (Place Details)
+  if (pathParts[0] === 'admin' && pathParts[1] === 'doctors' && pathParts[2] && pathParts[3] === 'resync') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const id = pathParts[2];
+    const col = await getCollection('doctor_places');
+    const doc = await col.findOne({ id });
+    if (!doc) return json({ error: 'Nicht gefunden' }, { status: 404 });
+    if (!doc.google_place_id) return json({ error: 'Keine externe ID' }, { status: 400 });
+    try {
+      const result = await resyncOneDoctor(doc.google_place_id);
+      return json({ ok: true, result });
+    } catch (err) {
+      return json({ error: String(err.message || err) }, { status: 500 });
+    }
+  }
+
+  // POST /api/admin/backfill – Batch-Refresh fehlender Felder (accessibility/parking/payment)
+  if (pathParts[0] === 'admin' && pathParts[1] === 'backfill') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const limit = Math.min(parseInt(body.limit || 50, 10), 200);
+    try {
+      const result = await backfillMissingFields({ limit });
+      return json({ ok: true, ...result });
     } catch (err) {
       return json({ error: String(err.message || err) }, { status: 500 });
     }
