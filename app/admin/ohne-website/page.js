@@ -23,6 +23,7 @@ function List({ token }) {
   const [totals, setTotals] = useState({ total_no_website: 0, unchecked: 0, checked: 0, discarded: 0 });
   const [show, setShow] = useState('unchecked');
   const [cityFilter, setCityFilter] = useState('');
+  const [sort, setSort] = useState('reviews'); // 'city' | 'reviews' | 'rating' | 'name'
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -34,7 +35,7 @@ function List({ token }) {
   const load = async () => {
     setLoading(true);
     try {
-      const q = new URLSearchParams({ show });
+      const q = new URLSearchParams({ show, sort });
       if (cityFilter) q.set('city', cityFilter);
       q.set('limit', String(PAGE_SIZE));
       q.set('offset', String((page - 1) * PAGE_SIZE));
@@ -53,9 +54,9 @@ function List({ token }) {
     } catch { toast.error('Fehler beim Laden'); }
     setLoading(false);
   };
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [show, cityFilter, page]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [show, cityFilter, sort, page]);
   // Filter-/View-Wechsel setzt Seite zurück
-  useEffect(() => { setPage(1); }, [show, cityFilter]);
+  useEffect(() => { setPage(1); }, [show, cityFilter, sort]);
 
   const totalPages = Math.max(1, Math.ceil(matchCount / PAGE_SIZE));
 
@@ -169,6 +170,17 @@ function List({ token }) {
             {allCities.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         )}
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm min-w-[190px]"
+          title="Sortierung"
+        >
+          <option value="reviews">🔥 Meiste Bewertungen zuerst</option>
+          <option value="rating">⭐ Beste Bewertung zuerst</option>
+          <option value="city">📍 Stadt A→Z</option>
+          <option value="name">🔤 Name A→Z</option>
+        </select>
         {(matchCount > 0 && matchCount !== items.length) && (
           <p className="self-center text-xs text-slate-400">
             Zeige {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, matchCount)} von {matchCount}
@@ -218,6 +230,17 @@ function List({ token }) {
                     </Link>
                     {doc.specialty_guess && <span className="rounded-full border border-sky-100 bg-sky-50 px-2 py-0.5 text-[11px] font-medium text-sky-700">{doc.specialty_guess}</span>}
                     {doc.city && <span className="text-xs text-slate-500">{doc.city}</span>}
+                    {doc.rating != null && (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-800"
+                        title={`Google-Bewertung: ${Number(doc.rating).toFixed(1)} · ${doc.user_rating_count || 0} Rezensionen`}
+                      >
+                        ⭐ {Number(doc.rating).toFixed(1)}
+                        {doc.user_rating_count != null && (
+                          <span className="text-amber-700/70">({doc.user_rating_count})</span>
+                        )}
+                      </span>
+                    )}
                     {isDiscarded && <span className="rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[11px] font-medium text-rose-700">verworfen</span>}
                   </div>
                   {doc.formatted_address && (

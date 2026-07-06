@@ -262,13 +262,14 @@ async function handleGet(request, pathParts) {
     return json({ items: list.map(stripId), open_count: openCount });
   }
 
-  // GET /api/admin/doctors-no-website?show=unchecked|checked|all&city=&limit=&offset=
+  // GET /api/admin/doctors-no-website?show=unchecked|checked|all&city=&limit=&offset=&sort=city|reviews|rating|name
   if (pathParts[0] === 'admin' && pathParts[1] === 'doctors-no-website') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
     const show = params.get('show') || 'unchecked';
     const cityFilter = params.get('city') || '';
     const limit = Math.min(parseInt(params.get('limit') || '500', 10), 2000);
     const offset = Math.max(parseInt(params.get('offset') || '0', 10), 0);
+    const sort = params.get('sort') || 'city';
     const col = await getCollection('doctor_places');
     const noWebsite = { $or: [{ website_url: { $exists: false } }, { website_url: null }, { website_url: '' }] };
     const notDiscarded = { is_active: { $ne: false } };
@@ -278,9 +279,17 @@ async function handleGet(request, pathParts) {
     else if (show === 'checked') filter = { ...noWebsite, ...notDiscarded, website_checked_at: { $exists: true, $ne: null } };
     else filter = { ...noWebsite, ...notDiscarded };
     if (cityFilter) filter.city = cityFilter;
-    const projection = { _id: 0, id: 1, name: 1, slug: 1, city: 1, city_slug: 1, formatted_address: 1, phone_national: 1, specialty_guess: 1, google_place_id: 1, google_maps_url: 1, website_checked_at: 1, is_active: 1, discarded_at: 1 };
+    const projection = { _id: 0, id: 1, name: 1, slug: 1, city: 1, city_slug: 1, formatted_address: 1, phone_national: 1, specialty_guess: 1, google_place_id: 1, google_maps_url: 1, website_checked_at: 1, is_active: 1, discarded_at: 1, rating: 1, user_rating_count: 1 };
+    // Sortier-Modi
+    const sortMap = {
+      city: { city: 1, name: 1 },
+      reviews: { user_rating_count: -1, rating: -1, name: 1 },  // meiste Rezensionen zuerst
+      rating: { rating: -1, user_rating_count: -1, name: 1 },   // beste Bewertung zuerst
+      name: { name: 1 },
+    };
+    const sortSpec = sortMap[sort] || sortMap.city;
     const [list, matchCount] = await Promise.all([
-      col.find(filter, { projection }).sort({ city: 1, name: 1 }).skip(offset).limit(limit).toArray(),
+      col.find(filter, { projection }).sort(sortSpec).skip(offset).limit(limit).toArray(),
       col.countDocuments(filter),
     ]);
 
