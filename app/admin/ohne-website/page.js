@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { ArrowLeft, Globe, Phone, MapPin, ExternalLink, RefreshCw, Search, CheckCircle2, Circle, Loader2, Copy } from 'lucide-react';
+import { ArrowLeft, Globe, Phone, MapPin, ExternalLink, RefreshCw, Search, CheckCircle2, Loader2, Copy, Trash2 } from 'lucide-react';
 
 export default function AdminOhneWebseitePage() {
   const [token, setToken] = useState(null);
@@ -18,7 +18,9 @@ export default function AdminOhneWebseitePage() {
 
 function List({ token }) {
   const [items, setItems] = useState([]);
-  const [totals, setTotals] = useState({ total_no_website: 0, unchecked: 0, checked: 0 });
+  const [allCities, setAllCities] = useState([]);
+  const [matchCount, setMatchCount] = useState(0);
+  const [totals, setTotals] = useState({ total_no_website: 0, unchecked: 0, checked: 0, discarded: 0 });
   const [show, setShow] = useState('unchecked');
   const [cityFilter, setCityFilter] = useState('');
   const [search, setSearch] = useState('');
@@ -30,19 +32,25 @@ function List({ token }) {
   const load = async () => {
     setLoading(true);
     try {
-      const r = await fetch(`/api/admin/doctors-no-website?show=${show}`, { headers: authHeaders });
+      const q = new URLSearchParams({ show });
+      if (cityFilter) q.set('city', cityFilter);
+      q.set('limit', '1000');
+      const r = await fetch(`/api/admin/doctors-no-website?${q}`, { headers: authHeaders });
       if (r.status === 401) { toast.error('Sitzung abgelaufen'); window.location.href = '/admin'; return; }
       const data = await r.json();
       setItems(Array.isArray(data.items) ? data.items : []);
+      setAllCities(Array.isArray(data.all_cities) ? data.all_cities : []);
+      setMatchCount(data.match_count || 0);
       setTotals({
         total_no_website: data.total_no_website || 0,
         unchecked: data.unchecked || 0,
         checked: data.checked || 0,
+        discarded: data.discarded || 0,
       });
     } catch { toast.error('Fehler beim Laden'); }
     setLoading(false);
   };
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [show]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [show, cityFilter]);
 
   const toggleChecked = async (doc) => {
     setBusyId(doc.id);
@@ -54,7 +62,6 @@ function List({ token }) {
       const data = await r.json();
       if (!r.ok) throw new Error(data.error);
       toast.success(doc.website_checked_at ? 'Zurückgesetzt' : 'Abgehakt');
-      // Aus aktueller Ansicht rausfiltern
       if (show === 'unchecked') setItems((prev) => prev.filter((it) => it.id !== doc.id));
       else if (show === 'checked' && doc.website_checked_at) setItems((prev) => prev.filter((it) => it.id !== doc.id));
       else setItems((prev) => prev.map((it) => it.id === doc.id ? { ...it, website_checked_at: doc.website_checked_at ? null : new Date().toISOString() } : it));
@@ -67,12 +74,53 @@ function List({ token }) {
     setBusyId(null);
   };
 
-  const cities = [...new Set(items.map((i) => i.city).filter(Boolean))].sort();
-  const filtered = items.filter((it) => {
-    if (cityFilter && it.city !== cityFilter) return false;
-    if (search && !it.name.toLowerCase().includes(search.toLowerCase())) return false;
-    return true;
-  });
+  const discardDoctor = async (doc) => {
+    if (!confirm(`Praxis wirklich verwerfen?\n\n"${doc.name}"\n\nSie wird aus dem Verzeichnis, aus der Suche und aus der Sitemap entfernt. Wiederherstellbar über Filter „Verworfen".`)) return;
+    setBusyId(doc.id);
+    try {
+      const r = await fetch(`/api/admin/doctors/${doc.id}/discard`, {
+        method: 'POST', headers: authHeaders,
+        body: JSON.stringify({ discarded: true, reason: 'admin_ohne_website' }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error);
+      toast.success('Verworfen');
+      setItems((prev) => prev.filter((it) => it.id !== doc.id));
+      setTotals((t) => ({
+        ...t,
+        total_no_website: Math.max(0, t.total_no_website - 1),
+        unchecked: doc.website_checked_at ? t.unchecked : Math.max(0, t.unchecked - 1),
+        checked: doc.website_checked_at ? Math.max(0, t.checked - 1) : t.checked,
+        discarded: t.discarded + 1,
+      }));
+    } catch (err) { toast.error(String(err.message || err)); }
+    setBusyId(null);
+  };
+
+  const restoreDoctor = async (doc) => {
+    setBusyId(doc.id);
+    try {
+      const r = await fetch(`/api/admin/doctors/${doc.id}/discard`, {
+        method: 'POST', headers: authHeaders,
+        body: JSON.stringify({ discarded: false }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error);
+      toast.success('Wiederhergestellt');
+      setItems((prev) => prev.filter((it) => it.id !== doc.id));
+      setTotals((t) => ({
+        ...t,
+        total_no_website: t.total_no_website + 1,
+        unchecked: t.unchecked + 1,
+        discarded: Math.max(0, t.discarded - 1),
+      }));
+    } catch (err) { toast.error(String(err.message || err)); }
+    setBusyId(null);
+  };
+
+  const filtered = search
+    ? items.filter((it) => it.name.toLowerCase().includes(search.toLowerCase()))
+    : items;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -85,14 +133,16 @@ function List({ token }) {
           <p className="mt-1 text-sm text-slate-500">
             Insgesamt <strong className="font-semibold text-slate-800">{totals.total_no_website}</strong> Praxen ohne Website ·
             <strong className="mx-1 font-semibold text-amber-700">{totals.unchecked}</strong> noch zu prüfen ·
-            <strong className="ml-1 font-semibold text-emerald-700">{totals.checked}</strong> bereits abgehakt
+            <strong className="ml-1 font-semibold text-emerald-700">{totals.checked}</strong> abgehakt ·
+            <strong className="ml-1 font-semibold text-slate-500">{totals.discarded}</strong> verworfen
           </p>
         </div>
         <div className="flex items-center gap-2">
           <select value={show} onChange={(e) => setShow(e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm">
             <option value="unchecked">Zu prüfen ({totals.unchecked})</option>
-            <option value="checked">Bereits abgehakt ({totals.checked})</option>
-            <option value="all">Alle ({totals.total_no_website})</option>
+            <option value="checked">Abgehakt ({totals.checked})</option>
+            <option value="discarded">Verworfen ({totals.discarded})</option>
+            <option value="all">Aktiv (alle) ({totals.total_no_website})</option>
           </select>
           <button onClick={load} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm hover:bg-slate-50">
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Aktualisieren
@@ -106,11 +156,14 @@ function List({ token }) {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Nach Praxisname suchen …" className="w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 py-2 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100" />
         </div>
-        {cities.length > 1 && (
-          <select value={cityFilter} onChange={(e) => setCityFilter(e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm">
-            <option value="">Alle Städte</option>
-            {cities.map((c) => <option key={c} value={c}>{c}</option>)}
+        {allCities.length > 1 && (
+          <select value={cityFilter} onChange={(e) => setCityFilter(e.target.value)} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm min-w-[180px]">
+            <option value="">Alle Städte ({allCities.length})</option>
+            {allCities.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
+        )}
+        {(matchCount > 0 && matchCount !== items.length) && (
+          <p className="self-center text-xs text-slate-400">Zeige {items.length} von {matchCount}</p>
         )}
       </div>
 
@@ -124,30 +177,39 @@ function List({ token }) {
           </div>
         ) : filtered.map((doc) => {
           const isChecked = !!doc.website_checked_at;
+          const isDiscarded = doc.is_active === false;
           const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(doc.name + ' ' + (doc.city || '') + ' website')}`;
           const profileUrl = typeof window !== 'undefined' ? `${window.location.origin}/praxis/${doc.city_slug}/${doc.slug}` : `/praxis/${doc.city_slug}/${doc.slug}`;
           return (
-            <div key={doc.id} className={`rounded-xl border p-4 transition ${isChecked ? 'border-emerald-100 bg-emerald-50/40' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
+            <div key={doc.id} className={`rounded-xl border p-4 transition ${isDiscarded ? 'border-slate-200 bg-slate-100/60 opacity-70' : isChecked ? 'border-emerald-100 bg-emerald-50/40' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
               <div className="flex flex-wrap items-start gap-4">
-                {/* Checkbox */}
-                <button
-                  onClick={() => toggleChecked(doc)}
-                  disabled={busyId === doc.id}
-                  className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition ${isChecked ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-300 bg-white hover:border-emerald-400'} disabled:opacity-50`}
-                  aria-label={isChecked ? 'Wieder öffnen' : 'Als geprüft markieren'}
-                  title={isChecked ? `Abgehakt am ${new Date(doc.website_checked_at).toLocaleDateString('de-DE')}` : 'Als geprüft markieren'}
-                >
-                  {busyId === doc.id ? <Loader2 className="h-4 w-4 animate-spin" /> : isChecked ? <CheckCircle2 className="h-4 w-4" /> : null}
-                </button>
+                {/* Checkbox (nicht bei verworfenen) */}
+                {!isDiscarded && (
+                  <button
+                    onClick={() => toggleChecked(doc)}
+                    disabled={busyId === doc.id}
+                    className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border transition ${isChecked ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-300 bg-white hover:border-emerald-400'} disabled:opacity-50`}
+                    aria-label={isChecked ? 'Wieder öffnen' : 'Als geprüft markieren'}
+                    title={isChecked ? `Abgehakt am ${new Date(doc.website_checked_at).toLocaleDateString('de-DE')}` : 'Als geprüft markieren'}
+                  >
+                    {busyId === doc.id ? <Loader2 className="h-4 w-4 animate-spin" /> : isChecked ? <CheckCircle2 className="h-4 w-4" /> : null}
+                  </button>
+                )}
+                {isDiscarded && (
+                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-rose-200 bg-rose-50 text-rose-500" title="Verworfen">
+                    <Trash2 className="h-4 w-4" />
+                  </div>
+                )}
 
                 {/* Info */}
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <Link href={`/praxis/${doc.city_slug}/${doc.slug}`} target="_blank" className={`font-semibold hover:text-sky-700 ${isChecked ? 'text-slate-500 line-through' : 'text-slate-900'}`}>
+                    <Link href={`/praxis/${doc.city_slug}/${doc.slug}`} target="_blank" className={`font-semibold hover:text-sky-700 ${isChecked || isDiscarded ? 'text-slate-500 line-through' : 'text-slate-900'}`}>
                       {doc.name}
                     </Link>
                     {doc.specialty_guess && <span className="rounded-full border border-sky-100 bg-sky-50 px-2 py-0.5 text-[11px] font-medium text-sky-700">{doc.specialty_guess}</span>}
                     {doc.city && <span className="text-xs text-slate-500">{doc.city}</span>}
+                    {isDiscarded && <span className="rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[11px] font-medium text-rose-700">verworfen</span>}
                   </div>
                   {doc.formatted_address && (
                     <p className="mt-1 flex items-start gap-1 text-xs text-slate-500">
@@ -183,11 +245,35 @@ function List({ token }) {
                         <Copy className="h-3 w-3" /> Name
                       </button>
                     )}
+                    {!isDiscarded && (
+                      <button
+                        disabled={busyId === doc.id}
+                        onClick={() => discardDoctor(doc)}
+                        className="inline-flex items-center gap-1 rounded-md border border-rose-200 bg-white px-2 py-1 text-rose-700 hover:bg-rose-50 disabled:opacity-50"
+                        title="Aus dem Verzeichnis entfernen"
+                      >
+                        <Trash2 className="h-3 w-3" /> Verwerfen
+                      </button>
+                    )}
+                    {isDiscarded && (
+                      <button
+                        disabled={busyId === doc.id}
+                        onClick={() => restoreDoctor(doc)}
+                        className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                      >
+                        <RefreshCw className="h-3 w-3" /> Wiederherstellen
+                      </button>
+                    )}
                   </div>
 
-                  {isChecked && (
+                  {isChecked && !isDiscarded && (
                     <p className="mt-2 text-xs text-emerald-700">
                       Als geprüft markiert am {new Date(doc.website_checked_at).toLocaleDateString('de-DE')}
+                    </p>
+                  )}
+                  {isDiscarded && doc.discarded_at && (
+                    <p className="mt-2 text-xs text-rose-700">
+                      Verworfen am {new Date(doc.discarded_at).toLocaleDateString('de-DE')}
                     </p>
                   )}
                 </div>
