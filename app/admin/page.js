@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Lock, LogOut, RefreshCw, Play, Database, Building2, ListChecks, AlertTriangle, CheckCircle2, Clock, Loader2 } from 'lucide-react';
+import { Lock, LogOut, RefreshCw, Play, Database, Building2, ListChecks, AlertTriangle, CheckCircle2, Clock, Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PLACE_TYPES = [
@@ -87,6 +87,11 @@ function Dashboard({ token, onLogout }) {
   const [maxResults, setMaxResults] = useState(20);
   const [importing, setImporting] = useState(false);
 
+  // Backfill state
+  const [backfilling, setBackfilling] = useState(false);
+  const [backfillForce, setBackfillForce] = useState(false);
+  const [backfillProgress, setBackfillProgress] = useState({ total: 0, ok: 0, failed: 0 });
+
   const authHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
 
   const loadAll = async () => {
@@ -134,6 +139,43 @@ function Dashboard({ token, onLogout }) {
       toast.error(String(err.message || err));
     }
     setImporting(false);
+  };
+
+  // Backfill: alle Praxen via Places Details API neu ziehen (Barrierefreiheit, Parken, Bezahlung, Stadtteil)
+  // Läuft in Schleife in Batches à 50, damit Requests nicht in Serverless-Timeouts laufen.
+  const runBackfill = async () => {
+    if (backfilling) return;
+    if (!confirm(`Backfill wirklich starten?\n\n${backfillForce ? '⚠ FORCE-Modus: ALLE Praxen werden neu synchronisiert (kostet 1 API-Request pro Praxis).' : 'Nur Praxen mit letzter Sync-Zeit > 24h werden aktualisiert.'}`)) return;
+    setBackfilling(true);
+    setBackfillProgress({ total: 0, ok: 0, failed: 0 });
+    let totalOk = 0, totalFailed = 0, totalProcessed = 0;
+    let emptyRuns = 0;
+    try {
+      // Bis zu 20 Runden × 50 = max. 1000 Praxen
+      for (let i = 0; i < 20; i += 1) {
+        const r = await fetch('/api/admin/backfill', {
+          method: 'POST',
+          headers: authHeaders,
+          body: JSON.stringify({ limit: 50, force: backfillForce }),
+        });
+        if (r.status === 401) { toast.error('Sitzung abgelaufen'); onLogout(); return; }
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || 'Backfill fehlgeschlagen');
+        totalProcessed += data.processed;
+        totalOk += data.ok;
+        totalFailed += data.failed;
+        setBackfillProgress({ total: totalProcessed, ok: totalOk, failed: totalFailed });
+        if (data.processed === 0) { emptyRuns += 1; if (emptyRuns >= 1) break; }
+        else emptyRuns = 0;
+        // Kleine Pause zwischen Batches
+        await new Promise((r2) => setTimeout(r2, 400));
+      }
+      toast.success(`Backfill fertig: ${totalOk} aktualisiert, ${totalFailed} Fehler`);
+      await loadAll();
+    } catch (err) {
+      toast.error(String(err.message || err));
+    }
+    setBackfilling(false);
   };
 
   return (
@@ -195,6 +237,60 @@ function Dashboard({ token, onLogout }) {
           <h2 className="text-lg font-semibold text-slate-900">Letzter Importlauf</h2>
           {stats?.last_job ? <JobDetails job={stats.last_job} /> : <p className="mt-2 text-sm text-slate-500">Noch keine Läufe.</p>}
         </div>
+      </div>
+
+      {/* Backfill Card */}
+      <div className="card-soft mt-6 p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+              <Sparkles className="h-5 w-5 text-sky-600" /> Datenanreicherung (Backfill)
+            </h2>
+            <p className="mt-1 max-w-2xl text-sm text-slate-500">
+              Zieht für bestehende Praxen die neuen Datenfelder nach: <b>Barrierefreiheit</b>, <b>Parken</b>, <b>Bezahlung</b>, <b>Stadtteil</b>, <b>Titel</b> und aktuelle Öffnungszeiten. Läuft in Batches à 50 mit 250 ms Rate-Limit. Manuelle Overrides werden respektiert.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 text-xs font-medium text-slate-600">
+              <input
+                type="checkbox"
+                checked={backfillForce}
+                onChange={(e) => setBackfillForce(e.target.checked)}
+                disabled={backfilling}
+                className="h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+              />
+              Alle erzwingen (statt nur älter 24h)
+            </label>
+            <button onClick={runBackfill} disabled={backfilling} className="btn-primary">
+              {backfilling ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Läuft …</> : <><Sparkles className="mr-2 h-4 w-4" /> Backfill starten</>}
+            </button>
+          </div>
+        </div>
+        {(backfilling || backfillProgress.total > 0) && (
+          <div className="mt-4 grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-white p-2"><Database className="h-4 w-4 text-slate-500" /></div>
+              <div>
+                <div className="text-xs text-slate-500">Verarbeitet</div>
+                <div className="text-lg font-semibold text-slate-900">{backfillProgress.total}</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-white p-2"><CheckCircle2 className="h-4 w-4 text-emerald-500" /></div>
+              <div>
+                <div className="text-xs text-slate-500">Aktualisiert</div>
+                <div className="text-lg font-semibold text-emerald-700">{backfillProgress.ok}</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-white p-2"><AlertTriangle className="h-4 w-4 text-rose-500" /></div>
+              <div>
+                <div className="text-xs text-slate-500">Fehler</div>
+                <div className="text-lg font-semibold text-rose-700">{backfillProgress.failed}</div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Job history */}

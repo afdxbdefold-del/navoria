@@ -329,8 +329,9 @@ async function handlePost(request, pathParts) {
   if (pathParts[0] === 'admin' && pathParts[1] === 'backfill') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
     const limit = Math.min(parseInt(body.limit || 50, 10), 200);
+    const force = body.force === true || body.force === 'true';
     try {
-      const result = await backfillMissingFields({ limit });
+      const result = await backfillMissingFields({ limit, force });
       return json({ ok: true, ...result });
     } catch (err) {
       return json({ error: String(err.message || err) }, { status: 500 });
