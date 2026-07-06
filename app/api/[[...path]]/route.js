@@ -287,6 +287,117 @@ async function handleGet(request, pathParts) {
     return json({ items: list, match_count: matchCount, all_cities: allCities, limit, offset, ...totals });
   }
 
+  // GET /api/admin/duplicates?type=address|name&limit=&offset=
+  //   Findet Gruppen mit >1 aktivem Eintrag an derselben Adresse ODER mit identischem Namen in derselben Stadt.
+  //   Fügt jeder Gruppe automatisch einen Vorschlag hinzu: der "beste" Eintrag wird behalten (is_suggested_keep),
+  //   alle anderen werden zum Verwerfen vorgeschlagen (is_suggested_discard).
+  if (pathParts[0] === 'admin' && pathParts[1] === 'duplicates') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const type = params.get('type') === 'name' ? 'name' : 'address';
+    const limit = Math.min(parseInt(params.get('limit') || '100', 10), 500);
+    const offset = Math.max(parseInt(params.get('offset') || '0', 10), 0);
+    const cityFilter = (params.get('city') || '').trim();
+
+    const col = await getCollection('doctor_places');
+    const matchStage = { is_active: { $ne: false } };
+    if (cityFilter) matchStage.city = cityFilter;
+
+    let groupId;
+    if (type === 'name') {
+      matchStage.name = { $exists: true, $ne: null, $ne: '' };
+      matchStage.city_slug = { $exists: true, $ne: null, $ne: '' };
+      groupId = { name_key: { $toLower: { $trim: { input: '$name' } } }, city_slug: '$city_slug' };
+    } else {
+      matchStage.formatted_address = { $exists: true, $ne: null, $ne: '' };
+      groupId = { addr_key: { $toLower: { $trim: { input: '$formatted_address' } } } };
+    }
+
+    const docShape = {
+      id: '$id', name: '$name', slug: '$slug', city: '$city', city_slug: '$city_slug',
+      formatted_address: '$formatted_address', rating: '$rating',
+      user_rating_count: '$user_rating_count', website_url: '$website_url',
+      is_verified: '$is_verified', specialty_guess: '$specialty_guess',
+      phone_national: '$phone_national', google_place_id: '$google_place_id',
+      google_maps_url: '$google_maps_url', opening_hours_json: '$opening_hours_json',
+      created_at: '$created_at', updated_at: '$updated_at',
+    };
+
+    // Zwei Aggregations parallel: Gesamt-Match-Count und die aktuelle Seite
+    const pipelineBase = [
+      { $match: matchStage },
+      { $group: { _id: groupId, count: { $sum: 1 }, docs: { $push: docShape } } },
+      { $match: { count: { $gt: 1 } } },
+    ];
+    const [totalGroupsAgg, groupsPage, totalDupesAgg] = await Promise.all([
+      col.aggregate([...pipelineBase, { $count: 'n' }]).toArray(),
+      col.aggregate([
+        ...pipelineBase,
+        { $sort: { count: -1, '_id': 1 } },
+        { $skip: offset },
+        { $limit: limit },
+      ]).toArray(),
+      col.aggregate([
+        ...pipelineBase,
+        { $group: { _id: null, groups: { $sum: 1 }, total_docs: { $sum: '$count' } } },
+      ]).toArray(),
+    ]);
+
+    const totalGroups = totalGroupsAgg[0]?.n || 0;
+    const totalStats = totalDupesAgg[0] || { groups: 0, total_docs: 0 };
+
+    // Score-Funktion: bester Eintrag pro Gruppe
+    const score = (d) => {
+      let s = 0;
+      if (d.website_url) s += 5;
+      if (d.is_verified) s += 3;
+      if (d.phone_national) s += 1;
+      if (d.opening_hours_json) s += 1;
+      s += (d.rating || 0);
+      s += Math.log((d.user_rating_count || 0) + 1) * 0.5;
+      return s;
+    };
+
+    const groups = groupsPage.map((g) => {
+      const docs = (g.docs || []).map((d) => ({ ...d, _score: Math.round(score(d) * 100) / 100 }));
+      docs.sort((a, b) => b._score - a._score || (b.user_rating_count || 0) - (a.user_rating_count || 0));
+      // Falls Gleichstand oben: nur einer wird als keep markiert (der erste)
+      const enriched = docs.map((d, i) => ({
+        ...d,
+        is_suggested_keep: i === 0,
+        is_suggested_discard: i !== 0,
+      }));
+      return {
+        key: g._id,
+        count: g.count,
+        // Für die UI eine lesbare Header-Zeile
+        label: type === 'name'
+          ? `${enriched[0]?.name || ''} · ${enriched[0]?.city || g._id.city_slug || ''}`
+          : (enriched[0]?.formatted_address || ''),
+        docs: enriched,
+      };
+    });
+
+    // Alle Städte für Filter-Dropdown (aus den betroffenen Duplikaten)
+    const affectedCities = await col.aggregate([
+      { $match: { is_active: { $ne: false }, city: { $ne: null } } },
+      { $group: { _id: type === 'name' ? { name_key: { $toLower: { $trim: { input: '$name' } } }, city_slug: '$city_slug', city: '$city' } : { addr_key: { $toLower: { $trim: { input: '$formatted_address' } } }, city: '$city' }, count: { $sum: 1 } } },
+      { $match: { count: { $gt: 1 } } },
+      { $group: { _id: '$_id.city' } },
+      { $sort: { _id: 1 } },
+    ]).toArray();
+
+    return json({
+      type,
+      total_groups: totalGroups,
+      total_duplicate_docs: totalStats.total_docs || 0,
+      redundant_count: Math.max(0, (totalStats.total_docs || 0) - (totalStats.groups || 0)), // wie viele könnten verworfen werden
+      groups,
+      all_cities: affectedCities.map((c) => c._id).filter(Boolean),
+      limit,
+      offset,
+    });
+  }
+
   // GET /api/admin/export – vollständigen doctor_places Dump als JSON zum Download
   if (pathParts[0] === 'admin' && pathParts[1] === 'export') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
@@ -412,6 +523,25 @@ async function handlePost(request, pathParts) {
     const res = await doctors.findOneAndUpdate({ id: pathParts[2] }, { $set: set }, { returnDocument: 'after' });
     if (!res) return json({ error: 'Nicht gefunden' }, { status: 404 });
     return json({ ok: true, doctor: stripId(res) });
+  }
+
+  // POST /api/admin/doctors/bulk-discard – mehrere Praxen auf einmal soft-verwerfen (is_active:false)
+  //   body: { ids: [uuid, uuid, ...], reason?: 'string' }
+  if (pathParts[0] === 'admin' && pathParts[1] === 'doctors' && pathParts[2] === 'bulk-discard') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const { ids, reason } = body || {};
+    if (!Array.isArray(ids) || ids.length === 0) return json({ error: 'ids[] erforderlich' }, { status: 400 });
+    if (ids.length > 5000) return json({ error: 'Zu viele Einträge (>5000)' }, { status: 400 });
+    const doctors = await getCollection('doctor_places');
+    const set = {
+      is_active: false,
+      discarded_at: new Date(),
+      updated_at: new Date(),
+    };
+    if (reason && typeof reason === 'string') set.discard_reason = reason.slice(0, 200);
+    else set.discard_reason = 'admin_duplicate';
+    const res = await doctors.updateMany({ id: { $in: ids }, is_active: { $ne: false } }, { $set: set });
+    return json({ ok: true, matched: res.matchedCount, modified: res.modifiedCount });
   }
 
   // POST /api/admin/doctors/:id/discard – Praxis dauerhaft aus Verzeichnis ausblenden

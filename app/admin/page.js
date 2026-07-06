@@ -239,6 +239,7 @@ function Dashboard({ token, onLogout }) {
           <a href="/admin/kampagnen" className="btn-primary">Bulk-Kampagne</a>
           <a href="/admin/aerzte" className="btn-secondary">Praxen verwalten</a>
           <a href="/admin/ohne-website" className="btn-secondary">Ohne Website</a>
+          <a href="/admin/duplikate" className="btn-secondary">Duplikate</a>
           <a href="/admin/korrekturen" className="btn-secondary">Korrektur-Meldungen</a>
           <button onClick={loadAll} className="btn-secondary"><RefreshCw className={`mr-1.5 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} /> Aktualisieren</button>
           <button onClick={onLogout} className="btn-secondary"><LogOut className="mr-1.5 h-4 w-4" /> Abmelden</button>
