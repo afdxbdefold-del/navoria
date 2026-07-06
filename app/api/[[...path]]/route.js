@@ -252,6 +252,25 @@ async function handleGet(request, pathParts) {
     return json({ items: list.map(stripId), open_count: openCount });
   }
 
+  // GET /api/admin/doctors-no-website?show=unchecked|checked|all
+  if (pathParts[0] === 'admin' && pathParts[1] === 'doctors-no-website') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const show = params.get('show') || 'unchecked';
+    const col = await getCollection('doctor_places');
+    const noWebsite = { $or: [{ website_url: { $exists: false } }, { website_url: null }, { website_url: '' }] };
+    let filter = noWebsite;
+    if (show === 'unchecked') filter = { ...noWebsite, $and: [{ $or: [{ website_checked_at: { $exists: false } }, { website_checked_at: null }] }] };
+    else if (show === 'checked') filter = { ...noWebsite, website_checked_at: { $exists: true, $ne: null } };
+    const projection = { _id: 0, id: 1, name: 1, slug: 1, city: 1, city_slug: 1, formatted_address: 1, phone_national: 1, specialty_guess: 1, google_place_id: 1, google_maps_url: 1, website_checked_at: 1 };
+    const list = await col.find(filter, { projection }).sort({ city: 1, name: 1 }).limit(500).toArray();
+    const totals = {
+      total_no_website: await col.countDocuments(noWebsite),
+      unchecked: await col.countDocuments({ ...noWebsite, $and: [{ $or: [{ website_checked_at: { $exists: false } }, { website_checked_at: null }] }] }),
+      checked: await col.countDocuments({ ...noWebsite, website_checked_at: { $exists: true, $ne: null } }),
+    };
+    return json({ items: list, ...totals });
+  }
+
   return json({ error: 'Not found' }, { status: 404 });
 }
 
@@ -335,6 +354,25 @@ async function handlePost(request, pathParts) {
       { $set: { is_verified: !!verified, verified_at: verified ? new Date() : null, verification_method: verified ? (method || 'admin_manual') : null, updated_at: new Date() } },
       { returnDocument: 'after' }
     );
+    if (!res) return json({ error: 'Nicht gefunden' }, { status: 404 });
+    return json({ ok: true, doctor: stripId(res) });
+  }
+
+  // POST /api/admin/doctors/:id/website-checked – Website-Recherche für Praxis abhaken
+  //   body: { checked: true, website_url?: '...' } – wenn website_url vorhanden, wird sie mit als manueller Override gespeichert
+  if (pathParts[0] === 'admin' && pathParts[1] === 'doctors' && pathParts[2] && pathParts[3] === 'website-checked') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const { checked, website_url } = body || {};
+    const doctors = await getCollection('doctor_places');
+    const set = { updated_at: new Date() };
+    if (checked) set.website_checked_at = new Date();
+    else set.website_checked_at = null;
+    if (website_url && typeof website_url === 'string' && website_url.trim().length > 0) {
+      const url = website_url.trim().startsWith('http') ? website_url.trim() : `https://${website_url.trim()}`;
+      set.website_url = url;
+      set['manual_overrides.website_url'] = url;
+    }
+    const res = await doctors.findOneAndUpdate({ id: pathParts[2] }, { $set: set }, { returnDocument: 'after' });
     if (!res) return json({ error: 'Nicht gefunden' }, { status: 404 });
     return json({ ok: true, doctor: stripId(res) });
   }
