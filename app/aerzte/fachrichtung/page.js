@@ -10,6 +10,7 @@ export const metadata = {
   alternates: { canonical: '/aerzte/fachrichtung' },
 };
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 600;
 
 const SPECIFIC_PRIMARY_TYPES = new Set(['dentist', 'dental_clinic', 'pharmacy', 'hospital', 'general_hospital', 'physiotherapist']);

@@ -9,6 +9,7 @@ export const metadata = {
   alternates: { canonical: '/aerzte' },
 };
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 300;
 
 export default async function AerzteHubPage() {

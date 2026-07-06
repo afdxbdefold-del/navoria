@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import RatingBadge from '@/components/RatingBadge';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 600;
 
 // Nur sehr spezifische primary_types als Fallback nutzen. 'doctor' ist zu unspezifisch
@@ -348,7 +349,6 @@ export default async function SpecialtyPillarPage({ params }) {
   );
 }
 
-// Statische Params für alle 19 Fachrichtungen (ISR)
-export async function generateStaticParams() {
-  return SPECIALTIES.map((s) => ({ slug: s.slug }));
-}
+// Statische Params entfernt: Prerender aller 19 Pillar-Seiten beim Build würde MongoDB
+// benötigen, das während des Cloud-Builds nicht erreichbar ist. Stattdessen werden die
+// Seiten on-demand beim ersten Request generiert und via ISR (revalidate = 600) gecached.
