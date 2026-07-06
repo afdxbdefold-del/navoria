@@ -112,7 +112,17 @@ async function handleGet(request, pathParts) {
     if (andClauses.length) filter.$and = andClauses;
 
     const total = await col.countDocuments(filter);
-    let docs = await col.find(filter).limit(500).toArray();
+    let docs = await col.find(filter, {
+      projection: {
+        _id: 0,
+        id: 1, name: 1, slug: 1, city: 1, city_slug: 1,
+        specialty_guess: 1, rating: 1, user_rating_count: 1,
+        phone_national: 1, phone_international: 1, website_url: 1,
+        formatted_address: 1, google_maps_url: 1, is_verified: 1,
+        opening_hours_json: 1, latitude: 1, longitude: 1,
+        primary_type: 1, primary_type_display: 1,
+      },
+    }).limit(500).toArray();
 
     // Ranking
     docs = docs.map((d) => ({
