@@ -75,10 +75,30 @@ const websiteSchema = {
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
+  '@id': `${BASE_URL}#organization`,
   name: 'Navoria',
+  legalName: 'AF Consulting',
   url: BASE_URL,
   logo: `${BASE_URL}/icon.svg`,
   slogan: 'Ihr nächster Arzt. Ohne Umwege.',
+  foundingDate: '2025',
+  founder: { '@type': 'Person', name: 'Andreas Frey' },
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Am Nesseufer 1',
+    postalCode: '26789',
+    addressLocality: 'Leer',
+    addressCountry: 'DE',
+  },
+  contactPoint: [{
+    '@type': 'ContactPoint',
+    email: 'mail@navoria.de',
+    contactType: 'customer support',
+    availableLanguage: ['de'],
+  }],
+  publishingPrinciples: `${BASE_URL}/redaktionelle-standards`,
+  correctionsPolicy: `${BASE_URL}/korrekturen`,
+  areaServed: { '@type': 'Country', name: 'Deutschland' },
   sameAs: [],
 };
 
@@ -131,8 +151,8 @@ function Footer() {
   return (
     <footer className="mt-24 border-t border-slate-100 bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-        <div className="grid gap-8 md:grid-cols-4">
-          <div>
+        <div className="grid gap-8 md:grid-cols-3 lg:grid-cols-5">
+          <div className="lg:col-span-1 md:col-span-3 lg:row-span-1">
             <div className="flex items-center gap-2">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-sky-500 to-teal-500 text-white">
                 <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
@@ -141,7 +161,8 @@ function Footer() {
               </div>
               <span className="font-semibold text-slate-900">Navoria</span>
             </div>
-            <p className="mt-3 text-sm text-slate-500">Navigation zum passenden Arzt.</p>
+            <p className="mt-3 text-sm text-slate-500">Verzeichnis für Arztpraxen in Deutschland.</p>
+            <p className="mt-2 text-xs text-slate-400">Betrieben von AF Consulting seit 2025.</p>
           </div>
           <div>
             <h4 className="text-sm font-semibold text-slate-900">Suchen</h4>
@@ -162,17 +183,26 @@ function Footer() {
             </ul>
           </div>
           <div>
+            <h4 className="text-sm font-semibold text-slate-900">Über Navoria</h4>
+            <ul className="mt-3 space-y-2 text-sm text-slate-600">
+              <li><a className="hover:text-sky-600" href="/ueber-uns">Über uns</a></li>
+              <li><a className="hover:text-sky-600" href="/redaktionelle-standards">Redaktionelle Standards</a></li>
+              <li><a className="hover:text-sky-600" href="/korrekturen">Korrekturen melden</a></li>
+              <li><a className="hover:text-sky-600" href="mailto:mail@navoria.de">Kontakt</a></li>
+            </ul>
+          </div>
+          <div>
             <h4 className="text-sm font-semibold text-slate-900">Rechtliches</h4>
             <ul className="mt-3 space-y-2 text-sm text-slate-600">
               <li><a className="hover:text-sky-600" href="/impressum">Impressum</a></li>
               <li><a className="hover:text-sky-600" href="/datenschutz">Datenschutz</a></li>
               <li><ConsentResetLink className="hover:text-sky-600" /></li>
             </ul>
-            <p className="mt-4 text-xs text-slate-400">Datenquelle: öffentliche Praxisinformationen und externe Karten-/Verzeichnisdienste.</p>
+            <p className="mt-4 text-xs text-slate-400">Betreiber: AF Consulting, 26789 Leer. Datenquelle: öffentliche Karten- und Verzeichnisdienste.</p>
           </div>
         </div>
         <div className="mt-8 border-t border-slate-200 pt-6 text-center text-xs text-slate-400">
-          Keine medizinische Diagnose. Bei Notfall 112. © {new Date().getFullYear()} Navoria
+          Kein Ersatz für ärztliche Beratung. Bei akutem Notfall 112, bei dringenden Beschwerden 116 117. © {new Date().getFullYear()} Navoria · AF Consulting
         </div>
       </div>
     </footer>

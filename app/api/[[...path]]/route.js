@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 import { getCollection } from '@/lib/mongodb';
 import { runImport, resyncOneDoctor, backfillMissingFields } from '@/lib/services/placesImport';
 import { suggestSpecialtiesForSymptom } from '@/lib/services/symptomMapping';
 import { slugify } from '@/lib/services/specialtyDetection';
 import { createSession, requireAdmin } from '@/lib/auth';
+
+function hashString(s) {
+  return crypto.createHash('sha256').update(String(s)).digest('hex').slice(0, 16);
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -236,12 +241,103 @@ async function handleGet(request, pathParts) {
     return json(list.map(stripId));
   }
 
+  // GET /api/admin/corrections?status=open
+  if (pathParts[0] === 'admin' && pathParts[1] === 'corrections') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const status = params.get('status') || 'open';
+    const col = await getCollection('correction_requests');
+    const filter = status === 'all' ? {} : { status };
+    const list = await col.find(filter).sort({ created_at: -1 }).limit(200).toArray();
+    const openCount = await col.countDocuments({ status: 'open' });
+    return json({ items: list.map(stripId), open_count: openCount });
+  }
+
   return json({ error: 'Not found' }, { status: 404 });
 }
 
 async function handlePost(request, pathParts) {
   let body = {};
   try { body = await request.json(); } catch { body = {}; }
+
+  // POST /api/correction-requests – öffentlich, mit einfachem Anti-Spam-Rate-Limit
+  if (pathParts[0] === 'correction-requests' && !pathParts[1]) {
+    const { doctor_id, field, correct_value, note, email } = body || {};
+    if (!doctor_id || !field) return json({ error: 'doctor_id und field erforderlich' }, { status: 400 });
+    if (typeof correct_value === 'string' && correct_value.length > 500) return json({ error: 'Wert zu lang' }, { status: 400 });
+    if (typeof note === 'string' && note.length > 500) return json({ error: 'Anmerkung zu lang' }, { status: 400 });
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ error: 'Ungültige E-Mail' }, { status: 400 });
+
+    const doctors = await getCollection('doctor_places');
+    const doc = await doctors.findOne({ id: doctor_id }, { projection: { id: 1, name: 1, slug: 1, city_slug: 1 } });
+    if (!doc) return json({ error: 'Praxis nicht gefunden' }, { status: 404 });
+
+    const corrections = await getCollection('correction_requests');
+    // Sehr einfaches Rate-Limit: pro doctor_id/field/email max 3 offene Meldungen
+    const openCount = await corrections.countDocuments({ doctor_id, field, status: 'open', email: email || null });
+    if (openCount >= 3) return json({ error: 'Zu viele offene Meldungen für dieses Feld. Bitte auf Bearbeitung warten.' }, { status: 429 });
+
+    const ip = (request.headers.get('x-forwarded-for') || '').split(',')[0].trim() || null;
+    const ua = request.headers.get('user-agent') || null;
+
+    await corrections.insertOne({
+      id: uuidv4(),
+      doctor_id,
+      doctor_name: doc.name,
+      doctor_slug: doc.slug,
+      doctor_city_slug: doc.city_slug,
+      field,
+      correct_value: correct_value ? String(correct_value).slice(0, 500) : null,
+      note: note ? String(note).slice(0, 500) : null,
+      email: email || null,
+      status: 'open',
+      created_at: new Date(),
+      ip_hash: ip ? hashString(ip) : null,
+      user_agent_snippet: ua ? ua.slice(0, 120) : null,
+    });
+    return json({ ok: true });
+  }
+
+  // POST /api/admin/corrections/:id/resolve – Meldung abschließen (accept oder reject)
+  if (pathParts[0] === 'admin' && pathParts[1] === 'corrections' && pathParts[2] && pathParts[3] === 'resolve') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const { action, apply_override } = body || {}; // action: 'accept' | 'reject'
+    if (!['accept', 'reject'].includes(action)) return json({ error: 'Ungültige Aktion' }, { status: 400 });
+    const corrections = await getCollection('correction_requests');
+    const doc = await corrections.findOne({ id: pathParts[2] });
+    if (!doc) return json({ error: 'Nicht gefunden' }, { status: 404 });
+
+    // Optional: manual override in doctor_places anwenden
+    if (action === 'accept' && apply_override && doc.correct_value) {
+      const doctors = await getCollection('doctor_places');
+      const fieldMap = { phone: 'phone_national', address: 'formatted_address', website: 'website_url', specialty: 'specialty_guess', name: 'name', opening_hours: null };
+      const dbField = fieldMap[doc.field];
+      if (dbField) {
+        await doctors.updateOne(
+          { id: doc.doctor_id },
+          { $set: { [dbField]: doc.correct_value, [`manual_overrides.${dbField}`]: doc.correct_value, updated_at: new Date() } }
+        );
+      }
+    }
+    await corrections.updateOne(
+      { id: pathParts[2] },
+      { $set: { status: action === 'accept' ? 'accepted' : 'rejected', resolved_at: new Date() } }
+    );
+    return json({ ok: true });
+  }
+
+  // POST /api/admin/doctors/:id/verify – Praxis manuell als verifiziert markieren
+  if (pathParts[0] === 'admin' && pathParts[1] === 'doctors' && pathParts[2] && pathParts[3] === 'verify') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const { verified, method } = body || {};
+    const doctors = await getCollection('doctor_places');
+    const res = await doctors.findOneAndUpdate(
+      { id: pathParts[2] },
+      { $set: { is_verified: !!verified, verified_at: verified ? new Date() : null, verification_method: verified ? (method || 'admin_manual') : null, updated_at: new Date() } },
+      { returnDocument: 'after' }
+    );
+    if (!res) return json({ error: 'Nicht gefunden' }, { status: 404 });
+    return json({ ok: true, doctor: stripId(res) });
+  }
 
   // POST /api/admin/login
   if (pathParts[0] === 'admin' && pathParts[1] === 'login') {

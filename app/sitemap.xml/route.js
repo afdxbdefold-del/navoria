@@ -13,6 +13,11 @@ export async function GET() {
   const urls = [];
   urls.push(url(base, '', 1.0));
   urls.push(url(base, '/aerzte', 0.9));
+  urls.push(url(base, '/ueber-uns', 0.7));
+  urls.push(url(base, '/redaktionelle-standards', 0.6));
+  urls.push(url(base, '/korrekturen', 0.5));
+  urls.push(url(base, '/impressum', 0.3));
+  urls.push(url(base, '/datenschutz', 0.3));
   for (const c of cities) {
     urls.push(url(base, `/aerzte/${c.slug}`, 0.8));
     for (const s of SPECIALTIES) {

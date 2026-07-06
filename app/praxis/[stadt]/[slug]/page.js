@@ -3,9 +3,10 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
   Phone, Globe, MapPin, ExternalLink, Clock, ShieldAlert, Info, CalendarClock,
-  Accessibility, CreditCard, ParkingCircle, HelpCircle, Stethoscope, ArrowRight, RefreshCw,
+  Accessibility, CreditCard, ParkingCircle, HelpCircle, Stethoscope, ArrowRight, RefreshCw, BadgeCheck,
 } from 'lucide-react';
 import CopyButton from '@/components/CopyButton';
+import CorrectionButton from '@/components/CorrectionButton';
 import FaqAccordion from '@/components/praxis/FaqAccordion';
 import MobileStickyCta from '@/components/praxis/MobileStickyCta';
 import { parseDisplayName } from '@/lib/doctorFormatter';
@@ -179,6 +180,14 @@ export default async function ProfilePage({ params }) {
     ...(d.city && { areaServed: { '@type': 'City', name: d.city } }),
     ...(paymentAccepted.length && { paymentAccepted: paymentAccepted.join(', ') }),
     ...(amenityFeatures.length && { amenityFeature: amenityFeatures }),
+    ...(d.is_verified && d.verified_at && {
+      identifier: {
+        '@type': 'PropertyValue',
+        propertyID: 'navoria:verified',
+        value: `verified:${new Date(d.verified_at).toISOString().slice(0, 10)}`,
+      },
+    }),
+    publisher: { '@id': `${base}#organization` },
     inLanguage: 'de-DE',
   };
 
@@ -251,6 +260,11 @@ export default async function ProfilePage({ params }) {
             <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600">{humanizedType}</span>
           )}
           {d.business_status === 'OPERATIONAL' && <span className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">Aktiv</span>}
+          {d.is_verified && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800" title="Vom Praxis-Team oder redaktionell bestätigt">
+              <BadgeCheck className="h-3.5 w-3.5" /> Verifiziert
+            </span>
+          )}
           {openNow === true && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800"><span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />Jetzt geöffnet</span>}
           {openNow === false && <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600"><span className="inline-block h-1.5 w-1.5 rounded-full bg-slate-400" />Aktuell geschlossen{nextOpen ? ` · öffnet ${nextOpen.dayLabel} ${String(nextOpen.hour).padStart(2, '0')}:${String(nextOpen.minute).padStart(2, '0')}` : ''}</span>}
         </div>
@@ -518,9 +532,21 @@ export default async function ProfilePage({ params }) {
               <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
               <div className="space-y-2">
                 <p>Navoria stellt öffentlich verfügbare Praxisinformationen bereit. Angaben zu Öffnungszeiten, Leistungen und Terminverfügbarkeit können sich ändern. Bitte bestätigen Sie wichtige Informationen direkt bei der Praxis.</p>
-                <p>Diese Seite ersetzt keine medizinische Beratung. Bei akuten lebensbedrohlichen Beschwerden wählen Sie <strong className="font-semibold">112</strong>.</p>
+                <p>Diese Seite ersetzt keine medizinische Beratung. Bei akuten lebensbedrohlichen Beschwerden wählen Sie <strong className="font-semibold">112</strong>. Für den ärztlichen Bereitschaftsdienst außerhalb der Sprechzeiten: <strong className="font-semibold">116 117</strong>.</p>
               </div>
             </div>
+          </section>
+
+          {/* Vertrauens- / Korrektur-Zeile */}
+          <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-600">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+              <Link href="/redaktionelle-standards" className="hover:text-sky-700">Wie diese Daten geprüft werden</Link>
+              <span className="text-slate-300">·</span>
+              <Link href="/korrekturen" className="hover:text-sky-700">Korrektur-Verfahren</Link>
+              <span className="text-slate-300">·</span>
+              <Link href="/ueber-uns" className="hover:text-sky-700">Über Navoria</Link>
+            </div>
+            <CorrectionButton doctorId={d.id} doctorName={displayName} />
           </section>
         </div>
 
