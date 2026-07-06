@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Lock, LogOut, RefreshCw, Play, Database, Building2, ListChecks, AlertTriangle, CheckCircle2, Clock, Loader2, Sparkles } from 'lucide-react';
+import { Lock, LogOut, RefreshCw, Play, Database, Building2, ListChecks, AlertTriangle, CheckCircle2, Clock, Loader2, Sparkles, Download, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
 const PLACE_TYPES = [
@@ -178,6 +178,56 @@ function Dashboard({ token, onLogout }) {
     setBackfilling(false);
   };
 
+  // Export: JSON aller Praxen aus dieser Umgebung herunterladen
+  const [exporting, setExporting] = useState(false);
+  const [importing2, setImporting2] = useState(false);
+  const [importReport, setImportReport] = useState(null);
+  const [importForce, setImportForce] = useState(false);
+
+  const runExport = async () => {
+    setExporting(true);
+    try {
+      const r = await fetch('/api/admin/export', { headers: authHeaders });
+      if (r.status === 401) { toast.error('Sitzung abgelaufen'); onLogout(); return; }
+      if (!r.ok) throw new Error('Export fehlgeschlagen');
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const stamp = new Date().toISOString().slice(0, 10);
+      link.download = `navoria-export-${stamp}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      toast.success('Export heruntergeladen');
+    } catch (err) { toast.error(String(err.message || err)); }
+    setExporting(false);
+  };
+
+  const runImport = async (file) => {
+    if (!file) return;
+    if (!confirm(`Import wirklich starten?\n\nDatei: ${file.name}\nModus: ${importForce ? '⚠ REPLACE (löscht alle bestehenden Einträge zuerst)' : 'MERGE (bestehende werden upgedatet, neue eingefügt)'}\n\nManuelle Overrides bleiben erhalten.`)) return;
+    setImporting2(true);
+    setImportReport(null);
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      const doctors = Array.isArray(parsed) ? parsed : (parsed.doctors || parsed.items || []);
+      if (!Array.isArray(doctors) || doctors.length === 0) throw new Error('Keine Praxen in der Datei gefunden');
+      const r = await fetch('/api/admin/import', {
+        method: 'POST', headers: authHeaders,
+        body: JSON.stringify({ doctors, mode: importForce ? 'replace' : 'merge', force: importForce }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'Import fehlgeschlagen');
+      setImportReport(data);
+      toast.success(`Import fertig: ${data.inserted} neu, ${data.updated} aktualisiert, ${data.skipped} übersprungen`);
+      await loadAll();
+    } catch (err) { toast.error(String(err.message || err)); }
+    setImporting2(false);
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -240,6 +290,62 @@ function Dashboard({ token, onLogout }) {
           {stats?.last_job ? <JobDetails job={stats.last_job} /> : <p className="mt-2 text-sm text-slate-500">Noch keine Läufe.</p>}
         </div>
       </div>
+
+      {/* Sync / Export / Import */}
+      <div className="card-soft mt-6 p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+              <Database className="h-5 w-5 text-emerald-600" /> Sync (Export / Import zwischen Umgebungen)
+            </h2>
+            <p className="mt-1 max-w-2xl text-sm text-slate-500">
+              Aus <b>Production</b> exportieren, dann in <b>Preview</b> importieren – oder umgekehrt. Der Import ist per Default <b>MERGE</b>: bestehende Praxen werden per <code>google_place_id</code> aktualisiert, neue eingefügt. Manuelle Overrides werden respektiert.
+            </p>
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button onClick={runExport} disabled={exporting} className="btn-secondary">
+            {exporting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Export läuft …</> : <><Download className="mr-2 h-4 w-4" /> JSON exportieren</>}
+          </button>
+          <label className={`btn-secondary cursor-pointer ${importing2 ? 'opacity-60' : ''}`}>
+            {importing2 ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Import läuft …</> : <><Upload className="mr-2 h-4 w-4" /> JSON importieren …</>}
+            <input
+              type="file"
+              accept=".json,application/json"
+              className="hidden"
+              disabled={importing2}
+              onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; runImport(f); }}
+            />
+          </label>
+          <label className="flex items-center gap-2 text-xs font-medium text-slate-600">
+            <input
+              type="checkbox"
+              checked={importForce}
+              onChange={(e) => setImportForce(e.target.checked)}
+              disabled={importing2}
+              className="h-4 w-4 rounded border-slate-300 text-rose-600 focus:ring-rose-500"
+            />
+            <span className="text-rose-700">REPLACE-Modus (löscht ALLES vorher)</span>
+          </label>
+        </div>
+        {importReport && (
+          <div className="mt-4 grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm sm:grid-cols-4">
+            <div><span className="text-slate-500">Verarbeitet:</span> <b className="text-slate-900">{importReport.total_processed}</b></div>
+            <div><span className="text-slate-500">Neu:</span> <b className="text-emerald-700">{importReport.inserted}</b></div>
+            <div><span className="text-slate-500">Aktualisiert:</span> <b className="text-sky-700">{importReport.updated}</b></div>
+            <div><span className="text-slate-500">Übersprungen:</span> <b className="text-slate-600">{importReport.skipped}</b></div>
+            {importReport.errors?.length > 0 && (
+              <div className="sm:col-span-4 mt-2 rounded border border-rose-200 bg-rose-50 p-2 text-xs text-rose-800">
+                {importReport.errors.length} Fehler beim Import. Erste: {importReport.errors[0].error}
+              </div>
+            )}
+          </div>
+        )}
+        <p className="mt-3 text-xs text-slate-400">
+          <b>So syncst du Production → Preview:</b> Auf navoria.de/admin auf „JSON exportieren" klicken (lädt Datei) → im Preview-Admin auf „JSON importieren" klicken → Datei auswählen. Alle Praxen werden per <code>google_place_id</code> gematcht.
+        </p>
+      </div>
+
 
       {/* Backfill Card */}
       <div className="card-soft mt-6 p-6">

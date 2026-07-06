@@ -271,6 +271,27 @@ async function handleGet(request, pathParts) {
     return json({ items: list, ...totals });
   }
 
+  // GET /api/admin/export – vollständigen doctor_places Dump als JSON zum Download
+  if (pathParts[0] === 'admin' && pathParts[1] === 'export') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const col = await getCollection('doctor_places');
+    const docs = await col.find({}, { projection: { _id: 0 } }).toArray();
+    const payload = {
+      exported_at: new Date().toISOString(),
+      source: 'navoria',
+      count: docs.length,
+      doctors: docs,
+    };
+    const filename = `navoria-export-${new Date().toISOString().slice(0, 10)}.json`;
+    return new NextResponse(JSON.stringify(payload, null, 2), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Content-Disposition': `attachment; filename="${filename}"`,
+      },
+    });
+  }
+
   return json({ error: 'Not found' }, { status: 404 });
 }
 
@@ -470,6 +491,64 @@ async function handlePost(request, pathParts) {
     } catch (err) {
       return json({ error: String(err.message || err) }, { status: 500 });
     }
+  }
+
+  // POST /api/admin/import – JSON aus anderer Umgebung importieren (Prod → Preview Sync)
+  //   body: { doctors: [ ... ], mode?: 'merge' | 'replace' }
+  //   - merge (default): upsert by google_place_id, manual_overrides respektieren
+  //   - replace: erst löschen, dann neu einspielen (nur mit force=true erlaubt)
+  if (pathParts[0] === 'admin' && pathParts[1] === 'import') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const { doctors, mode = 'merge', force = false } = body || {};
+    if (!Array.isArray(doctors)) return json({ error: 'doctors[] erforderlich' }, { status: 400 });
+    if (doctors.length > 20000) return json({ error: 'Zu viele Einträge (>20.000)' }, { status: 400 });
+
+    const doctorsCol = await getCollection('doctor_places');
+    let inserted = 0, updated = 0, skipped = 0;
+    const errors = [];
+
+    if (mode === 'replace') {
+      if (!force) return json({ error: 'mode=replace benötigt force=true' }, { status: 400 });
+      await doctorsCol.deleteMany({});
+    }
+
+    for (const raw of doctors) {
+      try {
+        if (!raw || !raw.google_place_id) { skipped += 1; continue; }
+        // Date-Felder zurück konvertieren (kamen als ISO-Strings über JSON)
+        const doc = { ...raw };
+        delete doc._id;
+        for (const k of ['created_at', 'updated_at', 'last_synced_at', 'last_external_sync_at', 'verified_at', 'website_checked_at']) {
+          if (doc[k] && typeof doc[k] === 'string') doc[k] = new Date(doc[k]);
+        }
+        const existing = await doctorsCol.findOne({ google_place_id: doc.google_place_id });
+        if (existing) {
+          const setFields = { ...doc };
+          delete setFields.id;
+          delete setFields.created_at;
+          // Manuelle Overrides der lokalen Kopie respektieren
+          const overrides = existing.manual_overrides || {};
+          for (const field of Object.keys(overrides)) {
+            if (overrides[field] != null) delete setFields[field];
+          }
+          setFields.updated_at = new Date();
+          await doctorsCol.updateOne({ google_place_id: doc.google_place_id }, { $set: setFields });
+          updated += 1;
+        } else {
+          doc.id = doc.id || uuidv4();
+          doc.created_at = doc.created_at || new Date();
+          doc.updated_at = new Date();
+          doc.manual_overrides = doc.manual_overrides || {};
+          doc.data_conflicts = doc.data_conflicts || [];
+          await doctorsCol.insertOne(doc);
+          inserted += 1;
+        }
+      } catch (err) {
+        errors.push({ gid: raw?.google_place_id, error: String(err.message || err) });
+      }
+    }
+
+    return json({ ok: true, inserted, updated, skipped, errors: errors.slice(0, 20), total_processed: doctors.length });
   }
 
   return json({ error: 'Not found' }, { status: 404 });
