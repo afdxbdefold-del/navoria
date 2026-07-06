@@ -4,12 +4,12 @@ import { SPECIALTIES } from '@/lib/specialties';
 import { MapPin, Stethoscope, ArrowRight } from 'lucide-react';
 
 export const metadata = {
-  title: 'Ärzte finden nach Stadt und Fachrichtung | Navoria',
+  title: 'Ärzte finden nach Stadt und Fachrichtung',
   description: 'Übersicht aller Standorte und Fachrichtungen bei Navoria. Ihr direkter Einstieg zur passenden Praxis in Deutschland.',
+  alternates: { canonical: '/aerzte' },
 };
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 300;
 
 export default async function AerzteHubPage() {
   const citiesCol = await getCollection('cities');

@@ -1,8 +1,9 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Datenschutzerklärung | Navoria',
+  title: 'Datenschutzerklärung',
   description: 'Informationen zur Datenverarbeitung bei Navoria nach DSGVO.',
+  alternates: { canonical: '/datenschutz' },
   robots: { index: true, follow: false },
 };
 

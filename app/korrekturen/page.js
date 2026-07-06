@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { AlertCircle } from 'lucide-react';
 
 export const metadata = {
-  title: 'Korrekturen und Fehlermeldungen – Navoria',
+  title: 'Korrekturen und Fehlermeldungen',
   description: 'So melden Sie falsche Angaben zu einer Praxis auf Navoria. Bearbeitungszeit, Verfahren und Ansprechpartner.',
   alternates: { canonical: '/korrekturen' },
 };

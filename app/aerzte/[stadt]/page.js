@@ -25,8 +25,16 @@ export async function generateMetadata({ params }) {
   const city = await loadCity(stadt);
   const cityName = city?.name || stadt;
   return {
-    title: `Ärzte in ${cityName} finden | Navoria`,
+    title: `Ärzte in ${cityName} finden`,
     description: `Finden Sie passende Ärzte und Praxen in ${cityName}. Mit Adresse, Telefonnummer, Website, Öffnungszeiten und Kartenlink.`,
+    alternates: { canonical: `/aerzte/${stadt}` },
+    openGraph: {
+      title: `Ärzte in ${cityName} finden`,
+      description: `Finden Sie passende Ärzte und Praxen in ${cityName}.`,
+      url: `/aerzte/${stadt}`,
+      type: 'website',
+      locale: 'de_DE',
+    },
   };
 }
 
@@ -136,7 +144,7 @@ function DoctorRow({ d, stadt }) {
               <a href={`tel:${d.phone_international || d.phone_national}`} className="flex items-center gap-1 text-slate-600 hover:text-sky-700 break-all"><Phone className="h-4 w-4 shrink-0" /> {d.phone_national || d.phone_international}</a>
             )}
             {d.website_url && (
-              <a href={d.website_url} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-slate-600 hover:text-sky-700"><Globe className="h-4 w-4" /> Website</a>
+              <a href={d.website_url} target="_blank" rel="nofollow noopener noreferrer" className="flex items-center gap-1 text-slate-600 hover:text-sky-700"><Globe className="h-4 w-4" /> Website</a>
             )}
           </div>
         </div>

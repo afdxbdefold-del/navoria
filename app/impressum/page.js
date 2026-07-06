@@ -1,8 +1,9 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Impressum | Navoria',
+  title: 'Impressum',
   description: 'Impressum und Anbieterkennzeichnung nach § 5 TMG für Navoria.',
+  alternates: { canonical: '/impressum' },
   robots: { index: true, follow: false },
 };
 

@@ -99,7 +99,6 @@ const organizationSchema = {
   publishingPrinciples: `${BASE_URL}/redaktionelle-standards`,
   correctionsPolicy: `${BASE_URL}/korrekturen`,
   areaServed: { '@type': 'Country', name: 'Deutschland' },
-  sameAs: [],
 };
 
 export default function RootLayout({ children }) {

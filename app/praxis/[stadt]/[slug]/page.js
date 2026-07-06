@@ -182,7 +182,6 @@ export default async function ProfilePage({ params }) {
       },
     }),
     ...(phone && { telephone: phone }),
-    ...(d.website_url && { url: d.website_url }),
     ...(d.latitude != null && d.longitude != null && {
       geo: { '@type': 'GeoCoordinates', latitude: d.latitude, longitude: d.longitude },
     }),

@@ -27,10 +27,26 @@ export async function generateMetadata({ params }) {
   const spec = specialtyBySlug(fachrichtung);
   const city = await loadCity(stadt);
   const cityName = city?.name || stadt;
-  if (!spec) return { title: 'Nicht gefunden | Navoria' };
+  if (!spec) return { title: 'Nicht gefunden' };
+
+  // Thin-Content-Schutz: wenn keine Ärzte für Stadt+Fach vorhanden sind → noindex
+  const doctors = await loadDoctorsForSpecialty(stadt, spec.label, spec.placeType);
+  const hasContent = doctors.length > 0;
+
   return {
-    title: `${spec.plural} in ${cityName} finden | Navoria`,
+    title: `${spec.plural} in ${cityName} finden`,
     description: `Finden Sie ${spec.plural} in ${cityName}. Mit Adresse, Telefonnummer, Website, Öffnungszeiten und Kartenlink. Aktuelle Praxis-Informationen aus öffentlichen Quellen.`,
+    alternates: { canonical: `/aerzte/${stadt}/${fachrichtung}` },
+    robots: hasContent
+      ? { index: true, follow: true }
+      : { index: false, follow: true },
+    openGraph: {
+      title: `${spec.plural} in ${cityName}`,
+      description: `Übersicht der ${spec.plural} in ${cityName}.`,
+      url: `/aerzte/${stadt}/${fachrichtung}`,
+      type: 'website',
+      locale: 'de_DE',
+    },
   };
 }
 
@@ -111,7 +127,7 @@ export default async function CitySpecialtyPage({ params }) {
                       <a href={`tel:${d.phone_international || d.phone_national}`} className="flex items-center gap-1 text-slate-600 hover:text-sky-700 break-all"><Phone className="h-4 w-4 shrink-0" /> {d.phone_national || d.phone_international}</a>
                     )}
                     {d.website_url && (
-                      <a href={d.website_url} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-slate-600 hover:text-sky-700"><Globe className="h-4 w-4" /> Website</a>
+                      <a href={d.website_url} target="_blank" rel="nofollow noopener noreferrer" className="flex items-center gap-1 text-slate-600 hover:text-sky-700"><Globe className="h-4 w-4" /> Website</a>
                     )}
                   </div>
                 </div>
