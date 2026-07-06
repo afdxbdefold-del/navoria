@@ -86,6 +86,17 @@ export default async function CityPage({ params }) {
       <h1 className="text-4xl font-semibold tracking-tight text-slate-900">Ärzte in {cityName} finden</h1>
       <p className="mt-3 max-w-2xl text-slate-600">{doctors.length} Praxen in unserer Datenbasis für {cityName} – mit vollständigen Kontaktdaten.</p>
 
+      {/* Sekundäre Nav: Stadtteile falls verfügbar */}
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Link
+          href={`/aerzte/${stadt}/stadtteil`}
+          className="inline-flex items-center gap-1 rounded-full border border-sky-100 bg-sky-50 px-3 py-1.5 text-xs font-medium text-sky-700 hover:bg-sky-100"
+        >
+          <MapPin className="h-3 w-3" /> Nach Stadtteil sortieren
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
+
       <div className="mt-8 grid gap-6 lg:grid-cols-[240px_1fr]">
         {/* Sidebar: Fachrichtungen dieser Stadt */}
         <aside className="card-soft h-fit p-5">

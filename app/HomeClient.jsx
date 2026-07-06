@@ -234,9 +234,14 @@ export default function HomePage() {
 
       {/* Große Städte */}
       <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-slate-900">Ärzte in großen Städten</h2>
-          <p className="text-sm text-slate-500">Direktzugang zu den wichtigsten deutschen Standorten.</p>
+        <div className="mb-6 flex items-end justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-slate-900">Ärzte in großen Städten</h2>
+            <p className="text-sm text-slate-500">Direktzugang zu den wichtigsten deutschen Standorten.</p>
+          </div>
+          <a href="/aerzte/bundesland" className="hidden text-sm font-medium text-sky-700 hover:text-sky-800 sm:inline-flex sm:items-center sm:gap-1">
+            Nach Bundesland <ArrowRight className="h-3.5 w-3.5" />
+          </a>
         </div>
         <div className="flex flex-wrap gap-2">
           {BIG_CITIES.map((c) => (
