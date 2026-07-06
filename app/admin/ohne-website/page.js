@@ -24,7 +24,6 @@ function List({ token }) {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
-  const [urlDraft, setUrlDraft] = useState({}); // { doctorId: 'https://...' }
 
   const authHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
 
@@ -45,19 +44,17 @@ function List({ token }) {
   };
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [show]);
 
-  const toggleChecked = async (doc, saveUrl = false) => {
+  const toggleChecked = async (doc) => {
     setBusyId(doc.id);
-    const url = saveUrl ? (urlDraft[doc.id] || '').trim() : null;
     try {
       const r = await fetch(`/api/admin/doctors/${doc.id}/website-checked`, {
         method: 'POST', headers: authHeaders,
-        body: JSON.stringify({ checked: !doc.website_checked_at, ...(url && { website_url: url }) }),
+        body: JSON.stringify({ checked: !doc.website_checked_at }),
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error);
-      if (url) toast.success(`Website gespeichert für ${doc.name}`);
-      else toast.success(doc.website_checked_at ? 'Zurückgesetzt' : 'Abgehakt');
-      // Optimistisch aktualisieren – bei "unchecked"-View filtern wir raus
+      toast.success(doc.website_checked_at ? 'Zurückgesetzt' : 'Abgehakt');
+      // Aus aktueller Ansicht rausfiltern
       if (show === 'unchecked') setItems((prev) => prev.filter((it) => it.id !== doc.id));
       else if (show === 'checked' && doc.website_checked_at) setItems((prev) => prev.filter((it) => it.id !== doc.id));
       else setItems((prev) => prev.map((it) => it.id === doc.id ? { ...it, website_checked_at: doc.website_checked_at ? null : new Date().toISOString() } : it));
@@ -66,7 +63,6 @@ function List({ token }) {
         unchecked: doc.website_checked_at ? t.unchecked + 1 : Math.max(0, t.unchecked - 1),
         checked: doc.website_checked_at ? Math.max(0, t.checked - 1) : t.checked + 1,
       }));
-      if (saveUrl) setUrlDraft((prev) => ({ ...prev, [doc.id]: '' }));
     } catch (err) { toast.error(String(err.message || err)); }
     setBusyId(null);
   };
@@ -129,6 +125,7 @@ function List({ token }) {
         ) : filtered.map((doc) => {
           const isChecked = !!doc.website_checked_at;
           const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(doc.name + ' ' + (doc.city || '') + ' website')}`;
+          const profileUrl = typeof window !== 'undefined' ? `${window.location.origin}/praxis/${doc.city_slug}/${doc.slug}` : `/praxis/${doc.city_slug}/${doc.slug}`;
           return (
             <div key={doc.id} className={`rounded-xl border p-4 transition ${isChecked ? 'border-emerald-100 bg-emerald-50/40' : 'border-slate-200 bg-white hover:border-slate-300'}`}>
               <div className="flex flex-wrap items-start gap-4">
@@ -171,6 +168,13 @@ function List({ token }) {
                     <a href={googleSearchUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 text-slate-600 hover:border-sky-200 hover:bg-sky-50 hover:text-sky-800">
                       <Search className="h-3 w-3" /> Google-Suche
                     </a>
+                    <button
+                      onClick={() => { navigator.clipboard.writeText(profileUrl); toast.success('Navoria-Profil-URL kopiert'); }}
+                      className="inline-flex items-center gap-1 rounded-md border border-sky-200 bg-sky-50 px-2 py-1 font-medium text-sky-800 hover:bg-sky-100"
+                      title={profileUrl}
+                    >
+                      <Copy className="h-3 w-3" /> Navoria-URL kopieren
+                    </button>
                     {doc.name && (
                       <button
                         onClick={() => { navigator.clipboard.writeText(doc.name); toast.success('Name kopiert'); }}
@@ -180,26 +184,6 @@ function List({ token }) {
                       </button>
                     )}
                   </div>
-
-                  {/* Optional: Website direkt eintragen */}
-                  {!isChecked && (
-                    <div className="mt-3 flex flex-wrap items-center gap-2">
-                      <input
-                        type="url"
-                        value={urlDraft[doc.id] || ''}
-                        onChange={(e) => setUrlDraft((p) => ({ ...p, [doc.id]: e.target.value }))}
-                        placeholder="Falls Website gefunden: URL hier eintragen …"
-                        className="flex-1 min-w-[240px] rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
-                      />
-                      <button
-                        disabled={busyId === doc.id || !urlDraft[doc.id]?.trim()}
-                        onClick={() => toggleChecked(doc, true)}
-                        className="inline-flex items-center gap-1 rounded-md bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-sky-700 disabled:opacity-50"
-                      >
-                        Speichern &amp; abhaken
-                      </button>
-                    </div>
-                  )}
 
                   {isChecked && (
                     <p className="mt-2 text-xs text-emerald-700">
