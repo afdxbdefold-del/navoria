@@ -1,0 +1,28 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "regions": ["fra1"],
+  "functions": {
+    "app/api/[[...path]]/route.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "app/api/mcp/route.js": {
+      "maxDuration": 30,
+      "memory": 512
+    },
+    "app/sitemap-praxen/[chunk]/route.js": {
+      "maxDuration": 30,
+      "memory": 1024
+    },
+    "app/sitemap-cities.xml/route.js": {
+      "maxDuration": 30,
+      "memory": 512
+    },
+    "app/praxis/[stadt]/[slug]/opengraph-image.js": {
+      "maxDuration": 15,
+      "memory": 512
+    }
+  },
+  "crons": []
+}

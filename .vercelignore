@@ -1,0 +1,25 @@
+# Emergent-spezifische Verzeichnisse
+.emergent/
+test_result.md
+/memory/
+
+# Lokale Umgebung
+.env
+.env.local
+.env.development
+
+# Test-Skripte
+/tests/
+/scripts/db-export/*.gz
+/scripts/db-export/*.json
+
+# Dokumentation für Migrationsprozess (nicht deployen)
+DEPLOYMENT.md
+VERCEL_CHECKLIST.md
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
