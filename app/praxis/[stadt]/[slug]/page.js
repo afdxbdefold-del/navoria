@@ -63,12 +63,42 @@ export async function generateMetadata({ params }) {
   const cityText = d.city || stadt;
   const specialty = d.specialty_guess;
   const displayName = d.name;
+  const canonical = `/praxis/${d.city_slug}/${d.slug}`;
+  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+
+  // HOMEPAGE-MODUS: Metadaten so gestalten, dass Google diese Seite als
+  // eigenständige Praxis-Website erkennt (kein Navoria-Bezug).
+  if (d.homepage_mode === true) {
+    const specialtyLabel = specialty || 'Arztpraxis';
+    const hpTitle = `${displayName} – ${specialtyLabel} in ${cityText}`;
+    const hpDesc = `Praxis ${displayName} in ${cityText}. ${d.formatted_address ? `Adresse: ${d.formatted_address}. ` : ''}${d.phone_national ? `Termine: ${d.phone_national}.` : ''}`;
+    return {
+      title: { absolute: hpTitle },
+      description: hpDesc,
+      alternates: { canonical },
+      robots: { index: true, follow: true },
+      openGraph: {
+        title: hpTitle,
+        description: hpDesc,
+        type: 'website',
+        locale: 'de_DE',
+        url: `${base}${canonical}`,
+        // Bewusst KEIN Navoria-siteName – Google/OG-Clients zeigen die Praxis als Herausgeber.
+        siteName: displayName,
+      },
+      twitter: { card: 'summary', title: hpTitle, description: hpDesc },
+      other: {
+        'og:site_name': displayName,
+        publisher: displayName,
+      },
+    };
+  }
+
+  // STANDARD-DIRECTORY-PROFIL
   const title = specialty
     ? `${displayName} – ${specialty} in ${cityText} | Adresse, Telefon & Öffnungszeiten`
     : `${displayName} in ${cityText} | Adresse, Telefon & Praxisinfos`;
   const description = `Informationen zu ${displayName}${specialty ? ` (${specialty})` : ''} in ${cityText}: Adresse, Telefonnummer, Öffnungszeiten, Fachgebiet, Website und Anfahrt. Angaben bitte vor dem Termin bestätigen.`;
-  const canonical = `/praxis/${d.city_slug}/${d.slug}`;
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
   const ogImage = `${base}${canonical}/opengraph-image${d.last_synced_at ? `?v=${new Date(d.last_synced_at).getTime()}` : ''}`;
   // Praxen MIT eigener EXTERNER Website: noindex,follow – vermeidet Duplicate-Content, Praxis-Website rankt selbst.
   // Praxen OHNE Website (oder mit Navoria-URL als Website): normal indexieren – hier liefern wir echten Mehrwert.

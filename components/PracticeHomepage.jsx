@@ -341,18 +341,53 @@ function normalizeOpeningHours(hours) {
 }
 
 function buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone }) {
+  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
+  const url = `${base}/praxis/${doctor.city_slug}/${doctor.slug}`;
+  // Wir emittieren einen JSON-LD-Graph mit drei Entitäten:
+  // - Organization (die Praxis als eigenständige Firma)
+  // - WebSite (die Homepage als eigenständige Website)
+  // - Physician (die medizinische Praxis-Entität)
+  // Google interpretiert das kombiniert als "eigenständige Praxis-Website".
   return {
     '@context': 'https://schema.org',
-    '@type': 'Physician',
-    '@id': `${process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de'}/praxis/${doctor.city_slug}/${doctor.slug}#physician`,
-    name,
-    telephone: phone || undefined,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: street,
-      postalCode,
-      addressLocality: city,
-      addressCountry: 'DE',
-    },
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${url}#organization`,
+        name,
+        url,
+        telephone: phone || undefined,
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: street,
+          postalCode,
+          addressLocality: city,
+          addressCountry: 'DE',
+        },
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${url}#website`,
+        url,
+        name,
+        inLanguage: 'de-DE',
+        publisher: { '@id': `${url}#organization` },
+      },
+      {
+        '@type': 'Physician',
+        '@id': `${url}#physician`,
+        name,
+        telephone: phone || undefined,
+        url,
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: street,
+          postalCode,
+          addressLocality: city,
+          addressCountry: 'DE',
+        },
+        parentOrganization: { '@id': `${url}#organization` },
+      },
+    ],
   };
 }
