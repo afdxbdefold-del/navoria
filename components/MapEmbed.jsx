@@ -65,7 +65,7 @@ export default function MapEmbed({ src, title, label }) {
         Karte laden
       </div>
       {/* Hinweis unten */}
-      <div className="absolute bottom-2 right-2 text-[10px] text-slate-400">
+      <div className="absolute bottom-2 right-2 text-[10px] text-slate-600">
         Klick lädt OpenStreetMap
       </div>
     </button>

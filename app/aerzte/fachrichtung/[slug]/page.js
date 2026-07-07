@@ -283,7 +283,7 @@ export default async function SpecialtyPillarPage({ params }) {
               </Link>
             ))}
           </div>
-          <p className="mt-3 text-[11px] text-slate-400">Bewertungen von Google (öffentliche Google-Rezensionen). Keine Empfehlung im medizinischen Sinne.</p>
+          <p className="mt-3 text-[11px] text-slate-500">Bewertungen von Google (öffentliche Google-Rezensionen). Keine Empfehlung im medizinischen Sinne.</p>
         </section>
       )}
 

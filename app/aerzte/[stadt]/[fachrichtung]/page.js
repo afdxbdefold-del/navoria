@@ -144,7 +144,7 @@ export default async function CitySpecialtyPage({ params }) {
           ))
         )}
         {doctors.some((d) => d.rating != null && d.user_rating_count > 0) && (
-          <p className="pt-2 text-[11px] text-slate-400">Bewertungen von Google (öffentliche Google-Rezensionen)</p>
+          <p className="pt-2 text-[11px] text-slate-500">Bewertungen von Google (öffentliche Google-Rezensionen)</p>
         )}
       </div>
     </div>

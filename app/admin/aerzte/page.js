@@ -112,7 +112,7 @@ export default function AdminDoctorsPage() {
                       {d.is_verified && <span className="chip border-emerald-100 bg-emerald-50 text-emerald-700"><ShieldCheck className="mr-1 h-3 w-3" />verifiziert</span>}
                       {!d.is_active && <span className="chip border-rose-100 bg-rose-50 text-rose-700">deaktiviert</span>}
                       <span className="chip">{d.primary_type || '–'}</span>
-                      {d.specialty_confidence != null && <span className="text-[10px] text-slate-400">conf {(d.specialty_confidence * 100).toFixed(0)}%</span>}
+                      {d.specialty_confidence != null && <span className="text-[10px] text-slate-600">conf {(d.specialty_confidence * 100).toFixed(0)}%</span>}
                     </div>
                     <p className="mt-1 text-sm text-slate-600">{d.formatted_address}</p>
                     <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">

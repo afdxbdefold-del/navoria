@@ -299,7 +299,7 @@ function ListCard({ title, icon, items, valueLabel }) {
         <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
           {icon} {title}
         </h3>
-        <span className="text-[10px] uppercase tracking-wide text-slate-400">{valueLabel}</span>
+        <span className="text-[10px] uppercase tracking-wide text-slate-600">{valueLabel}</span>
       </div>
       {items.length ? (
         <ul className="divide-y divide-slate-50">

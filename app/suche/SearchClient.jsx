@@ -61,32 +61,35 @@ function SearchContent() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <form onSubmit={submit} className="card-soft p-3 sm:p-4">
+      <form onSubmit={submit} className="card-soft p-3 sm:p-4" aria-label="Suche verfeinern">
         <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Suchbegriff" className="input pl-9" />
+            <label htmlFor="search-q" className="sr-only">Suchbegriff (z. B. Hausarzt, Kardiologe)</label>
+            <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input id="search-q" name="q" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Suchbegriff" className="input pl-9" autoComplete="off" />
           </div>
           <div className="relative">
-            <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input value={ort} onChange={(e) => setOrt(e.target.value)} placeholder="Ort oder PLZ" className="input pl-9" />
+            <label htmlFor="search-ort" className="sr-only">Ort oder Postleitzahl</label>
+            <MapPin aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input id="search-ort" name="ort" type="search" value={ort} onChange={(e) => setOrt(e.target.value)} placeholder="Ort oder PLZ" className="input pl-9" autoComplete="postal-code" />
           </div>
-          <button className="btn-primary">Suchen</button>
+          <button type="submit" className="btn-primary">Suchen</button>
         </div>
       </form>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[280px_1fr]">
-        <aside className="card-soft h-fit p-5">
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-900"><Filter className="h-4 w-4" /> Filter</div>
+        <aside className="card-soft h-fit p-5" aria-label="Filter und Sortierung">
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-900"><Filter className="h-4 w-4" aria-hidden="true" /> Filter</div>
           <div className="mt-5 space-y-5">
             <div>
-              <label className="label">Sortierung</label>
-              <select value={sort} onChange={(e) => setSort(e.target.value)} className="input mt-1.5">
+              <label htmlFor="filter-sort" className="label">Sortierung</label>
+              <select id="filter-sort" value={sort} onChange={(e) => setSort(e.target.value)} className="input mt-1.5">
                 <option value="relevance">Relevanz</option>
                 <option value="completeness">Profil-Vollständigkeit</option>
               </select>
             </div>
-            <div className="space-y-2">
+            <fieldset className="space-y-2">
+              <legend className="label mb-1">Nur Praxen anzeigen mit</legend>
               <label className="flex items-center gap-2 text-sm text-slate-700">
                 <input type="checkbox" checked={withWebsite} onChange={(e) => setWithWebsite(e.target.checked)} className="h-4 w-4 rounded border-slate-300 text-sky-600" /> Mit Website
               </label>
@@ -96,23 +99,29 @@ function SearchContent() {
               <label className="flex items-center gap-2 text-sm text-slate-700">
                 <input type="checkbox" checked={hasHours} onChange={(e) => setHasHours(e.target.checked)} className="h-4 w-4 rounded border-slate-300 text-sky-600" /> Mit Öffnungszeiten
               </label>
-            </div>
+            </fieldset>
           </div>
         </aside>
 
         <div>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-slate-600">
+            <p
+              className="text-sm text-slate-600"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
               {loading ? 'Suche läuft …' : (<><span className="font-semibold text-slate-900">{total}</span> Treffer{q && <> für „<span className="text-slate-900">{q}</span>“</>}{ort && <> in <span className="text-slate-900">{ort}</span></>}</>)}
             </p>
-            <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1">
-              <button onClick={() => setView('list')} className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${view === 'list' ? 'bg-sky-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}><List className="h-4 w-4" /> Liste</button>
-              <button onClick={() => setView('map')} className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${view === 'map' ? 'bg-sky-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}><MapIcon className="h-4 w-4" /> Karte</button>
+            <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1" role="group" aria-label="Darstellung wechseln">
+              <button onClick={() => setView('list')} aria-pressed={view === 'list'} className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${view === 'list' ? 'bg-sky-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}><List className="h-4 w-4" aria-hidden="true" /> Liste</button>
+              <button onClick={() => setView('map')} aria-pressed={view === 'map'} className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${view === 'map' ? 'bg-sky-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}><MapIcon className="h-4 w-4" aria-hidden="true" /> Karte</button>
             </div>
           </div>
 
+          <h2 className="sr-only">Suchergebnisse</h2>
           {loading ? (
-            <div className="flex items-center justify-center py-16 text-slate-500"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Lade Ergebnisse …</div>
+            <div className="flex items-center justify-center py-16 text-slate-500" role="status" aria-label="Lade Ergebnisse"><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> Lade Ergebnisse …</div>
           ) : results.length === 0 ? (
             <div className="card-soft p-10 text-center">
               <h3 className="text-lg font-semibold text-slate-900">Keine Ergebnisse gefunden</h3>
@@ -122,9 +131,13 @@ function SearchContent() {
             <MapView doctors={results} />
           ) : (
             <>
-              <div className="space-y-3">{results.map((d) => <ResultCard key={d.google_place_id} d={d} />)}</div>
+              <ul role="list" className="space-y-3">
+                {results.map((d) => (
+                  <li key={d.google_place_id}><ResultCard d={d} /></li>
+                ))}
+              </ul>
               {results.some((d) => d.rating != null && d.user_rating_count > 0) && (
-                <p className="mt-6 text-[11px] text-slate-400">Bewertungen von Google (öffentliche Google-Rezensionen)</p>
+                <p className="mt-6 text-[11px] text-slate-500">Bewertungen von Google (öffentliche Google-Rezensionen)</p>
               )}
             </>
           )}

@@ -187,7 +187,7 @@ export default function HomePage() {
                   })}
                 </div>
               )}
-              <p className="mt-4 text-[11px] text-slate-400">Navoria ersetzt keine ärztliche Diagnose. Bei akuten oder lebensbedrohlichen Beschwerden rufen Sie 112.</p>
+              <p className="mt-4 text-[11px] text-slate-500">Navoria ersetzt keine ärztliche Diagnose. Bei akuten oder lebensbedrohlichen Beschwerden rufen Sie 112.</p>
             </div>
           )}
         </div>

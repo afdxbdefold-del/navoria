@@ -128,8 +128,19 @@ export default function ClaimForm({ doctor }) {
         </div>
         <div>
           <label htmlFor="email" className={label}>E-Mail{req}</label>
-          <input id="email" type="email" value={form.email} onChange={(e) => upd('email', e.target.value)} className={input} required maxLength={160} autoComplete="email" />
-          <p className="mt-1 text-[11px] text-slate-500">Bevorzugt eine E-Mail-Adresse Ihrer Praxis-Domain – erleichtert die Verifizierung.</p>
+          <input
+            id="email"
+            type="email"
+            value={form.email}
+            onChange={(e) => upd('email', e.target.value)}
+            className={input}
+            required
+            maxLength={160}
+            autoComplete="email"
+            aria-describedby="email-hint"
+            aria-invalid={!!errMsg && errMsg.toLowerCase().includes('e-mail')}
+          />
+          <p id="email-hint" className="mt-1 text-[11px] text-slate-500">Bevorzugt eine E-Mail-Adresse Ihrer Praxis-Domain – erleichtert die Verifizierung.</p>
         </div>
         <div>
           <label htmlFor="phone" className={label}>Telefon (optional)</label>
@@ -155,8 +166,9 @@ export default function ClaimForm({ doctor }) {
           maxLength={1500}
           className={input}
           placeholder="Angaben zu Korrekturen, Zusatzinfos (Sprachen, Kassen/Privat, Schwerpunkte) oder Fragen zur Verifizierung."
+          aria-describedby="message-count"
         />
-        <p className="mt-1 text-[11px] text-slate-500">{form.message.length}/1500 Zeichen</p>
+        <p id="message-count" className="mt-1 text-[11px] text-slate-500" aria-live="polite">{form.message.length}/1500 Zeichen</p>
       </div>
 
       <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50/60 p-4">

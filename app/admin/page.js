@@ -51,24 +51,24 @@ function Login({ onLogin }) {
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md items-center justify-center px-4">
-      <form onSubmit={submit} className="card-soft w-full p-8">
-        <div className="flex items-center gap-2 text-sky-700"><Lock className="h-5 w-5" /><span className="text-sm font-semibold">Navoria Admin</span></div>
-        <h1 className="mt-2 text-2xl font-semibold text-slate-900">Anmelden</h1>
+      <form onSubmit={submit} className="card-soft w-full p-8" aria-labelledby="admin-login-title">
+        <div className="flex items-center gap-2 text-sky-700"><Lock className="h-5 w-5" aria-hidden="true" /><span className="text-sm font-semibold">Navoria Admin</span></div>
+        <h1 id="admin-login-title" className="mt-2 text-2xl font-semibold text-slate-900">Anmelden</h1>
         <p className="mt-1 text-sm text-slate-500">Zugang zum Datenmanagement.</p>
         <div className="mt-6 space-y-3">
           <div>
-            <label className="label">E-Mail</label>
-            <input value={email} onChange={(e) => setEmail(e.target.value)} className="input mt-1.5" placeholder="admin@navoria.de" />
+            <label htmlFor="admin-email" className="label">E-Mail</label>
+            <input id="admin-email" name="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="input mt-1.5" placeholder="admin@navoria.de" />
           </div>
           <div>
-            <label className="label">Passwort</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input mt-1.5" placeholder="••••••••" />
+            <label htmlFor="admin-password" className="label">Passwort</label>
+            <input id="admin-password" name="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className="input mt-1.5" placeholder="••••••••" />
           </div>
         </div>
-        <button disabled={loading} className="btn-primary mt-6 w-full">
-          {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Anmelden …</> : 'Anmelden'}
+        <button type="submit" disabled={loading} className="btn-primary mt-6 w-full">
+          {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> Anmelden …</> : 'Anmelden'}
         </button>
-        <p className="mt-4 text-[11px] text-slate-400">Standardzugang: admin@navoria.de / navoria2025</p>
+        <p className="mt-4 text-[11px] text-slate-500">Standardzugang: admin@navoria.de / navoria2025</p>
       </form>
     </div>
   );
