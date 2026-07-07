@@ -25,12 +25,14 @@ export default function RatingBadge({
   return (
     <span className={`inline-flex flex-col ${className}`}>
       <span
+        role="img"
+        aria-label={`Bewertung: ${value.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} von 5 Sternen${c > 0 ? ` bei ${c} Rezensionen` : ''}`}
         className={`inline-flex items-center ${sizes.gap} rounded-full border border-amber-200 bg-amber-50 ${sizes.pad} ${sizes.text} font-semibold text-amber-900`}
         title={`${value.toFixed(1)} von 5${c ? ` – ${c} Bewertungen` : ''}`}
       >
-        <Star className={`${sizes.star} fill-amber-500 text-amber-500`} />
-        <span>{value.toFixed(1)}</span>
-        {c > 0 && <span className="font-normal text-amber-800/80">({c})</span>}
+        <Star aria-hidden="true" className={`${sizes.star} fill-amber-500 text-amber-500`} />
+        <span aria-hidden="true">{value.toFixed(1)}</span>
+        {c > 0 && <span aria-hidden="true" className="font-normal text-amber-800/80">({c})</span>}
       </span>
       {showAttribution && (
         <span className="mt-1 text-[10px] leading-tight text-slate-400">Bewertungen von Google</span>

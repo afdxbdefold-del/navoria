@@ -111,8 +111,15 @@ export default function RootLayout({ children }) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       </head>
       <body className="min-h-screen bg-white text-slate-900 antialiased">
+        {/* Skip-Link: Nur bei Fokus sichtbar, für Screenreader- und Tastatur-Nutzer:innen */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-sky-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-sky-300"
+        >
+          Zum Hauptinhalt springen
+        </a>
         <Header />
-        <main>{children}</main>
+        <main id="main-content" tabIndex={-1}>{children}</main>
         <Footer />
         <ConsentBanner />
         <Toaster position="top-center" richColors />
@@ -200,6 +207,7 @@ function Footer() {
             <ul className="mt-3 space-y-2 text-sm text-slate-600">
               <li><a className="hover:text-sky-600" href="/impressum">Impressum</a></li>
               <li><a className="hover:text-sky-600" href="/datenschutz">Datenschutz</a></li>
+              <li><a className="hover:text-sky-600" href="/barrierefreiheit">Barrierefreiheit</a></li>
               <li><ConsentResetLink className="hover:text-sky-600" /></li>
             </ul>
             <p className="mt-4 text-xs text-slate-400">Betreiber: AF Consulting, 26789 Leer. Datenquelle: öffentliche Karten- und Verzeichnisdienste.</p>

@@ -10,6 +10,26 @@
 html, body { height: 100%; }
 body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
 
+/* Global accessible focus indicator – gilt für alle interaktiven Elemente,
+   die nicht bereits über eine spezifische focus-visible-Klasse verfügen.
+   WCAG 2.4.7 (Focus Visible) & 2.4.11 (Focus Not Obscured). */
+@layer base {
+  :focus-visible {
+    outline: 2px solid #0284c7; /* sky-600 */
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  /* Reduzierte Bewegung respektieren – WCAG 2.3.3 */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
 /* Feine, ruhige Design-Tokens – innerhalb @layer components, damit Utility-Klassen (pl-9 etc.) überschreiben können */
 @layer components {
   .card-soft { @apply rounded-2xl border border-slate-100 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_4px_16px_-8px_rgba(15,23,42,0.08)]; }

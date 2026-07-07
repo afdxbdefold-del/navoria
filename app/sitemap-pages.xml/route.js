@@ -23,6 +23,7 @@ export async function GET() {
   urls.push(url(base, '/korrekturen', 0.5, now));
   urls.push(url(base, '/impressum', 0.3, now));
   urls.push(url(base, '/datenschutz', 0.3, now));
+  urls.push(url(base, '/barrierefreiheit', 0.4, now));
   for (const s of SPECIALTIES) {
     urls.push(url(base, `/aerzte/fachrichtung/${s.slug}`, 0.8, now));
   }
