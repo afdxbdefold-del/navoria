@@ -35,7 +35,6 @@ export default function UeberUnsPage() {
       <h2 className={h2}>Was Navoria nicht ist</h2>
       <p className={p}>Damit klar ist, was Sie hier <em>nicht</em> finden:</p>
       <ul className={ul}>
-        <li><strong>Kein Bewertungsportal.</strong> Auf Navoria gibt es keine Sterne, Rankings oder Rezensionen. Wer eine Praxis empfehlen oder kritisieren möchte, nutzt bitte etablierte Bewertungsplattformen.</li>
         <li><strong>Keine medizinische Beratung.</strong> Auf den Praxisseiten steht, wer wo praktiziert – nicht, welche Behandlung für Sie richtig ist. Bei akuten Beschwerden rufen Sie 112 oder die 116 117.</li>
         <li><strong>Keine Terminvergabe.</strong> Termine vereinbaren Sie direkt bei der Praxis. Wenn ein Praxis-Website-Link hinterlegt ist, führt er zu deren eigenem Buchungssystem – sofern vorhanden.</li>
         <li><strong>Keine Werbe-Rankings.</strong> Reihenfolgen in Suchen und Listen entstehen aus Datenvollständigkeit und Relevanz, nicht aus bezahlten Platzierungen.</li>
