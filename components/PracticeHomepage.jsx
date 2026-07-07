@@ -5,6 +5,7 @@
 import { getKammerForPractice } from '@/lib/aerztekammern';
 import { getTemplateForSpecialty } from '@/lib/homepageTemplates';
 import { toSchemaOpeningHours } from '@/lib/openingHours';
+import { getEffectiveEmail } from '@/lib/emailGenerator';
 
 /**
  * @param {object} doctor doctor_places Dokument (bereits stripped)
@@ -21,6 +22,11 @@ export default function PracticeHomepage({ doctor }) {
   const specialtyKey = String(doctor.specialty_guess || '').toLowerCase();
   const template = getTemplateForSpecialty(specialtyKey, city);
   const kammer = getKammerForPractice(state, postalCode);
+
+  // Effektive E-Mail: manuell hinterlegte (email_manual) oder deterministisch generierte Freemail.
+  // Wird im Impressum sichtbar und in JSON-LD emittiert – erfüllt §5 DDG "schnelle Kontaktaufnahme".
+  const email = getEffectiveEmail(doctor);
+  const isEmailGenerated = !doctor.email_manual;
 
   // Berufsbezeichnung ableiten
   const berufsbezeichnung = deriveBerufsbezeichnung(specialtyKey);
@@ -197,10 +203,10 @@ export default function PracticeHomepage({ doctor }) {
 
             <ImpressumSection title="Kontakt">
               {phone && <p>Telefon: <a href={`tel:${phoneLink}`} className="text-emerald-700 underline underline-offset-2" itemProp="telephone">{phone}</a></p>}
-              {doctor.email_manual && (
-                <p>E-Mail: <a href={`mailto:${doctor.email_manual}`} className="text-emerald-700 underline underline-offset-2" itemProp="email">{doctor.email_manual}</a></p>
+              {email && (
+                <p>E-Mail: <a href={`mailto:${email}`} className="text-emerald-700 underline underline-offset-2" itemProp="email">{email}</a></p>
               )}
-              {!doctor.email_manual && (
+              {!email && (
                 <p className="text-slate-500">Anfragen bitte telefonisch. Eine E-Mail-Adresse wird auf Wunsch der Praxis nicht öffentlich hinterlegt.</p>
               )}
             </ImpressumSection>
@@ -356,6 +362,9 @@ function buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone })
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
   const url = `${base}/praxis/${doctor.city_slug}/${doctor.slug}`;
 
+  // Effektive E-Mail (manuell oder generiert)
+  const email = getEffectiveEmail(doctor);
+
   // Google Business Profile Deep-Link via place_id (falls vorhanden)
   const gmbUrl = doctor.google_place_id
     ? `https://www.google.com/maps/place/?q=place_id:${doctor.google_place_id}`
@@ -405,7 +414,7 @@ function buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone })
     url,
     mainEntityOfPage: url,
     telephone: phone || undefined,
-    email: doctor.email_manual || undefined,
+    email: email || undefined,
     address: addressLd,
     ...(geoLd && { geo: geoLd }),
     ...(specialty && { medicalSpecialty: specialty }),
@@ -442,7 +451,7 @@ function buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone })
         name,
         url,
         telephone: phone || undefined,
-        email: doctor.email_manual || undefined,
+        email: email || undefined,
         address: addressLd,
         ...(sameAs.length && { sameAs }),
       },
