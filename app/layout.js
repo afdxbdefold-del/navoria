@@ -121,6 +121,7 @@ export default function RootLayout({ children }) {
         >
           Zum Hauptinhalt springen
         </a>
+        <AnnouncementBar />
         <Header />
         <main id="main-content" tabIndex={-1}>{children}</main>
         <Footer />
@@ -135,9 +136,36 @@ export default function RootLayout({ children }) {
   );
 }
 
+function AnnouncementBar() {
+  return (
+    <a
+      href="/praxis-beanspruchen"
+      className="group block w-full border-b border-teal-200 bg-gradient-to-r from-teal-600 via-sky-700 to-sky-800 text-white transition hover:from-teal-700 hover:via-sky-800 hover:to-sky-900"
+      aria-label="Kostenloses Profil für Ihre Arztpraxis auf Navoria beanspruchen"
+    >
+      <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-xs font-medium sm:gap-3 sm:text-sm">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 shrink-0" aria-hidden="true">
+          <path d="M20 7 9 18l-5-5" />
+        </svg>
+        <span>
+          <strong className="font-semibold">Sie sind Arzt oder Praxis-Team?</strong>{' '}
+          <span className="hidden sm:inline">Kostenloses Profil für Ihre Arztpraxis auf Navoria&nbsp;·</span>{' '}
+          <span className="sm:hidden">Kostenloses Profil beanspruchen</span>{' '}
+          <span className="inline-flex items-center gap-0.5 underline underline-offset-2 group-hover:no-underline">
+            <span className="hidden sm:inline">Jetzt Profil beanspruchen</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5" aria-hidden="true">
+              <path d="M5 12h14M13 5l7 7-7 7" />
+            </svg>
+          </span>
+        </span>
+      </div>
+    </a>
+  );
+}
+
 function Header() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-100 bg-white/90 backdrop-blur">
+    <header className="w-full border-b border-slate-100 bg-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <a href="/" className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-teal-500 text-white">
