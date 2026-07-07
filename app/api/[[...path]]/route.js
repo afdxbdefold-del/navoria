@@ -291,6 +291,8 @@ async function handleGet(request, pathParts) {
       regular_opening_hours: 1, opening_hours_json: 1, current_opening_hours: 1,
       accessibility_options: 1, parking_options: 1, payment_options: 1,
       primary_type: 1, external_primary_type: 1, types: 1, external_types: 1,
+      // Outscraper Claim-Check Felder:
+      gmb_verified: 1, gmb_owner_id: 1, gmb_owner_title: 1, gmb_claim_checked_at: 1, gmb_claim_check_status: 1,
     };
     // DB-native Sortier-Modi
     const sortMap = {
@@ -298,7 +300,13 @@ async function handleGet(request, pathParts) {
       reviews: { user_rating_count: -1, rating: -1, name: 1 },
       rating: { rating: -1, user_rating_count: -1, name: 1 },
       name: { name: 1 },
+      // Unclaimed-Sales-Priorität: nur unclaimed, sortiert nach Bewertung DESC (Sales-Ranking)
+      unclaimed_rating_desc: { rating: -1, user_rating_count: -1, name: 1 },
     };
+    // Sonderfall: unclaimed_rating_desc filtert zusätzlich auf nicht-verifizierte Einträge
+    if (sort === 'unclaimed_rating_desc') {
+      filter.gmb_verified = false;
+    }
     // Bei Managed-Sortierung: DB unsortiert holen, im Speicher scoren + sortieren, danach paginate.
     // Bei Standard-Sortierung: nutze DB-Sort mit skip/limit.
     let list, matchCount;
@@ -1118,6 +1126,107 @@ async function handlePost(request, pathParts) {
     const res = await doctors.updateMany({ id: { $in: ids }, is_active: { $ne: false } }, { $set: set });
     return json({ ok: true, matched: res.matchedCount, modified: res.modifiedCount });
   }
+
+  // POST /api/admin/claim-check – Prüft via Outscraper API den Claim-Status von Praxen OHNE Website.
+  // Body: { limit?: number (default 100, max 500), only_stale?: boolean (nur nicht/länger nicht geprüfte) }
+  // Antwort: { checked, claimed, unclaimed, errors, cost_estimate_usd, batches }
+  // WICHTIG: Nur Praxen ohne Website werden geprüft (Kostenkontrolle).
+  if (pathParts[0] === 'admin' && pathParts[1] === 'claim-check') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    if (!process.env.OUTSCRAPER_API_KEY) {
+      return json({ error: 'OUTSCRAPER_API_KEY nicht konfiguriert' }, { status: 500 });
+    }
+    const limitInput = Math.max(1, Math.min(parseInt(body?.limit || '100', 10) || 100, 500));
+    const onlyStale = body?.only_stale !== false; // Standard: true → nur nicht/länger nicht geprüfte
+
+    const { checkClaimStatusBatch, sleep } = await import('@/lib/outscraperClaim');
+    const doctors = await getCollection('doctor_places');
+
+    // Basis-Filter: Praxen ohne Website, aktiv, mit google_place_id
+    const baseFilter = {
+      $or: [{ website_url: { $exists: false } }, { website_url: null }, { website_url: '' }],
+      is_active: { $ne: false },
+      google_place_id: { $exists: true, $ne: null, $ne: '' },
+    };
+
+    // Nur "stale" (nie geprüft ODER älter als 90 Tage) — Standard
+    if (onlyStale) {
+      const staleDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+      baseFilter.$and = [
+        { $or: [
+          { gmb_claim_checked_at: { $exists: false } },
+          { gmb_claim_checked_at: null },
+          { gmb_claim_checked_at: { $lt: staleDate } },
+        ] },
+      ];
+    }
+
+    // Kandidaten laden (mit hoher Bewertungsanzahl priorisiert = Sales-Priority)
+    const candidates = await doctors.find(baseFilter, {
+      projection: { _id: 0, id: 1, google_place_id: 1, name: 1 },
+    }).sort({ user_rating_count: -1, rating: -1 }).limit(limitInput).toArray();
+
+    if (candidates.length === 0) {
+      return json({ ok: true, checked: 0, claimed: 0, unclaimed: 0, errors: 0, cost_estimate_usd: 0, batches: 0, message: 'Keine Kandidaten gefunden.' });
+    }
+
+    // Batch-Größe: 10 place_ids pro Outscraper-Request (guter Kompromiss zwischen Speed & Timeout)
+    const BATCH_SIZE = 10;
+    const DELAY_MS = 300; // 300ms Pause zwischen Batches
+    let checked = 0, claimed = 0, unclaimed = 0, errors = 0, batches = 0;
+
+    for (let i = 0; i < candidates.length; i += BATCH_SIZE) {
+      const batch = candidates.slice(i, i + BATCH_SIZE);
+      const placeIds = batch.map((c) => c.google_place_id);
+      const results = await checkClaimStatusBatch(placeIds);
+      batches += 1;
+
+      // Ergebnisse in DB schreiben (bulk write)
+      const bulkOps = [];
+      const now = new Date();
+      for (let j = 0; j < batch.length; j++) {
+        const cand = batch[j];
+        const r = results[j] || {};
+        const setFields = {
+          gmb_claim_checked_at: now,
+          gmb_claim_check_status: r.error ? 'error' : 'success',
+          updated_at: now,
+        };
+        if (r.error) {
+          setFields.gmb_claim_check_error = String(r.error).slice(0, 200);
+          errors += 1;
+        } else {
+          setFields.gmb_verified = r.verified;
+          setFields.gmb_owner_id = r.owner_id || null;
+          setFields.gmb_owner_title = r.owner_title || null;
+          setFields.gmb_claim_check_error = null;
+          checked += 1;
+          if (r.verified === true) claimed += 1;
+          else if (r.verified === false) unclaimed += 1;
+        }
+        bulkOps.push({ updateOne: { filter: { id: cand.id }, update: { $set: setFields } } });
+      }
+      if (bulkOps.length) await doctors.bulkWrite(bulkOps);
+
+      // Delay zwischen Batches (schont API + Rate Limits)
+      if (i + BATCH_SIZE < candidates.length) await sleep(DELAY_MS);
+    }
+
+    // Kosten-Schätzung (Outscraper ~$0.001 pro Query)
+    const costEstimate = (checked + errors) * 0.001;
+
+    return json({
+      ok: true,
+      checked: checked + errors,
+      claimed,
+      unclaimed,
+      errors,
+      batches,
+      cost_estimate_usd: Number(costEstimate.toFixed(3)),
+      total_candidates_scanned: candidates.length,
+    });
+  }
+
 
   // POST /api/admin/doctors/:id/discard – Praxis dauerhaft aus Verzeichnis ausblenden
   //   body: { discarded: true|false, reason?: 'string' }

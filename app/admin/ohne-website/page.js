@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { ArrowLeft, Globe, Phone, MapPin, ExternalLink, RefreshCw, Search, CheckCircle2, Loader2, Copy, Trash2, BadgeCheck, Sparkles, Home, Gauge } from 'lucide-react';
+import { ArrowLeft, Globe, Phone, MapPin, ExternalLink, RefreshCw, Search, CheckCircle2, Loader2, Copy, Trash2, BadgeCheck, Sparkles, Home, Gauge, ShieldQuestion, ShieldCheck, ShieldX } from 'lucide-react';
 import { likelihoodLabel, likelihoodColorClasses } from '@/lib/managedScore';
 
 export default function AdminOhneWebseitePage() {
@@ -29,6 +29,8 @@ function List({ token }) {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
+  const [claimChecking, setClaimChecking] = useState(false);
+  const [claimCheckLimit, setClaimCheckLimit] = useState(100);
 
   const PAGE_SIZE = 100;
   const authHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
@@ -58,6 +60,32 @@ function List({ token }) {
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [show, cityFilter, sort, page]);
   // Filter-/View-Wechsel setzt Seite zurück
   useEffect(() => { setPage(1); }, [show, cityFilter, sort]);
+
+  // Batch-Claim-Check via Outscraper API
+  const runClaimCheck = async () => {
+    const limit = Math.max(1, Math.min(500, parseInt(claimCheckLimit, 10) || 100));
+    const estCost = (limit * 0.001).toFixed(3);
+    if (!confirm(`Claim-Status via Outscraper prüfen für bis zu ${limit} Praxen ohne Website?\n\nKostenschätzung: ~$${estCost} USD.\nEs werden bevorzugt Praxen mit vielen Google-Bewertungen geprüft (Sales-Priorität).\n\nFortsetzen?`)) return;
+    setClaimChecking(true);
+    try {
+      const r = await fetch('/api/admin/claim-check', {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify({ limit, only_stale: true }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'Fehler');
+      toast.success(
+        `Geprüft: ${data.checked} · Unclaimed: ${data.unclaimed} · Claimed: ${data.claimed}` +
+        (data.errors ? ` · Fehler: ${data.errors}` : '') +
+        ` · Kosten: ~$${data.cost_estimate_usd}`
+      );
+      await load();
+    } catch (err) {
+      toast.error(`Claim-Check fehlgeschlagen: ${err.message}`);
+    }
+    setClaimChecking(false);
+  };
 
   const totalPages = Math.max(1, Math.ceil(matchCount / PAGE_SIZE));
 
@@ -265,6 +293,9 @@ function List({ token }) {
           className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm min-w-[220px]"
           title="Sortierung"
         >
+          <optgroup label="Claim-Status (Outscraper)">
+            <option value="unclaimed_rating_desc">🎯 Nur Unclaimed · Bewertung ↓ (Sales-Priorität)</option>
+          </optgroup>
           <optgroup label="Managed-Score">
             <option value="managed_asc">🎯 Unmanaged zuerst (Homepage-Kandidaten)</option>
             <option value="managed_desc">✅ Verwaltet zuerst</option>
@@ -276,6 +307,25 @@ function List({ token }) {
             <option value="name">🔤 Name A→Z</option>
           </optgroup>
         </select>
+        <div className="flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50/50 px-2 py-1.5">
+          <input
+            type="number" min="1" max="500" step="10"
+            value={claimCheckLimit}
+            onChange={(e) => setClaimCheckLimit(e.target.value)}
+            className="w-14 rounded border border-purple-200 bg-white px-1.5 py-1 text-xs text-center focus:outline-none focus:ring-1 focus:ring-purple-300"
+            title="Anzahl Praxen für Claim-Check (max. 500 pro Lauf)"
+            disabled={claimChecking}
+          />
+          <button
+            onClick={runClaimCheck}
+            disabled={claimChecking}
+            className="inline-flex items-center gap-1.5 rounded-md bg-purple-700 px-2.5 py-1 text-xs font-semibold text-white hover:bg-purple-800 disabled:opacity-50"
+            title="Prüft via Outscraper API, welche Google-Business-Einträge noch unclaimed sind. Kosten: ~$0.001 pro Praxis."
+          >
+            {claimChecking ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldQuestion className="h-3.5 w-3.5" />}
+            {claimChecking ? 'Prüfe…' : 'Claim-Status prüfen'}
+          </button>
+        </div>
         {(matchCount > 0 && matchCount !== items.length) && (
           <p className="self-center text-xs text-slate-400">
             Zeige {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, matchCount)} von {matchCount}
@@ -347,6 +397,30 @@ function List({ token }) {
                         title={`Managed-Score: ${doc.managed_score}/100 · Signale: ${(doc.managed_signals || []).join(', ') || 'keine'}`}
                       >
                         <Gauge className="h-3 w-3" /> {likelihoodLabel(doc.managed_likelihood)} · {doc.managed_score}
+                      </span>
+                    )}
+                    {doc.gmb_claim_checked_at && doc.gmb_verified === true && (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-800"
+                        title={`Google-Business claimed am ${new Date(doc.gmb_claim_checked_at).toLocaleDateString('de-DE')}${doc.gmb_owner_title ? ' · Inhaber: ' + doc.gmb_owner_title : ''}`}
+                      >
+                        <ShieldCheck className="h-3 w-3" /> Claimed
+                      </span>
+                    )}
+                    {doc.gmb_claim_checked_at && doc.gmb_verified === false && (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border border-orange-300 bg-orange-50 px-2 py-0.5 text-[11px] font-semibold text-orange-800"
+                        title={`Google-Business Unclaimed – "Inhaberschaft beanspruchen" verfügbar (geprüft am ${new Date(doc.gmb_claim_checked_at).toLocaleDateString('de-DE')})`}
+                      >
+                        <ShieldX className="h-3 w-3" /> Unclaimed
+                      </span>
+                    )}
+                    {doc.gmb_claim_checked_at && doc.gmb_verified == null && doc.gmb_claim_check_status === 'error' && (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-500"
+                        title="Claim-Check konnte nicht durchgeführt werden (Fehler oder nicht gefunden)"
+                      >
+                        <ShieldQuestion className="h-3 w-3" /> Check fehlgeschlagen
                       </span>
                     )}
                     {doc.rating != null && (
