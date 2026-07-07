@@ -312,7 +312,7 @@ export default async function ProfilePage({ params }) {
 
         <div className="mt-5 flex flex-wrap gap-2">
           {phone && (
-            <a href={`tel:${phone}`} className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-sky-700">
+            <a href={`tel:${phone}`} className="inline-flex items-center gap-2 rounded-lg bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-sky-700">
               <Phone className="h-4 w-4" /> {d.phone_national || d.phone_international}
             </a>
           )}
@@ -602,7 +602,7 @@ export default async function ProfilePage({ params }) {
             </p>
             <Link
               href={`/praxis-beanspruchen?doctor_id=${encodeURIComponent(d.id)}`}
-              className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-sky-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-sky-700"
+              className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-sky-700 px-3 py-2 text-xs font-semibold text-white transition hover:bg-sky-700"
             >
               <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
               Profil beanspruchen

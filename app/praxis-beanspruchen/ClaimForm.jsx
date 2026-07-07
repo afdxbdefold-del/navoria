@@ -198,7 +198,7 @@ export default function ClaimForm({ doctor }) {
         <button
           type="submit"
           disabled={state === 'submitting'}
-          className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700 disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-lg bg-sky-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-800 disabled:opacity-60"
         >
           {state === 'submitting' && <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />}
           {state === 'submitting' ? 'Wird gesendet…' : 'Anfrage absenden'}

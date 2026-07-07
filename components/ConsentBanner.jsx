@@ -78,7 +78,7 @@ export default function ConsentBanner() {
               <button onClick={acceptNecessary} className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">
                 Nur notwendige
               </button>
-              <button onClick={acceptAll} className="inline-flex items-center justify-center rounded-xl bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700">
+              <button onClick={acceptAll} className="inline-flex items-center justify-center rounded-xl bg-sky-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-800">
                 Alle akzeptieren
               </button>
             </div>

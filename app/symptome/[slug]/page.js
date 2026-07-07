@@ -230,7 +230,7 @@ export default async function SymptomDetailPage({ params }) {
             </div>
             <Link
               href={`/aerzte/fachrichtung/${primarySpecObj.slug}`}
-              className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700"
+              className="inline-flex items-center gap-2 rounded-xl bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-800"
             >
               <MapPin className="h-4 w-4" />
               {primarySpecObj.plural} finden

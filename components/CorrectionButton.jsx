@@ -109,7 +109,7 @@ export default function CorrectionButton({ doctorId, doctorName }) {
                 )}
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-700">Anmerkung <span className="text-slate-400">(optional)</span></label>
+                  <label className="block text-xs font-medium text-slate-700">Anmerkung <span className="text-slate-500">(optional)</span></label>
                   <textarea
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
@@ -121,7 +121,7 @@ export default function CorrectionButton({ doctorId, doctorName }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-700">Ihre E-Mail <span className="text-slate-400">(optional, nur für Rückmeldung)</span></label>
+                  <label className="block text-xs font-medium text-slate-700">Ihre E-Mail <span className="text-slate-500">(optional, nur für Rückmeldung)</span></label>
                   <input
                     type="email"
                     value={email}
@@ -139,7 +139,7 @@ export default function CorrectionButton({ doctorId, doctorName }) {
 
                 <div className="flex justify-end gap-2">
                   <button type="button" onClick={close} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Abbrechen</button>
-                  <button disabled={busy} className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700 disabled:opacity-60">
+                  <button disabled={busy} className="inline-flex items-center gap-2 rounded-lg bg-sky-700 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-800 disabled:opacity-60">
                     {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Wird gesendet...</> : <><Send className="h-4 w-4" /> Meldung senden</>}
                   </button>
                 </div>

@@ -50,7 +50,7 @@ export default function MapEmbed({ src, title, label }) {
       />
       {/* Marker in der Mitte */}
       <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-600 text-white shadow-lg ring-4 ring-white">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-700 text-white shadow-lg ring-4 ring-white">
           <MapPin aria-hidden="true" className="h-5 w-5" />
         </div>
         {label && (

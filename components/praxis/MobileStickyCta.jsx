@@ -7,7 +7,7 @@ export default function MobileStickyCta({ phone, mapsUrl }) {
     <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur-md p-2 shadow-[0_-4px_18px_-4px_rgba(15,23,42,0.12)] md:hidden">
       <div className="mx-auto flex max-w-md items-center gap-2">
         {phone && (
-          <a href={`tel:${phone}`} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-sky-600 py-2.5 text-sm font-semibold text-white active:bg-sky-700">
+          <a href={`tel:${phone}`} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-sky-700 py-2.5 text-sm font-semibold text-white active:bg-sky-800">
             <Phone className="h-4 w-4" /> Anrufen
           </a>
         )}

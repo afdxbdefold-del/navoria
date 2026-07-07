@@ -68,7 +68,7 @@ export default async function CityDistrictOverviewPage({ params }) {
         <p className="mt-3 text-slate-600">
           Aktuell liegen für {cityName} noch keine Stadtteil-Zuordnungen vor. Sie können alle Ärzte in {cityName} auf einen Blick sehen:
         </p>
-        <Link href={`/aerzte/${stadt}`} className="mt-4 inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-700">
+        <Link href={`/aerzte/${stadt}`} className="mt-4 inline-flex items-center gap-2 rounded-xl bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-700">
           <MapPin className="h-4 w-4" /> Alle Ärzte in {cityName} <ArrowRight className="h-4 w-4" />
         </Link>
       </div>

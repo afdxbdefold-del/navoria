@@ -153,7 +153,7 @@ export default function KampagnenPage() {
                 </button>
               )}
               {activeCampaign.status === 'aborted' && activeCampaign.done_queries < activeCampaign.total_queries && (
-                <button onClick={() => resumeCampaign(activeCampaign.id)} className="inline-flex items-center rounded-xl bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700">
+                <button onClick={() => resumeCampaign(activeCampaign.id)} className="inline-flex items-center rounded-xl bg-sky-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700">
                   <RotateCw className="mr-1.5 h-4 w-4" /> Fortsetzen ({activeCampaign.total_queries - activeCampaign.done_queries} offen)
                 </button>
               )}
@@ -372,7 +372,7 @@ export default function KampagnenPage() {
                       </button>
                     )}
                     {(c.status === 'aborted' || c.status === 'failed') && c.done_queries < c.total_queries && (
-                      <button onClick={() => resumeCampaign(c.id)} className="inline-flex items-center rounded-xl bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-sky-700">
+                      <button onClick={() => resumeCampaign(c.id)} className="inline-flex items-center rounded-xl bg-sky-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-sky-700">
                         <RotateCw className="mr-1 h-3 w-3" /> Fortsetzen
                       </button>
                     )}

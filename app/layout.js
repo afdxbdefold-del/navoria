@@ -117,7 +117,7 @@ export default function RootLayout({ children }) {
         {/* Skip-Link: Nur bei Fokus sichtbar, für Screenreader- und Tastatur-Nutzer:innen */}
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-sky-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-sky-300"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-sky-700 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-sky-300"
         >
           Zum Hauptinhalt springen
         </a>
@@ -180,7 +180,7 @@ function Footer() {
               <span className="font-semibold text-slate-900">Navoria</span>
             </div>
             <p className="mt-3 text-sm text-slate-500">Verzeichnis für Arztpraxen in Deutschland.</p>
-            <p className="mt-2 text-xs text-slate-400">Betrieben von AF Consulting seit 2025.</p>
+            <p className="mt-2 text-xs text-slate-500">Betrieben von AF Consulting seit 2025.</p>
           </div>
           <div>
             <h4 className="text-sm font-semibold text-slate-900">Suchen</h4>
@@ -217,10 +217,10 @@ function Footer() {
               <li><a className="hover:text-sky-600" href="/barrierefreiheit">Barrierefreiheit</a></li>
               <li><ConsentResetLink className="hover:text-sky-600" /></li>
             </ul>
-            <p className="mt-4 text-xs text-slate-400">Betreiber: AF Consulting, 26789 Leer. Datenquelle: öffentliche Karten- und Verzeichnisdienste.</p>
+            <p className="mt-4 text-xs text-slate-500">Betreiber: AF Consulting, 26789 Leer. Datenquelle: öffentliche Karten- und Verzeichnisdienste.</p>
           </div>
         </div>
-        <div className="mt-8 border-t border-slate-200 pt-6 text-center text-xs text-slate-400">
+        <div className="mt-8 border-t border-slate-200 pt-6 text-center text-xs text-slate-500">
           Kein Ersatz für ärztliche Beratung. Bei akutem Notfall 112, bei dringenden Beschwerden 116 117. © {new Date().getFullYear()} Navoria · AF Consulting
         </div>
       </div>

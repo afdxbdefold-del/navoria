@@ -141,8 +141,8 @@ function SearchContent() {
               {loading ? 'Suche läuft …' : (<><span className="font-semibold text-slate-900">{total}</span> Treffer{q && <> für „<span className="text-slate-900">{q}</span>“</>}{ort && <> in <span className="text-slate-900">{ort}</span></>}</>)}
             </p>
             <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1" role="group" aria-label="Darstellung wechseln">
-              <button onClick={() => setView('list')} aria-pressed={view === 'list'} className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${view === 'list' ? 'bg-sky-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}><List className="h-4 w-4" aria-hidden="true" /> Liste</button>
-              <button onClick={() => setView('map')} aria-pressed={view === 'map'} className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${view === 'map' ? 'bg-sky-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}><MapIcon className="h-4 w-4" aria-hidden="true" /> Karte</button>
+              <button onClick={() => setView('list')} aria-pressed={view === 'list'} className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${view === 'list' ? 'bg-sky-700 text-white' : 'text-slate-600 hover:bg-slate-50'}`}><List className="h-4 w-4" aria-hidden="true" /> Liste</button>
+              <button onClick={() => setView('map')} aria-pressed={view === 'map'} className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${view === 'map' ? 'bg-sky-700 text-white' : 'text-slate-600 hover:bg-slate-50'}`}><MapIcon className="h-4 w-4" aria-hidden="true" /> Karte</button>
             </div>
           </div>
 

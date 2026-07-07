@@ -32,7 +32,7 @@ export default function RatingBadge({
       >
         <Star aria-hidden="true" className={`${sizes.star} fill-amber-500 text-amber-500`} />
         <span aria-hidden="true">{value.toFixed(1)}</span>
-        {c > 0 && <span aria-hidden="true" className="font-normal text-amber-800/80">({c})</span>}
+        {c > 0 && <span aria-hidden="true" className="font-normal text-amber-900">({c})</span>}
       </span>
       {showAttribution && (
         <span className="mt-1 text-[10px] leading-tight text-slate-500">Bewertungen von Google</span>
