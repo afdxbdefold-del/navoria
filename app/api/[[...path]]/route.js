@@ -280,7 +280,7 @@ async function handleGet(request, pathParts) {
     else if (show === 'checked') filter = { ...noWebsite, ...notDiscarded, website_checked_at: { $exists: true, $ne: null } };
     else filter = { ...noWebsite, ...notDiscarded };
     if (cityFilter) filter.city = cityFilter;
-    const projection = { _id: 0, id: 1, name: 1, slug: 1, city: 1, city_slug: 1, formatted_address: 1, phone_national: 1, specialty_guess: 1, google_place_id: 1, google_maps_url: 1, website_checked_at: 1, is_active: 1, discarded_at: 1, rating: 1, user_rating_count: 1 };
+    const projection = { _id: 0, id: 1, name: 1, slug: 1, city: 1, city_slug: 1, formatted_address: 1, phone_national: 1, specialty_guess: 1, google_place_id: 1, google_maps_url: 1, website_checked_at: 1, is_active: 1, discarded_at: 1, rating: 1, user_rating_count: 1, is_verified: 1, verification_method: 1 };
     // Sortier-Modi
     const sortMap = {
       city: { city: 1, name: 1 },
@@ -956,19 +956,46 @@ async function handlePost(request, pathParts) {
 
   // POST /api/admin/doctors/:id/website-checked – Website-Recherche für Praxis abhaken
   //   body: { checked: true, website_url?: '...' } – wenn website_url vorhanden, wird sie mit als manueller Override gespeichert
+  //
+  //   Zusatz: Abhaken markiert die Praxis zusätzlich als "verifiziert/beansprucht"
+  //   (is_verified:true, verification_method:'admin_no_website_check').
+  //   Beim Zurücksetzen wird die Verifizierung nur entfernt, wenn sie ursprünglich
+  //   über diesen Flow kam (nicht wenn ein echter Claim-Request approved wurde).
   if (pathParts[0] === 'admin' && pathParts[1] === 'doctors' && pathParts[2] && pathParts[3] === 'website-checked') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
     const { checked, website_url } = body || {};
     const doctors = await getCollection('doctor_places');
+    const existing = await doctors.findOne({ id: pathParts[2] }, { projection: { verification_method: 1, is_verified: 1 } });
+    if (!existing) return json({ error: 'Nicht gefunden' }, { status: 404 });
+
     const set = { updated_at: new Date() };
-    if (checked) set.website_checked_at = new Date();
-    else set.website_checked_at = null;
+    const unset = {};
+
+    if (checked) {
+      const now = new Date();
+      set.website_checked_at = now;
+      // Zusätzlich als verifiziert/beansprucht markieren (redaktionell durch Admin)
+      set.is_verified = true;
+      set.verified_at = now;
+      set.verification_method = 'admin_no_website_check';
+    } else {
+      set.website_checked_at = null;
+      // Nur eigene Verifizierung zurücknehmen – Claim-Request-Verifizierungen unangetastet lassen
+      if (existing.is_verified && existing.verification_method === 'admin_no_website_check') {
+        set.is_verified = false;
+        set.verified_at = null;
+        unset.verification_method = '';
+      }
+    }
+
     if (website_url && typeof website_url === 'string' && website_url.trim().length > 0) {
       const url = website_url.trim().startsWith('http') ? website_url.trim() : `https://${website_url.trim()}`;
       set.website_url = url;
       set['manual_overrides.website_url'] = url;
     }
-    const res = await doctors.findOneAndUpdate({ id: pathParts[2] }, { $set: set }, { returnDocument: 'after' });
+
+    const update = Object.keys(unset).length > 0 ? { $set: set, $unset: unset } : { $set: set };
+    const res = await doctors.findOneAndUpdate({ id: pathParts[2] }, update, { returnDocument: 'after' });
     if (!res) return json({ error: 'Nicht gefunden' }, { status: 404 });
     return json({ ok: true, doctor: stripId(res) });
   }

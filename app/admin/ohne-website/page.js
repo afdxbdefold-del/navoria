@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { ArrowLeft, Globe, Phone, MapPin, ExternalLink, RefreshCw, Search, CheckCircle2, Loader2, Copy, Trash2 } from 'lucide-react';
+import { ArrowLeft, Globe, Phone, MapPin, ExternalLink, RefreshCw, Search, CheckCircle2, Loader2, Copy, Trash2, BadgeCheck } from 'lucide-react';
 
 export default function AdminOhneWebseitePage() {
   const [token, setToken] = useState(null);
@@ -72,7 +72,18 @@ function List({ token }) {
       toast.success(doc.website_checked_at ? 'Zurückgesetzt' : 'Abgehakt');
       if (show === 'unchecked') setItems((prev) => prev.filter((it) => it.id !== doc.id));
       else if (show === 'checked' && doc.website_checked_at) setItems((prev) => prev.filter((it) => it.id !== doc.id));
-      else setItems((prev) => prev.map((it) => it.id === doc.id ? { ...it, website_checked_at: doc.website_checked_at ? null : new Date().toISOString() } : it));
+      else setItems((prev) => prev.map((it) => it.id === doc.id ? {
+        ...it,
+        website_checked_at: doc.website_checked_at ? null : new Date().toISOString(),
+        // Verifizierung reflektieren (Backend setzt is_verified=true bei check, und
+        // entfernt sie beim Uncheck nur, wenn wir sie selbst gesetzt haben)
+        is_verified: doc.website_checked_at
+          ? (it.verification_method === 'admin_no_website_check' ? false : it.is_verified)
+          : true,
+        verification_method: doc.website_checked_at
+          ? (it.verification_method === 'admin_no_website_check' ? null : it.verification_method)
+          : 'admin_no_website_check',
+      } : it));
       setTotals((t) => ({
         ...t,
         unchecked: doc.website_checked_at ? t.unchecked + 1 : Math.max(0, t.unchecked - 1),
@@ -143,6 +154,12 @@ function List({ token }) {
             <strong className="mx-1 font-semibold text-amber-700">{totals.unchecked}</strong> noch zu prüfen ·
             <strong className="ml-1 font-semibold text-emerald-700">{totals.checked}</strong> abgehakt ·
             <strong className="ml-1 font-semibold text-slate-500">{totals.discarded}</strong> verworfen
+          </p>
+          <p className="mt-2 inline-flex items-start gap-1.5 rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-xs text-emerald-800">
+            <BadgeCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <span>
+              <strong>Neu:</strong> Abhaken markiert die Praxis zusätzlich als <strong>verifiziert</strong> (grüner Badge auf dem Profil, Ranking-Boost in der Suche).
+            </span>
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -230,6 +247,14 @@ function List({ token }) {
                     </Link>
                     {doc.specialty_guess && <span className="rounded-full border border-sky-100 bg-sky-50 px-2 py-0.5 text-[11px] font-medium text-sky-700">{doc.specialty_guess}</span>}
                     {doc.city && <span className="text-xs text-slate-500">{doc.city}</span>}
+                    {doc.is_verified && (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800"
+                        title={doc.verification_method === 'admin_no_website_check' ? 'Verifiziert durch Abhaken auf dieser Seite' : 'Verifiziert'}
+                      >
+                        <BadgeCheck className="h-3 w-3" /> Verifiziert
+                      </span>
+                    )}
                     {doc.rating != null && (
                       <span
                         className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-800"
