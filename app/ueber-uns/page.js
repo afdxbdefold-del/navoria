@@ -50,16 +50,6 @@ export default function UeberUnsPage() {
       <h2 className={h2}>Wie Sie mithelfen können</h2>
       <p className={p}>Wenn Ihnen ein Fehler auffällt – falsche Nummer, veränderte Öffnungszeiten, umgezogene Praxis – nutzen Sie den <strong>„Fehler melden“-Button</strong> auf der jeweiligen Praxisseite. Meldungen werden werktags geprüft. Praxisinhaber, die ihr Profil selbst pflegen möchten, schreiben bitte kurz an <a href="mailto:mail@navoria.de" className={a}>mail@navoria.de</a>. Ein Self-Service-Claim ist für spätere Ausbaustufen geplant.</p>
 
-      <h2 className={h2}>Was noch fehlt</h2>
-      <p className={p}>Ehrlich gesagt einiges. Die Roadmap enthält derzeit:</p>
-      <ul className={ul}>
-        <li>Ausbau auf 100+ Städte.</li>
-        <li>Verifizierungs-Programm für Praxisinhaber (Claim-Flow).</li>
-        <li>Redaktionell geprüfte Zusatzinformationen (Sprachen, Kassen/Privat, Schwerpunkte) – nur wenn bestätigt.</li>
-        <li>Verlinkung mit amtlichen Facharzt-Registern, sobald technisch verfügbar.</li>
-      </ul>
-      <p className={p}>Bis dahin gilt: <strong>Was auf Navoria steht, bitte vor dem Besuch bei der Praxis kurz bestätigen.</strong> Das steht auch auf jeder Praxisseite, aber es ist wichtig genug, um es hier zu wiederholen.</p>
-
       <h2 className={h2}>Weiterführend</h2>
       <ul className={ul}>
         <li><Link href="/redaktionelle-standards" className={a}>Wie Daten geprüft und aktualisiert werden</Link></li>
