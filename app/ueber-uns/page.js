@@ -30,7 +30,6 @@ export default function UeberUnsPage() {
         <li>Wie kontaktiere ich sie?</li>
         <li>Wann hat sie geöffnet?</li>
       </ul>
-      <p className={p}>Zum Start (Sommer 2026) sind rund 120 Praxen aus Berlin, Hamburg und München erfasst. Der Bestand wird schrittweise erweitert – nicht in einem großen Rundumschlag, sondern Stadt für Stadt, damit die Datenqualität pro Ort hoch bleibt.</p>
 
       <h2 className={h2}>Was Navoria nicht ist</h2>
       <p className={p}>Damit klar ist, was Sie hier <em>nicht</em> finden:</p>
