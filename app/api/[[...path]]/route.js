@@ -6,6 +6,7 @@ import { runImport, resyncOneDoctor, backfillMissingFields } from '@/lib/service
 import { suggestSpecialtiesForSymptom } from '@/lib/services/symptomMapping';
 import { slugify } from '@/lib/services/specialtyDetection';
 import { createSession, requireAdmin } from '@/lib/auth';
+import { hashIp, getClientIp, getGeo, isBot, getDeviceType, getBrowserFamily } from '@/lib/analytics';
 
 function hashString(s) {
   return crypto.createHash('sha256').update(String(s)).digest('hex').slice(0, 16);
@@ -568,10 +569,231 @@ async function handleGet(request, pathParts) {
     });
   }
 
+  // GET /api/admin/analytics/live – Aktive Nutzer:innen der letzten 5 Minuten
+  if (pathParts[0] === 'admin' && pathParts[1] === 'analytics' && pathParts[2] === 'live') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const since = new Date(Date.now() - 5 * 60 * 1000);
+    const col = await getCollection('page_views');
+    // Neueste Aktivität je Session
+    const rows = await col.aggregate([
+      { $match: { timestamp: { $gte: since }, is_bot: { $ne: true } } },
+      { $sort: { timestamp: -1 } },
+      { $group: {
+        _id: '$session_id',
+        lastPath: { $first: '$path' },
+        lastAt: { $first: '$timestamp' },
+        city: { $first: '$city' },
+        country: { $first: '$country' },
+        region: { $first: '$region' },
+        device: { $first: '$device_type' },
+        browser: { $first: '$browser' },
+        pageviews: { $sum: 1 },
+      } },
+      { $sort: { lastAt: -1 } },
+      { $limit: 200 },
+    ]).toArray();
+
+    return json({
+      active_sessions: rows.length,
+      window_minutes: 5,
+      users: rows.map((r) => ({
+        session_id: r._id ? r._id.slice(0, 8) : null,
+        last_path: r.lastPath,
+        last_at: r.lastAt,
+        city: r.city,
+        country: r.country,
+        region: r.region,
+        device: r.device,
+        browser: r.browser,
+        pageviews_in_window: r.pageviews,
+      })),
+    });
+  }
+
+  // GET /api/admin/analytics/summary?range=today|yesterday|7d|30d
+  if (pathParts[0] === 'admin' && pathParts[1] === 'analytics' && pathParts[2] === 'summary') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const col = await getCollection('page_views');
+
+    const now = new Date();
+    const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0));
+    const yesterdayStart = new Date(todayStart.getTime() - 24 * 60 * 60 * 1000);
+    const sevenDaysStart = new Date(todayStart.getTime() - 6 * 24 * 60 * 60 * 1000);
+
+    async function bucketStats(from, to) {
+      const match = { timestamp: { $gte: from, $lt: to }, is_bot: { $ne: true } };
+      const [tot] = await col.aggregate([
+        { $match: match },
+        { $group: { _id: null, pv: { $sum: 1 }, sessions: { $addToSet: '$session_id' } } },
+        { $project: { pv: 1, sessions: { $size: '$sessions' } } },
+      ]).toArray();
+      return { pageviews: tot?.pv || 0, sessions: tot?.sessions || 0 };
+    }
+
+    async function botCount(from, to) {
+      return col.countDocuments({ timestamp: { $gte: from, $lt: to }, is_bot: true });
+    }
+
+    async function topPaths(from, to, limit = 10) {
+      return col.aggregate([
+        { $match: { timestamp: { $gte: from, $lt: to }, is_bot: { $ne: true } } },
+        { $group: { _id: '$path', views: { $sum: 1 }, sessions: { $addToSet: '$session_id' } } },
+        { $project: { path: '$_id', views: 1, uniques: { $size: '$sessions' }, _id: 0 } },
+        { $sort: { views: -1 } },
+        { $limit: limit },
+      ]).toArray();
+    }
+
+    async function topCities(from, to, limit = 10) {
+      return col.aggregate([
+        { $match: { timestamp: { $gte: from, $lt: to }, is_bot: { $ne: true }, city: { $nin: [null, ''] } } },
+        { $group: { _id: { city: '$city', country: '$country' }, sessions: { $addToSet: '$session_id' } } },
+        { $project: { city: '$_id.city', country: '$_id.country', uniques: { $size: '$sessions' }, _id: 0 } },
+        { $sort: { uniques: -1 } },
+        { $limit: limit },
+      ]).toArray();
+    }
+
+    async function topCountries(from, to, limit = 10) {
+      return col.aggregate([
+        { $match: { timestamp: { $gte: from, $lt: to }, is_bot: { $ne: true }, country: { $nin: [null, ''] } } },
+        { $group: { _id: '$country', sessions: { $addToSet: '$session_id' } } },
+        { $project: { country: '$_id', uniques: { $size: '$sessions' }, _id: 0 } },
+        { $sort: { uniques: -1 } },
+        { $limit: limit },
+      ]).toArray();
+    }
+
+    async function devices(from, to) {
+      return col.aggregate([
+        { $match: { timestamp: { $gte: from, $lt: to }, is_bot: { $ne: true } } },
+        { $group: { _id: '$device_type', sessions: { $addToSet: '$session_id' } } },
+        { $project: { device: '$_id', uniques: { $size: '$sessions' }, _id: 0 } },
+      ]).toArray();
+    }
+
+    async function topBots(from, to, limit = 8) {
+      return col.aggregate([
+        { $match: { timestamp: { $gte: from, $lt: to }, is_bot: true } },
+        { $group: { _id: '$bot_name', hits: { $sum: 1 } } },
+        { $project: { bot: '$_id', hits: 1, _id: 0 } },
+        { $sort: { hits: -1 } },
+        { $limit: limit },
+      ]).toArray();
+    }
+
+    async function hourly(from, to) {
+      return col.aggregate([
+        { $match: { timestamp: { $gte: from, $lt: to }, is_bot: { $ne: true } } },
+        { $group: {
+          _id: { hour: { $hour: '$timestamp' } },
+          pv: { $sum: 1 },
+          sessions: { $addToSet: '$session_id' },
+        } },
+        { $project: { hour: '$_id.hour', pv: 1, uniques: { $size: '$sessions' }, _id: 0 } },
+        { $sort: { hour: 1 } },
+      ]).toArray();
+    }
+
+    const [
+      today, yesterday, last7,
+      todayBots, yesterdayBots,
+      topPathsToday, topCitiesToday, topCountriesToday,
+      devicesToday, topBotsToday, hourlyToday, hourlyYesterday,
+    ] = await Promise.all([
+      bucketStats(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
+      bucketStats(yesterdayStart, todayStart),
+      bucketStats(sevenDaysStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
+      botCount(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
+      botCount(yesterdayStart, todayStart),
+      topPaths(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
+      topCities(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
+      topCountries(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
+      devices(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
+      topBots(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
+      hourly(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
+      hourly(yesterdayStart, todayStart),
+    ]);
+
+    return json({
+      today: { ...today, bots: todayBots, hourly: hourlyToday },
+      yesterday: { ...yesterday, bots: yesterdayBots, hourly: hourlyYesterday },
+      last_7_days: last7,
+      top_paths_today: topPathsToday,
+      top_cities_today: topCitiesToday,
+      top_countries_today: topCountriesToday,
+      devices_today: devicesToday,
+      top_bots_today: topBotsToday,
+      generated_at: new Date().toISOString(),
+    });
+  }
+
   return json({ error: 'Not found' }, { status: 404 });
 }
 
 async function handlePost(request, pathParts) {
+  // POST /api/track – First-Party Analytics (öffentlich, kein Auth)
+  if (pathParts[0] === 'track' && !pathParts[1]) {
+    let body = {};
+    try { body = await request.json(); } catch { body = {}; }
+    const path = typeof body.path === 'string' ? body.path.slice(0, 300) : null;
+    if (!path) return json({ ok: false }, { status: 400 });
+    // Kein Tracking von Admin-Routen und Track-Endpunkt
+    if (path.startsWith('/admin') || path.startsWith('/api/')) return json({ ok: true, skipped: true });
+
+    const ua = request.headers.get('user-agent') || '';
+    const referrer = typeof body.referrer === 'string' ? body.referrer.slice(0, 300) : null;
+    const bot = isBot(ua);
+    const ip = getClientIp(request);
+    const geo = getGeo(request);
+
+    // 1st-party session_id cookie – strictly-necessary, kein Consent erforderlich
+    const cookieHeader = request.headers.get('cookie') || '';
+    const match = cookieHeader.match(/(?:^|; )navoria_sid=([^;]+)/);
+    let sessionId = match ? match[1] : null;
+    const setCookie = !sessionId;
+    if (setCookie) sessionId = uuidv4();
+
+    const doc = {
+      id: uuidv4(),
+      session_id: sessionId,
+      path,
+      referrer: referrer || null,
+      ip_hash: hashIp(ip),
+      country: geo.country,
+      city: geo.city,
+      region: geo.region,
+      device_type: getDeviceType(ua),
+      browser: getBrowserFamily(ua),
+      screen: typeof body.screen === 'string' ? body.screen.slice(0, 20) : null,
+      is_bot: bot,
+      bot_name: bot ? (ua.match(/(googlebot|bingbot|gptbot|claudebot|perplexitybot|applebot|amazonbot|ccbot|semrushbot|ahrefsbot|facebookexternalhit|twitterbot|linkedinbot|whatsapp)/i)?.[1]?.toLowerCase() || 'other') : null,
+      timestamp: new Date(),
+    };
+
+    try {
+      const col = await getCollection('page_views');
+      // Best-effort Index setup (idempotent)
+      try {
+        await col.createIndex({ timestamp: -1 });
+        await col.createIndex({ session_id: 1, timestamp: -1 });
+        // TTL: 90 Tage
+        await col.createIndex({ timestamp: 1 }, { expireAfterSeconds: 60 * 60 * 24 * 90 });
+      } catch { /* Indexe können bereits existieren */ }
+      await col.insertOne(doc);
+    } catch (e) {
+      // Tracking-Fehler dürfen niemals nach außen fallen
+      return json({ ok: false }, { status: 200 });
+    }
+
+    const res = json({ ok: true });
+    if (setCookie) {
+      // 1 Jahr Session-ID, HttpOnly, SameSite=Lax
+      res.headers.set('Set-Cookie', `navoria_sid=${sessionId}; Path=/; Max-Age=31536000; HttpOnly; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`);
+    }
+    return res;
+  }
+
   let body = {};
   try { body = await request.json(); } catch { body = {}; }
 

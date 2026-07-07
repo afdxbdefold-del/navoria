@@ -90,6 +90,34 @@ export default function DatenschutzPage() {
             Sitzungs-Token ebenfalls im lokalen Speicher (localStorage) Ihres Browsers abgelegt. Dieser dient allein der
             Authentifizierung angemeldeter Redaktions-Accounts und wird beim Abmelden gelöscht.
           </p>
+          <p className="mt-3">
+            Zusätzlich setzen wir ein technisch notwendiges First-Party-Cookie <code>navoria_sid</code>
+            (Session-ID, 1&nbsp;Jahr Laufzeit, HttpOnly, SameSite=Lax). Es dient ausschließlich der reichweiten- und
+            fehleranalytischen Erhebung („Wie viele Nutzer:innen sind aktuell aktiv?"). Wir setzen dieses Cookie
+            <b> ohne Einwilligung</b>, da es strictly-necessary im Sinne von § 25 Abs. 2 Nr.&nbsp;2 TTDSG ist. Details
+            zur Verarbeitung siehe Abschnitt „Reichweitenmessung".
+          </p>
+        </div>
+
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">5a. Reichweitenmessung (First-Party-Analytics)</h2>
+          <p className="mt-2">
+            Wir erheben zur Reichweitenmessung und Fehleranalyse folgende pseudonymisierte Daten in einer eigenen
+            Datenbank (keine Weitergabe an Dritte, kein Google Analytics, kein Cross-Site-Tracking):
+          </p>
+          <ul className="mt-3 list-disc space-y-1 pl-6">
+            <li>Session-ID (siehe oben) – kein Personenbezug</li>
+            <li>Aufgerufener Pfad und Verweisquelle (Referrer)</li>
+            <li>Grober Standort (Land, Region, Stadt) aus Server-Headern der Content Delivery Infrastruktur</li>
+            <li>Geräte-Kategorie (Desktop/Mobile/Tablet) und Browser-Familie</li>
+            <li>Ein <b>täglich rotierender SHA-256-Hash</b> der IP-Adresse (nicht die IP selbst)</li>
+          </ul>
+          <p className="mt-3">
+            Rechtsgrundlage: Art.&nbsp;6 Abs.&nbsp;1 lit.&nbsp;f DSGVO (berechtigtes Interesse an einem stabilen,
+            zielgruppengerecht betriebenen Angebot). Rohdaten werden automatisch nach <b>90 Tagen</b> gelöscht
+            (MongoDB TTL-Index). Die Speicherung erfolgt ausschließlich in unserer eigenen Datenbank und wird nicht
+            an Dritte übermittelt.
+          </p>
         </div>
 
         <div>

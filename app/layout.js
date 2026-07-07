@@ -1,7 +1,9 @@
 import './globals.css';
+import { Suspense } from 'react';
 import { Toaster } from 'sonner';
 import ConsentBanner, { ConsentResetLink } from '@/components/ConsentBanner';
 import MobileMenu from '@/components/MobileMenu';
+import PageTracker from '@/components/PageTracker';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
 const ADSENSE_CLIENT = 'ca-pub-8583619451045805';
@@ -123,6 +125,9 @@ export default function RootLayout({ children }) {
         <Footer />
         <ConsentBanner />
         <Toaster position="top-center" richColors />
+        <Suspense fallback={null}>
+          <PageTracker />
+        </Suspense>
       </body>
     </html>
   );
