@@ -303,3 +303,16 @@ agent_communication:
         - Google Places API integration working ✅
         
         Backend is production-ready. All core functionality verified.
+
+
+  - task: "WebMCP / MCP Server (POST /api/mcp, GET /mcp.json, /.well-known/mcp.json)"
+    implemented: true
+    working: true
+    file: "/app/app/api/mcp/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Verifiziert per curl am 2025: initialize gibt korrekte serverInfo + capabilities. tools/list liefert 7 Tools (search_doctors, get_doctor, find_specialty_for_symptom, list_specialties, list_bundeslaender, get_ratgeber, get_emergency_info). tools/call für find_specialty_for_symptom(Rückenschmerzen) liefert [Orthopäde, Hausarzt, Physiotherapeut] + symptom_guide. get_emergency_info liefert 112/116117 strukturiert. search_doctors Berlin/Hausarzt liefert 3 Praxen mit Profil-URLs. ping ok, unknown method → -32601. /mcp.json und /.well-known/mcp.json beide HTTP 200. /mcp Doku-Seite rendert."

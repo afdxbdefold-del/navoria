@@ -37,6 +37,13 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      // MCP Discovery via /.well-known
+      { source: '/.well-known/mcp.json', destination: '/mcp.json' },
+      { source: '/.well-known/mcp', destination: '/api/mcp' },
+    ];
+  },
 };
 
 module.exports = nextConfig;
