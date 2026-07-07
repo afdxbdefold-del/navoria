@@ -117,27 +117,49 @@ function List({ token }) {
   };
 
   // Homepage-Modus für eine Praxis aktivieren (Generate)
-  const generateHomepage = async (doc) => {
-    if (!confirm(`Homepage-Modus für "${doc.name}" aktivieren?\n\nDas Praxisprofil wird ab sofort als eigenständige One-Page-Website gerendert (statt als Navoria-Directory-Profil). Deaktivierung jederzeit über das Abhaken-Feld möglich.`)) return;
+  const generateHomepage = async (doc, modeOnly = false) => {
+    if (!modeOnly && !confirm(`Homepage-Modus für "${doc.name}" aktivieren?\n\nDas Praxisprofil wird ab sofort als eigenständige One-Page-Website gerendert (statt als Navoria-Directory-Profil). Deaktivierung jederzeit über das Abhaken-Feld möglich.`)) return;
     setBusyId(doc.id);
     try {
       const r = await fetch(`/api/admin/doctors/${doc.id}/homepage`, {
         method: 'POST', headers: authHeaders,
-        body: JSON.stringify({ enabled: true }),
+        body: JSON.stringify({ enabled: true, mode_only: modeOnly }),
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error);
-      toast.success('Homepage-Modus aktiviert – Profil ist jetzt eine One-Page-Website');
-      // Die Praxis fliegt aus "unchecked" raus (weil website_checked_at gesetzt wird)
-      if (show === 'unchecked') setItems((prev) => prev.filter((it) => it.id !== doc.id));
+      toast.success(modeOnly ? 'Zurück auf Homepage-Modus' : 'Homepage-Modus aktiviert – Profil ist jetzt eine One-Page-Website');
+      // Die Praxis fliegt aus "unchecked" raus (wenn erste Aktivierung; bei modeOnly ist website_checked_at bereits gesetzt)
+      if (show === 'unchecked' && !modeOnly) setItems((prev) => prev.filter((it) => it.id !== doc.id));
       else setItems((prev) => prev.map((it) => it.id === doc.id ? {
         ...it,
         homepage_mode: true,
-        website_checked_at: new Date().toISOString(),
-        is_verified: true,
-        verification_method: 'navoria_homepage',
+        website_checked_at: modeOnly ? it.website_checked_at : new Date().toISOString(),
+        is_verified: modeOnly ? it.is_verified : true,
+        verification_method: modeOnly ? it.verification_method : 'navoria_homepage',
       } : it));
-      setTotals((t) => ({ ...t, unchecked: Math.max(0, t.unchecked - 1), checked: t.checked + 1 }));
+      if (!modeOnly) setTotals((t) => ({ ...t, unchecked: Math.max(0, t.unchecked - 1), checked: t.checked + 1 }));
+    } catch (err) { toast.error(String(err.message || err)); }
+    setBusyId(null);
+  };
+
+  // Manueller Wechsel: nur Darstellung ändern, Verifizierung + website_checked_at bleiben.
+  // Praxis bleibt in "abgehakt"-Liste, wird nur wieder als Standard-Directory-Profil gerendert.
+  const switchToDirectoryMode = async (doc) => {
+    setBusyId(doc.id);
+    try {
+      const r = await fetch(`/api/admin/doctors/${doc.id}/homepage`, {
+        method: 'POST', headers: authHeaders,
+        body: JSON.stringify({ enabled: false, mode_only: true }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error);
+      toast.success('Zurück auf Standard-Directory-Profil');
+      setItems((prev) => prev.map((it) => it.id === doc.id ? {
+        ...it,
+        homepage_mode: false,
+        // Verifizierung bleibt, verification_method wechselt auf admin_no_website_check
+        verification_method: it.verification_method === 'navoria_homepage' ? 'admin_no_website_check' : it.verification_method,
+      } : it));
     } catch (err) { toast.error(String(err.message || err)); }
     setBusyId(null);
   };
@@ -370,14 +392,34 @@ function List({ token }) {
                       </button>
                     )}
                     {!isDiscarded && doc.homepage_mode && (
-                      <Link
-                        href={`/praxis/${doc.city_slug}/${doc.slug}`}
-                        target="_blank"
-                        className="inline-flex items-center gap-1 rounded-md border border-purple-300 bg-purple-50 px-2 py-1 font-semibold text-purple-800 hover:bg-purple-100"
-                        title="Homepage-Preview öffnen"
+                      <>
+                        <Link
+                          href={`/praxis/${doc.city_slug}/${doc.slug}`}
+                          target="_blank"
+                          className="inline-flex items-center gap-1 rounded-md border border-purple-300 bg-purple-50 px-2 py-1 font-semibold text-purple-800 hover:bg-purple-100"
+                          title="Homepage-Preview öffnen"
+                        >
+                          <Home className="h-3 w-3" /> Homepage ansehen <ExternalLink className="h-3 w-3" />
+                        </Link>
+                        <button
+                          disabled={busyId === doc.id}
+                          onClick={() => switchToDirectoryMode(doc)}
+                          className="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-1 font-medium text-slate-700 hover:border-slate-400 hover:bg-slate-50 disabled:opacity-50"
+                          title="Zurück zum Standard-Directory-Profil (Homepage-Modus deaktivieren, Verifizierung bleibt)"
+                        >
+                          <RefreshCw className="h-3 w-3" /> Zum Standard-Profil
+                        </button>
+                      </>
+                    )}
+                    {!isDiscarded && !doc.homepage_mode && doc.website_checked_at && (
+                      <button
+                        disabled={busyId === doc.id}
+                        onClick={() => generateHomepage(doc, true)}
+                        className="inline-flex items-center gap-1 rounded-md border border-purple-300 bg-white px-2 py-1 font-medium text-purple-700 hover:bg-purple-50 disabled:opacity-50"
+                        title="Praxisprofil (erneut) als Homepage aktivieren – Verifizierung bleibt bestehen"
                       >
-                        <Home className="h-3 w-3" /> Homepage ansehen <ExternalLink className="h-3 w-3" />
-                      </Link>
+                        <Sparkles className="h-3 w-3" /> Zur Homepage wechseln
+                      </button>
                     )}
                     {!isDiscarded && (
                       <button

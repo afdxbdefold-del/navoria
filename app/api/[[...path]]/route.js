@@ -1001,13 +1001,20 @@ async function handlePost(request, pathParts) {
   }
 
   // POST /api/admin/doctors/:id/homepage – Homepage-Modus toggeln
-  //   body: { enabled: true|false }
-  //   Bei enabled=true: rendert die Praxis als eigenständige One-Page-Website
-  //   (Lovable-Style) statt als Navoria-Directory-Profil. URL bleibt gleich.
-  //   Bei enabled=false: zurück zum Standard-Directory-Profil.
+  //   body: {
+  //     enabled: true|false,
+  //     mode_only?: boolean  // Wenn true: NUR homepage_mode togglen, Verifizierung/Website-check unangetastet
+  //   }
+  //   Standard-Verhalten (mode_only:false):
+  //     enabled:true → Praxis wird als eigenständige One-Page-Website gerendert,
+  //                    verification_method='navoria_homepage', is_verified=true, website_checked_at=now
+  //     enabled:false → alles zurück (nur wenn eigenes verification_method)
+  //   mode_only:true → nur homepage_mode ändern, sonst nichts.
+  //     Wird verwendet für den "Zum Standard-Profil"-Button im Admin, wenn Admin nur
+  //     die Darstellung wechseln will (Praxis bleibt "abgehakt" und verifiziert).
   if (pathParts[0] === 'admin' && pathParts[1] === 'doctors' && pathParts[2] && pathParts[3] === 'homepage') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
-    const { enabled } = body || {};
+    const { enabled, mode_only } = body || {};
     const doctors = await getCollection('doctor_places');
     const now = new Date();
     const set = { updated_at: now };
@@ -1016,22 +1023,31 @@ async function handlePost(request, pathParts) {
     if (enabled) {
       set.homepage_mode = true;
       set.homepage_generated_at = now;
-      // Implizit: die Praxis hat jetzt eine (Navoria-gehostete) Web-Präsenz.
-      // Website-check + verifiziert setzen, damit sie aus "Praxen ohne Website"-Liste rausfliegt.
-      set.website_checked_at = now;
-      set.is_verified = true;
-      set.verified_at = now;
-      set.verification_method = 'navoria_homepage';
+      if (!mode_only) {
+        set.website_checked_at = now;
+        set.is_verified = true;
+        set.verified_at = now;
+        set.verification_method = 'navoria_homepage';
+      }
     } else {
       unset.homepage_mode = '';
       unset.homepage_generated_at = '';
-      // Website-check + Verifizierung zurück (nur wenn wir sie gesetzt hatten)
-      const existing = await doctors.findOne({ id: pathParts[2] }, { projection: { verification_method: 1 } });
-      if (existing?.verification_method === 'navoria_homepage') {
-        set.website_checked_at = null;
-        set.is_verified = false;
-        set.verified_at = null;
-        unset.verification_method = '';
+      if (!mode_only) {
+        // Website-check + Verifizierung zurück (nur wenn wir sie gesetzt hatten)
+        const existing = await doctors.findOne({ id: pathParts[2] }, { projection: { verification_method: 1 } });
+        if (existing?.verification_method === 'navoria_homepage') {
+          set.website_checked_at = null;
+          set.is_verified = false;
+          set.verified_at = null;
+          unset.verification_method = '';
+        }
+      } else {
+        // mode_only: wenn verification_method='navoria_homepage' war, auf editoriell umstellen,
+        // damit die Verifizierung erhalten bleibt, aber semantisch stimmig ist.
+        const existing = await doctors.findOne({ id: pathParts[2] }, { projection: { verification_method: 1 } });
+        if (existing?.verification_method === 'navoria_homepage') {
+          set.verification_method = 'admin_no_website_check';
+        }
       }
     }
 
