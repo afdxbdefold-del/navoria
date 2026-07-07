@@ -1074,14 +1074,27 @@ async function handlePost(request, pathParts) {
   }
 
   // POST /api/admin/campaigns - Bulk-Import-Kampagne starten
+  //   body: {
+  //     cities: string[],
+  //     specialtySlugs: string[],
+  //     maxPerQuery?: number,
+  //     filterNoWebsiteOnly?: boolean,
+  //     name?: string
+  //   }
   if (pathParts[0] === 'admin' && pathParts[1] === 'campaigns') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
-    const { cities, specialtySlugs, maxPerQuery } = body;
+    const { cities, specialtySlugs, maxPerQuery, filterNoWebsiteOnly, name } = body;
     if (!Array.isArray(cities) || cities.length === 0) return json({ error: 'Keine Städte ausgewählt' }, { status: 400 });
     if (!Array.isArray(specialtySlugs) || specialtySlugs.length === 0) return json({ error: 'Keine Fachrichtungen ausgewählt' }, { status: 400 });
     try {
       const { createCampaign } = await import('@/lib/services/campaignWorker');
-      const campaign = await createCampaign({ cities, specialtySlugs, maxPerQuery: Math.min(parseInt(maxPerQuery || 60, 10), 60) });
+      const campaign = await createCampaign({
+        cities,
+        specialtySlugs,
+        maxPerQuery: Math.min(parseInt(maxPerQuery || 60, 10), 60),
+        filterNoWebsiteOnly: !!filterNoWebsiteOnly,
+        name: name || undefined,
+      });
       return json({ ok: true, campaign: stripId(campaign) });
     } catch (err) {
       return json({ error: String(err.message || err) }, { status: 500 });

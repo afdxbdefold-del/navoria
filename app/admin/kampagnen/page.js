@@ -4,13 +4,16 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { Loader2, CheckCircle2, AlertTriangle, RefreshCw, Play, Pause, RotateCw, Rocket, MapPin, Stethoscope, Clock, TrendingUp, ArrowLeft } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertTriangle, RefreshCw, Play, Pause, RotateCw, Rocket, MapPin, Stethoscope, Clock, TrendingUp, ArrowLeft, Globe, MapPinOff } from 'lucide-react';
 import { TOP_100_CITIES } from '@/lib/germanCities';
+import { REST_DE_CITIES } from '@/lib/germanCitiesRest';
 import { SPECIALTIES } from '@/lib/specialties';
 
 const TOP_10_CITIES = TOP_100_CITIES.slice(0, 10);
 const TOP_20_CITIES = TOP_100_CITIES.slice(0, 20);
 const TOP_50_CITIES = TOP_100_CITIES.slice(0, 50);
+// Kernfachrichtungen für sparsame Rest-DE-Sweeps (Kosten-Optimierung)
+const CORE_SPECIALTY_SLUGS = ['hausarzt', 'zahnarzt', 'frauenarzt', 'kinderarzt', 'orthopaede', 'augenarzt', 'hautarzt', 'hno-arzt', 'urologe', 'neurologe', 'psychotherapeut'];
 
 export default function KampagnenPage() {
   const router = useRouter();
@@ -18,6 +21,8 @@ export default function KampagnenPage() {
   const [selectedCities, setSelectedCities] = useState([...TOP_100_CITIES]);
   const [selectedSpecs, setSelectedSpecs] = useState(SPECIALTIES.map((s) => s.slug));
   const [maxPerQuery, setMaxPerQuery] = useState(60);
+  const [filterNoWebsiteOnly, setFilterNoWebsiteOnly] = useState(false);
+  const [cityPool, setCityPool] = useState('top100'); // 'top100' | 'rest'
   const [starting, setStarting] = useState(false);
   const [campaigns, setCampaigns] = useState([]);
   const [activeCampaign, setActiveCampaign] = useState(null);
@@ -82,7 +87,15 @@ export default function KampagnenPage() {
     try {
       const r = await fetch('/api/admin/campaigns', {
         method: 'POST', headers: auth,
-        body: JSON.stringify({ cities: selectedCities, specialtySlugs: selectedSpecs, maxPerQuery }),
+        body: JSON.stringify({
+          cities: selectedCities,
+          specialtySlugs: selectedSpecs,
+          maxPerQuery,
+          filterNoWebsiteOnly,
+          name: filterNoWebsiteOnly
+            ? `Rest-DE ohne Website · ${selectedCities.length} Städte × ${selectedSpecs.length} Fachrichtungen`
+            : undefined,
+        }),
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || 'Fehler');
@@ -157,12 +170,13 @@ export default function KampagnenPage() {
             </div>
             {activeCampaign.current_query && <p className="mt-2 text-xs text-slate-500">Aktuell: {activeCampaign.current_query}</p>}
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-6">
+          <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-7">
             <Stat label="Gefunden" value={activeCampaign.found} />
             <Stat label="Neu" value={activeCampaign.inserted} color="text-emerald-700" />
             <Stat label="Aktualisiert" value={activeCampaign.updated} color="text-sky-700" />
             <Stat label="Übersprungen" value={activeCampaign.skipped} />
             <Stat label="Verworfene geblockt" value={activeCampaign.skipped_discarded || 0} color="text-amber-700" />
+            <Stat label="Mit Website übersprungen" value={activeCampaign.skipped_has_website || 0} color="text-teal-700" />
             <Stat label="Fehler" value={activeCampaign.errors} color={activeCampaign.errors > 0 ? 'text-rose-700' : ''} />
           </div>
           {activeCampaign.error_samples?.length > 0 && (
@@ -180,22 +194,90 @@ export default function KampagnenPage() {
       <div className="card-soft mt-6 p-6">
         <h2 className="text-lg font-semibold text-slate-900">Neue Kampagne konfigurieren</h2>
 
+        {/* Rest-Deutschland One-Click-Preset */}
+        <div className="mt-4 rounded-xl border border-teal-200 bg-gradient-to-br from-teal-50 to-sky-50/50 p-4">
+          <div className="flex flex-wrap items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-teal-100 text-teal-700">
+              <MapPinOff className="h-5 w-5" aria-hidden="true" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-semibold text-slate-900">Rest-Deutschland: Praxen ohne Website</h3>
+              <p className="mt-0.5 text-xs text-slate-600">
+                {REST_DE_CITIES.length} deutsche Mittelstädte (nicht in Top 100) × {CORE_SPECIALTY_SLUGS.length} Kernfachrichtungen.
+                Filtert Praxen mit Website automatisch heraus – ideal um &bdquo;vergessene&rdquo; Landarztpraxen zu erfassen.
+                Städte werden bei Bedarf automatisch angelegt.
+              </p>
+              <div className="mt-1.5 text-[11px] text-slate-500">
+                ≈ {(REST_DE_CITIES.length * CORE_SPECIALTY_SLUGS.length).toLocaleString('de-DE')} Queries
+                · ca. {Math.ceil((REST_DE_CITIES.length * CORE_SPECIALTY_SLUGS.length * 4) / 5 / 60)} Min. Laufzeit
+                · Google-Kosten ≈ {(REST_DE_CITIES.length * CORE_SPECIALTY_SLUGS.length * 0.032).toFixed(2)} $
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                setCityPool('rest');
+                setSelectedCities([...REST_DE_CITIES]);
+                setSelectedSpecs([...CORE_SPECIALTY_SLUGS]);
+                setFilterNoWebsiteOnly(true);
+                setMaxPerQuery(60);
+                toast.success(`Rest-DE-Modus aktiviert · ${REST_DE_CITIES.length} Städte × ${CORE_SPECIALTY_SLUGS.length} Fachrichtungen · nur ohne Website`);
+              }}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-700"
+            >
+              <MapPinOff className="h-4 w-4" aria-hidden="true" /> Rest-DE laden
+            </button>
+          </div>
+        </div>
+
+        {/* Städte-Pool Umschalter */}
+        <div className="mt-4 inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1" role="group" aria-label="Städte-Pool wählen">
+          <button
+            onClick={() => setCityPool('top100')}
+            aria-pressed={cityPool === 'top100'}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${cityPool === 'top100' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+          >
+            Top 100 ({TOP_100_CITIES.length})
+          </button>
+          <button
+            onClick={() => setCityPool('rest')}
+            aria-pressed={cityPool === 'rest'}
+            className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${cityPool === 'rest' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+          >
+            Rest-DE ({REST_DE_CITIES.length})
+          </button>
+        </div>
+
         {/* Presets */}
         <div className="mt-4 flex flex-wrap gap-2">
-          <span className="text-xs font-medium text-slate-500 mr-2 self-center">Städte-Presets:</span>
-          <button onClick={() => setSelectedCities([...TOP_10_CITIES])} className="chip hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700">Top 10</button>
-          <button onClick={() => setSelectedCities([...TOP_20_CITIES])} className="chip hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700">Top 20</button>
-          <button onClick={() => setSelectedCities([...TOP_50_CITIES])} className="chip hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700">Top 50</button>
-          <button onClick={() => setSelectedCities([...TOP_100_CITIES])} className="chip hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700">Top 100</button>
+          <span className="text-xs font-medium text-slate-500 mr-2 self-center">
+            {cityPool === 'top100' ? 'Top-Städte-Presets:' : 'Rest-DE Presets:'}
+          </span>
+          {cityPool === 'top100' ? (
+            <>
+              <button onClick={() => setSelectedCities([...TOP_10_CITIES])} className="chip hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700">Top 10</button>
+              <button onClick={() => setSelectedCities([...TOP_20_CITIES])} className="chip hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700">Top 20</button>
+              <button onClick={() => setSelectedCities([...TOP_50_CITIES])} className="chip hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700">Top 50</button>
+              <button onClick={() => setSelectedCities([...TOP_100_CITIES])} className="chip hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700">Top 100</button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => setSelectedCities(REST_DE_CITIES.slice(0, 50))} className="chip hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700">Erste 50</button>
+              <button onClick={() => setSelectedCities(REST_DE_CITIES.slice(0, 150))} className="chip hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700">Erste 150</button>
+              <button onClick={() => setSelectedCities([...REST_DE_CITIES])} className="chip hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700">Alle ({REST_DE_CITIES.length})</button>
+            </>
+          )}
           <button onClick={() => setSelectedCities([])} className="chip hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700">Keine</button>
         </div>
 
         <div className="mt-4 grid gap-6 lg:grid-cols-2">
           <div>
-            <label className="label flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> Städte ({selectedCities.length} / {TOP_100_CITIES.length})</label>
+            <label className="label flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+              Städte ({selectedCities.length} / {cityPool === 'top100' ? TOP_100_CITIES.length : REST_DE_CITIES.length})
+            </label>
             <div className="mt-2 max-h-72 overflow-y-auto rounded-xl border border-slate-200 bg-white p-3">
               <div className="grid grid-cols-2 gap-1.5">
-                {TOP_100_CITIES.map((c) => (
+                {(cityPool === 'top100' ? TOP_100_CITIES : REST_DE_CITIES).map((c) => (
                   <label key={c} className="flex items-center gap-2 rounded px-2 py-1 text-sm text-slate-700 hover:bg-slate-50">
                     <input type="checkbox" checked={selectedCities.includes(c)} onChange={() => toggleCity(c)} className="h-4 w-4 rounded border-slate-300 text-sky-600" />
                     <span className="truncate">{c}</span>
@@ -226,22 +308,33 @@ export default function KampagnenPage() {
 
         <div className="mt-6 flex flex-wrap items-end gap-4">
           <div>
-            <label className="label">Max. Ergebnisse pro Query</label>
-            <select value={maxPerQuery} onChange={(e) => setMaxPerQuery(parseInt(e.target.value, 10))} className="input mt-1.5">
+            <label htmlFor="max-per-query" className="label">Max. Ergebnisse pro Query</label>
+            <select id="max-per-query" value={maxPerQuery} onChange={(e) => setMaxPerQuery(parseInt(e.target.value, 10))} className="input mt-1.5">
               <option value="20">20 (1 API-Seite)</option>
               <option value="40">40 (2 Seiten)</option>
               <option value="60">60 (max, 3 Seiten)</option>
             </select>
           </div>
 
+          <label className={`flex cursor-pointer items-center gap-2 self-end rounded-xl border px-3 py-2 text-sm transition ${filterNoWebsiteOnly ? 'border-teal-300 bg-teal-50 text-teal-900' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}>
+            <input
+              type="checkbox"
+              checked={filterNoWebsiteOnly}
+              onChange={(e) => setFilterNoWebsiteOnly(e.target.checked)}
+              className="h-4 w-4 rounded border-slate-300 text-teal-600"
+            />
+            <Globe className="h-4 w-4" aria-hidden="true" />
+            <span>Nur Praxen <strong>ohne Website</strong> importieren</span>
+          </label>
+
           <div className="ml-auto flex flex-col items-end gap-3 sm:flex-row sm:items-end">
             <div className="text-right">
               <div className="text-xs text-slate-500">Kampagnen-Umfang</div>
               <div className="text-lg font-semibold text-slate-900">{totalQueries.toLocaleString('de-DE')} Queries</div>
-              <div className="flex items-center gap-1 text-xs text-slate-500"><Clock className="h-3 w-3" /> ca. {estimatedMinutes} Min. geschätzt</div>
+              <div className="flex items-center gap-1 text-xs text-slate-500"><Clock className="h-3 w-3" aria-hidden="true" /> ca. {estimatedMinutes} Min. geschätzt</div>
             </div>
             <button onClick={startCampaign} disabled={starting || totalQueries === 0 || activeCampaign?.status === 'running'} className="btn-primary disabled:cursor-not-allowed">
-              {starting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Starte …</> : <><Play className="mr-2 h-4 w-4" /> Kampagne starten</>}
+              {starting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> Starte …</> : <><Play className="mr-2 h-4 w-4" aria-hidden="true" /> Kampagne starten</>}
             </button>
           </div>
         </div>
