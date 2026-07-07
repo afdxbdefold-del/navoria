@@ -35,7 +35,7 @@ export default function RatingBadge({
         {c > 0 && <span aria-hidden="true" className="font-normal text-amber-800/80">({c})</span>}
       </span>
       {showAttribution && (
-        <span className="mt-1 text-[10px] leading-tight text-slate-400">Bewertungen von Google</span>
+        <span className="mt-1 text-[10px] leading-tight text-slate-500">Bewertungen von Google</span>
       )}
     </span>
   );

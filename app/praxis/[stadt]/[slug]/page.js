@@ -8,6 +8,7 @@ import {
 import CopyButton from '@/components/CopyButton';
 import CorrectionButton from '@/components/CorrectionButton';
 import RatingBadge from '@/components/RatingBadge';
+import MapEmbed from '@/components/MapEmbed';
 import FaqAccordion from '@/components/praxis/FaqAccordion';
 import MobileStickyCta from '@/components/praxis/MobileStickyCta';
 import { parseDisplayName } from '@/lib/doctorFormatter';
@@ -327,7 +328,7 @@ export default async function ProfilePage({ params }) {
           )}
         </div>
         {d.rating != null && d.user_rating_count > 0 && (
-          <p className="mt-3 text-[11px] text-slate-400">Bewertungen von Google (öffentliche Google-Rezensionen)</p>
+          <p className="mt-3 text-xs text-slate-500">Bewertungen von Google (öffentliche Google-Rezensionen)</p>
         )}
       </header>
 
@@ -430,7 +431,7 @@ export default async function ProfilePage({ params }) {
                           <td className={`px-4 py-2.5 ${isToday ? 'font-semibold text-sky-800' : 'text-slate-600'}`}>{row.dayLabel}{isToday ? ' · heute' : ''}</td>
                           <td className={`px-4 py-2.5 text-right ${isToday ? 'font-medium text-sky-900' : 'text-slate-800'}`}>
                             {row.ranges.length === 0
-                              ? <span className="text-slate-400">Geschlossen</span>
+                              ? <span className="text-slate-500">Geschlossen</span>
                               : row.ranges.map((r, i) => (
                                   <span key={i} className="ml-2 inline-block">
                                     {r.open}–{r.close === '24:00' ? '24:00' : r.close}
@@ -498,15 +499,11 @@ export default async function ProfilePage({ params }) {
             <section>
               <h2 className="text-lg font-semibold text-slate-900">Standort</h2>
               <p className="mt-2 text-sm text-slate-600">Praxis in {city}{d.district ? `, Stadtteil ${d.district}` : ''}{d.postal_code ? `, PLZ ${d.postal_code}` : ''}.</p>
-              <div className="mt-3 overflow-hidden rounded-xl border border-slate-200">
-                <iframe
+              <div className="mt-3">
+                <MapEmbed
                   src={mapEmbed}
                   title={`Standort ${displayName}`}
-                  width="100%"
-                  height="320"
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
-                  className="block"
+                  label={[d.postal_code, city].filter(Boolean).join(' ')}
                 />
               </div>
               {routeUrl && (
