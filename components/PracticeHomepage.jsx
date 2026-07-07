@@ -34,7 +34,9 @@ export default function PracticeHomepage({ doctor }) {
   const openHours = normalizeOpeningHours(doctor.opening_hours);
 
   const jsonLd = buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone, openHours });
-  const pagePath = `/praxis/${doctor.city_slug}/${doctor.slug}`;
+  const pagePath = doctor.homepage_slug
+    ? `/${doctor.homepage_slug}`
+    : `/praxis/${doctor.city_slug}/${doctor.slug}`;
   const pageUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de'}${pagePath}`;
   const initials = getInitials(name);
 
@@ -360,7 +362,9 @@ function normalizeOpeningHours(hours) {
 
 function buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone }) {
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
-  const url = `${base}/praxis/${doctor.city_slug}/${doctor.slug}`;
+  const url = doctor.homepage_slug
+    ? `${base}/${doctor.homepage_slug}`
+    : `${base}/praxis/${doctor.city_slug}/${doctor.slug}`;
 
   // Effektive E-Mail (manuell oder generiert)
   const email = getEffectiveEmail(doctor);

@@ -1,5 +1,5 @@
 import { getCollection } from '@/lib/mongodb';
-import { notFound } from 'next/navigation';
+import { notFound, redirect, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
 import {
   Phone, Globe, MapPin, ExternalLink, Clock, ShieldAlert, Info, CalendarClock,
@@ -132,6 +132,12 @@ export default async function ProfilePage({ params }) {
   // Homepage-Modus: Praxis wird als eigenständige One-Page-Website gerendert
   // statt als Navoria-Directory-Profil. Toggle im Admin-Bereich.
   if (d.homepage_mode === true) {
+    // Wenn homepage_slug gesetzt → 301-Redirect auf die Root-Level Praxis-URL /[homepage_slug].
+    // Das trennt die Praxis-Homepage sauber von der Navoria-Directory-URL (SEO-Decoupling).
+    // Ohne homepage_slug (Legacy-Fall) → wir rendern die Homepage inline wie bisher.
+    if (d.homepage_slug) {
+      permanentRedirect(`/${d.homepage_slug}`);
+    }
     const { default: PracticeHomepage } = await import('@/components/PracticeHomepage');
     return <PracticeHomepage doctor={d} />;
   }

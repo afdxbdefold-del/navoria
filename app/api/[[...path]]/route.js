@@ -1067,7 +1067,7 @@ async function handlePost(request, pathParts) {
   //     die Darstellung wechseln will (Praxis bleibt "abgehakt" und verifiziert).
   if (pathParts[0] === 'admin' && pathParts[1] === 'doctors' && pathParts[2] && pathParts[3] === 'homepage') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
-    const { enabled, mode_only } = body || {};
+    const { enabled, mode_only, custom_slug } = body || {};
     const doctors = await getCollection('doctor_places');
     const now = new Date();
     const set = { updated_at: now };
@@ -1076,6 +1076,20 @@ async function handlePost(request, pathParts) {
     if (enabled) {
       set.homepage_mode = true;
       set.homepage_generated_at = now;
+      // Root-Level Homepage-Slug generieren oder aus custom_slug übernehmen
+      const { findFreeHomepageSlug, validateHomepageSlug } = await import('@/lib/homepageSlug');
+      const existingDoc = await doctors.findOne({ id: pathParts[2] });
+      if (!existingDoc) return json({ error: 'Nicht gefunden' }, { status: 404 });
+      if (custom_slug) {
+        const err = validateHomepageSlug(custom_slug);
+        if (err) return json({ error: err }, { status: 400 });
+        // Kollisionsprüfung (andere Praxis mit diesem Slug?)
+        const taken = await doctors.findOne({ homepage_slug: custom_slug.trim().toLowerCase(), id: { $ne: pathParts[2] } });
+        if (taken) return json({ error: `Slug "${custom_slug}" ist bereits an eine andere Praxis vergeben` }, { status: 409 });
+        set.homepage_slug = custom_slug.trim().toLowerCase();
+      } else if (!existingDoc.homepage_slug) {
+        set.homepage_slug = await findFreeHomepageSlug(existingDoc, doctors);
+      }
       if (!mode_only) {
         set.website_checked_at = now;
         set.is_verified = true;
@@ -1085,6 +1099,7 @@ async function handlePost(request, pathParts) {
     } else {
       unset.homepage_mode = '';
       unset.homepage_generated_at = '';
+      // homepage_slug bleibt bewusst ERHALTEN – so bleibt ein späterer Re-Toggle stabil (gleiche URL).
       if (!mode_only) {
         // Website-check + Verifizierung zurück (nur wenn wir sie gesetzt hatten)
         const existing = await doctors.findOne({ id: pathParts[2] }, { projection: { verification_method: 1 } });
