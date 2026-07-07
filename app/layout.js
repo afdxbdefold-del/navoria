@@ -1,6 +1,7 @@
 import './globals.css';
 import { Toaster } from 'sonner';
 import ConsentBanner, { ConsentResetLink } from '@/components/ConsentBanner';
+import MobileMenu from '@/components/MobileMenu';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
 const ADSENSE_CLIENT = 'ca-pub-8583619451045805';
@@ -140,7 +141,10 @@ function Header() {
           <a href="/" className="hover:text-sky-600">Start</a>
           <a href="/suche" className="hover:text-sky-600">Suche</a>
           <a href="/aerzte" className="hover:text-sky-600">Ärzte-Verzeichnis</a>
+          <a href="/symptome" className="hover:text-sky-600">Symptome</a>
+          <a href="/ratgeber" className="hover:text-sky-600">Ratgeber</a>
         </nav>
+        <MobileMenu />
       </div>
     </header>
   );
