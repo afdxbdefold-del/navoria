@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Script from 'next/script';
 import { Cookie, X } from 'lucide-react';
+import { useIsStandaloneRoute } from '@/components/NavShell';
 
 const STORAGE_KEY = 'navoria_consent_v1';
 const ADSENSE_CLIENT = 'ca-pub-8583619451045805';
@@ -12,12 +13,15 @@ const ADSENSE_CLIENT = 'ca-pub-8583619451045805';
  * AdSense wird NUR geladen, wenn Nutzer aktiv 'ads' zugestimmt hat.
  * Zustimmung wird in localStorage gespeichert. Widerruf jederzeit via Footer-Link
  * (custom event 'navoria:consent:reset') möglich.
+ * Auf Standalone-Routen (eigenständige Praxis-Websites) wird kein Banner gezeigt.
  */
 export default function ConsentBanner() {
+  const isStandalone = useIsStandaloneRoute();
   const [consent, setConsent] = useState(null); // null=nicht entschieden, 'all'|'necessary'
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    if (isStandalone) return;
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'all' || stored === 'necessary') {
       setConsent(stored);
@@ -32,7 +36,9 @@ export default function ConsentBanner() {
     };
     window.addEventListener('navoria:consent:reset', onReset);
     return () => window.removeEventListener('navoria:consent:reset', onReset);
-  }, []);
+  }, [isStandalone]);
+
+  if (isStandalone) return null;
 
   const acceptAll = () => {
     localStorage.setItem(STORAGE_KEY, 'all');
