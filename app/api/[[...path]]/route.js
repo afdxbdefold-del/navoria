@@ -280,19 +280,64 @@ async function handleGet(request, pathParts) {
     else if (show === 'checked') filter = { ...noWebsite, ...notDiscarded, website_checked_at: { $exists: true, $ne: null } };
     else filter = { ...noWebsite, ...notDiscarded };
     if (cityFilter) filter.city = cityFilter;
-    const projection = { _id: 0, id: 1, name: 1, slug: 1, city: 1, city_slug: 1, formatted_address: 1, phone_national: 1, specialty_guess: 1, google_place_id: 1, google_maps_url: 1, website_checked_at: 1, is_active: 1, discarded_at: 1, rating: 1, user_rating_count: 1, is_verified: 1, verification_method: 1, homepage_mode: 1 };
-    // Sortier-Modi
+    // Managed-Score verwendet mehr Felder als die Standard-Projection.
+    // Wir bringen die Felder mit rein und strippen sie nach dem Scoring wieder.
+    const isManagedSort = sort === 'managed_asc' || sort === 'managed_desc';
+    const projection = {
+      _id: 0, id: 1, name: 1, slug: 1, city: 1, city_slug: 1, formatted_address: 1, phone_national: 1,
+      specialty_guess: 1, google_place_id: 1, google_maps_url: 1, website_checked_at: 1, is_active: 1,
+      discarded_at: 1, rating: 1, user_rating_count: 1, is_verified: 1, verification_method: 1, homepage_mode: 1,
+      // Felder f\u00fcr Managed-Score:
+      regular_opening_hours: 1, opening_hours_json: 1, current_opening_hours: 1,
+      accessibility_options: 1, parking_options: 1, payment_options: 1,
+      primary_type: 1, external_primary_type: 1, types: 1, external_types: 1,
+    };
+    // DB-native Sortier-Modi
     const sortMap = {
       city: { city: 1, name: 1 },
-      reviews: { user_rating_count: -1, rating: -1, name: 1 },  // meiste Rezensionen zuerst
-      rating: { rating: -1, user_rating_count: -1, name: 1 },   // beste Bewertung zuerst
+      reviews: { user_rating_count: -1, rating: -1, name: 1 },
+      rating: { rating: -1, user_rating_count: -1, name: 1 },
       name: { name: 1 },
     };
-    const sortSpec = sortMap[sort] || sortMap.city;
-    const [list, matchCount] = await Promise.all([
-      col.find(filter, { projection }).sort(sortSpec).skip(offset).limit(limit).toArray(),
-      col.countDocuments(filter),
-    ]);
+    // Bei Managed-Sortierung: DB unsortiert holen, im Speicher scoren + sortieren, danach paginate.
+    // Bei Standard-Sortierung: nutze DB-Sort mit skip/limit.
+    let list, matchCount;
+    if (isManagedSort) {
+      // Alle passenden Dokumente holen (max 5000, sollte f\u00fcr alle Setups reichen)
+      const { computeManagedScore } = await import('@/lib/managedScore');
+      const allDocs = await col.find(filter, { projection }).limit(5000).toArray();
+      const scored = allDocs.map((d) => {
+        const s = computeManagedScore(d);
+        return { ...d, managed_score: s.score, managed_likelihood: s.likelihood, managed_signals: s.signals };
+      });
+      scored.sort((a, b) => {
+        if (sort === 'managed_asc') return a.managed_score - b.managed_score || (a.city || '').localeCompare(b.city || '', 'de');
+        return b.managed_score - a.managed_score || (b.user_rating_count || 0) - (a.user_rating_count || 0);
+      });
+      matchCount = scored.length;
+      list = scored.slice(offset, offset + limit);
+    } else {
+      const sortSpec = sortMap[sort] || sortMap.city;
+      const [rawList, count] = await Promise.all([
+        col.find(filter, { projection }).sort(sortSpec).skip(offset).limit(limit).toArray(),
+        col.countDocuments(filter),
+      ]);
+      // Score trotzdem berechnen, damit UI ihn immer anzeigen kann
+      const { computeManagedScore } = await import('@/lib/managedScore');
+      list = rawList.map((d) => {
+        const s = computeManagedScore(d);
+        return { ...d, managed_score: s.score, managed_likelihood: s.likelihood, managed_signals: s.signals };
+      });
+      matchCount = count;
+    }
+
+    // Score-Compute-Felder aus finaler Ausgabe entfernen (Rohdaten nicht ans UI leaken)
+    const trimFields = ['regular_opening_hours', 'opening_hours_json', 'current_opening_hours', 'accessibility_options', 'parking_options', 'payment_options', 'external_primary_type', 'external_types'];
+    list = list.map((d) => {
+      const clean = { ...d };
+      trimFields.forEach((f) => delete clean[f]);
+      return clean;
+    });
 
     // Alle unique Städte für Filter-Dropdown – aus GESAMTEM noWebsite-Bestand (nicht nur aus der Ergebnismenge)
     const allCities = await col.distinct('city', { ...noWebsite, ...notDiscarded, city: { $ne: null } });

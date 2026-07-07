@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { ArrowLeft, Globe, Phone, MapPin, ExternalLink, RefreshCw, Search, CheckCircle2, Loader2, Copy, Trash2, BadgeCheck, Sparkles, Home } from 'lucide-react';
+import { ArrowLeft, Globe, Phone, MapPin, ExternalLink, RefreshCw, Search, CheckCircle2, Loader2, Copy, Trash2, BadgeCheck, Sparkles, Home, Gauge } from 'lucide-react';
+import { likelihoodLabel, likelihoodColorClasses } from '@/lib/managedScore';
 
 export default function AdminOhneWebseitePage() {
   const [token, setToken] = useState(null);
@@ -261,13 +262,19 @@ function List({ token }) {
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm min-w-[190px]"
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm min-w-[220px]"
           title="Sortierung"
         >
-          <option value="reviews">🔥 Meiste Bewertungen zuerst</option>
-          <option value="rating">⭐ Beste Bewertung zuerst</option>
-          <option value="city">📍 Stadt A→Z</option>
-          <option value="name">🔤 Name A→Z</option>
+          <optgroup label="Managed-Score">
+            <option value="managed_asc">🎯 Unmanaged zuerst (Homepage-Kandidaten)</option>
+            <option value="managed_desc">✅ Verwaltet zuerst</option>
+          </optgroup>
+          <optgroup label="Standard">
+            <option value="reviews">🔥 Meiste Bewertungen zuerst</option>
+            <option value="rating">⭐ Beste Bewertung zuerst</option>
+            <option value="city">📍 Stadt A→Z</option>
+            <option value="name">🔤 Name A→Z</option>
+          </optgroup>
         </select>
         {(matchCount > 0 && matchCount !== items.length) && (
           <p className="self-center text-xs text-slate-400">
@@ -332,6 +339,14 @@ function List({ token }) {
                         title="Praxisprofil wird als eigenständige One-Page-Homepage gerendert"
                       >
                         <Home className="h-3 w-3" /> Homepage-Modus
+                      </span>
+                    )}
+                    {typeof doc.managed_score === 'number' && (
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${likelihoodColorClasses(doc.managed_likelihood)}`}
+                        title={`Managed-Score: ${doc.managed_score}/100 · Signale: ${(doc.managed_signals || []).join(', ') || 'keine'}`}
+                      >
+                        <Gauge className="h-3 w-3" /> {likelihoodLabel(doc.managed_likelihood)} · {doc.managed_score}
                       </span>
                     )}
                     {doc.rating != null && (
