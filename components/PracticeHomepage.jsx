@@ -4,6 +4,7 @@
 
 import { getKammerForPractice } from '@/lib/aerztekammern';
 import { getTemplateForSpecialty } from '@/lib/homepageTemplates';
+import { toSchemaOpeningHours } from '@/lib/openingHours';
 
 /**
  * @param {object} doctor doctor_places Dokument (bereits stripped)
@@ -178,24 +179,35 @@ export default function PracticeHomepage({ doctor }) {
       </section>
 
       {/* Impressum */}
-      <section id="impressum" className="border-t border-slate-200 bg-white py-20">
+      <section id="impressum" className="border-t border-slate-200 bg-white py-20" itemScope itemType="https://schema.org/Physician">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <p className="text-sm font-semibold uppercase tracking-widest text-emerald-800">Rechtliches</p>
           <h2 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-4xl">Impressum</h2>
 
           <div className="mt-10 space-y-8 text-sm text-slate-700 sm:text-base">
             <ImpressumSection title="Angaben gemäß § 5 DDG (Digitale-Dienste-Gesetz) / § 5 TMG">
-              <p><strong>{name}</strong><br />{berufsbezeichnung.full}<br />{street}<br />{postalCode} {city}</p>
+              <p itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
+                <strong itemProp="name">{name}</strong><br />
+                {berufsbezeichnung.full}<br />
+                <span itemProp="streetAddress">{street}</span><br />
+                <span itemProp="postalCode">{postalCode}</span> <span itemProp="addressLocality">{city}</span>
+                <meta itemProp="addressCountry" content="DE" />
+              </p>
             </ImpressumSection>
 
             <ImpressumSection title="Kontakt">
-              {phone && <p>Telefon: <a href={`tel:${phoneLink}`} className="text-emerald-700 underline underline-offset-2">{phone}</a></p>}
-              <p className="text-slate-500">Anfragen bitte telefonisch. Eine E-Mail-Adresse wird auf Wunsch der Praxis nicht öffentlich hinterlegt.</p>
+              {phone && <p>Telefon: <a href={`tel:${phoneLink}`} className="text-emerald-700 underline underline-offset-2" itemProp="telephone">{phone}</a></p>}
+              {doctor.email_manual && (
+                <p>E-Mail: <a href={`mailto:${doctor.email_manual}`} className="text-emerald-700 underline underline-offset-2" itemProp="email">{doctor.email_manual}</a></p>
+              )}
+              {!doctor.email_manual && (
+                <p className="text-slate-500">Anfragen bitte telefonisch. Eine E-Mail-Adresse wird auf Wunsch der Praxis nicht öffentlich hinterlegt.</p>
+              )}
             </ImpressumSection>
 
             <ImpressumSection title="Berufsbezeichnung und berufsrechtliche Regelungen">
               <ul className="space-y-1">
-                <li><strong>Berufsbezeichnung:</strong> {berufsbezeichnung.full} (verliehen in der Bundesrepublik Deutschland)</li>
+                <li><strong>Berufsbezeichnung:</strong> <span itemProp="medicalSpecialty">{berufsbezeichnung.full}</span> (verliehen in der Bundesrepublik Deutschland)</li>
                 {kammer ? (
                   <>
                     <li><strong>Zuständige Kammer:</strong> {kammer.name}, {kammer.address}</li>
@@ -343,10 +355,83 @@ function normalizeOpeningHours(hours) {
 function buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone }) {
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
   const url = `${base}/praxis/${doctor.city_slug}/${doctor.slug}`;
+
+  // Google Business Profile Deep-Link via place_id (falls vorhanden)
+  const gmbUrl = doctor.google_place_id
+    ? `https://www.google.com/maps/place/?q=place_id:${doctor.google_place_id}`
+    : null;
+
+  // Fachrichtung -> medizinische Fachrichtung (freier Text, Google akzeptiert dt. Bezeichnungen)
+  const specialty = doctor.specialty_guess || null;
+
+  // Strukturierte Öffnungszeiten aus Places-Daten
+  const openingHoursSpec = toSchemaOpeningHours(
+    doctor.regular_opening_hours || doctor.opening_hours_json || doctor.opening_hours
+  );
+
+  // Zahlungsmethoden aus Places-Daten
+  const paymentList = [];
+  if (doctor.payment_options?.acceptsCreditCards) paymentList.push('Kreditkarte');
+  if (doctor.payment_options?.acceptsDebitCards) paymentList.push('EC-/Debitkarte');
+  if (doctor.payment_options?.acceptsCashOnly) paymentList.push('Barzahlung');
+  if (doctor.payment_options?.acceptsNfc) paymentList.push('Kontaktloses Bezahlen');
+
+  // sameAs: Google Business Profile + optional externe Website (falls in DB)
+  const sameAs = [];
+  if (gmbUrl) sameAs.push(gmbUrl);
+  if (doctor.website_url) sameAs.push(doctor.website_url);
+
+  // Address-Block wiederverwendbar
+  const addressLd = {
+    '@type': 'PostalAddress',
+    streetAddress: street || undefined,
+    postalCode: postalCode || undefined,
+    addressLocality: city || undefined,
+    addressRegion: doctor.state || undefined,
+    addressCountry: 'DE',
+  };
+
+  const geoLd = (doctor.latitude != null && doctor.longitude != null)
+    ? { '@type': 'GeoCoordinates', latitude: doctor.latitude, longitude: doctor.longitude }
+    : null;
+
+  // Physician-Entität mit vollem Kontext – Google's präferierter Typ für Ärzt:innen.
+  // Wir kombinieren Physician mit MedicalBusiness via multi-type Array, damit Google die
+  // Praxis sowohl als Arzt-Entität als auch als Geschäftsstandort erkennt (Local SEO).
+  const physicianEntity = {
+    '@type': ['Physician', 'MedicalBusiness'],
+    '@id': `${url}#physician`,
+    name,
+    url,
+    mainEntityOfPage: url,
+    telephone: phone || undefined,
+    email: doctor.email_manual || undefined,
+    address: addressLd,
+    ...(geoLd && { geo: geoLd }),
+    ...(specialty && { medicalSpecialty: specialty }),
+    ...(sameAs.length && { sameAs }),
+    ...(openingHoursSpec?.length && { openingHoursSpecification: openingHoursSpec }),
+    ...(paymentList.length && { paymentAccepted: paymentList.join(', ') }),
+    // Praxen rechnen i.d.R. mit gesetzlicher & privater Krankenversicherung ab – Standardwert.
+    priceRange: 'Kassen- und Privatabrechnung',
+    areaServed: city ? { '@type': 'City', name: city } : undefined,
+    parentOrganization: { '@id': `${url}#organization` },
+    inLanguage: 'de-DE',
+    ...(doctor.rating != null && doctor.user_rating_count > 0 && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: Number(doctor.rating).toFixed(1),
+        reviewCount: Number(doctor.user_rating_count),
+        bestRating: '5',
+        worstRating: '1',
+      },
+    }),
+  };
+
   // Wir emittieren einen JSON-LD-Graph mit drei Entitäten:
-  // - Organization (die Praxis als eigenständige Firma)
-  // - WebSite (die Homepage als eigenständige Website)
-  // - Physician (die medizinische Praxis-Entität)
+  // - Organization: die Praxis als juristische Einheit (Impressum-Verantwortlicher)
+  // - WebSite: diese Homepage als eigenständige Website (nicht Navoria)
+  // - Physician/MedicalBusiness: die medizinische Praxis-Entität mit voller Local-SEO-Info
   // Google interpretiert das kombiniert als "eigenständige Praxis-Website".
   return {
     '@context': 'https://schema.org',
@@ -357,13 +442,9 @@ function buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone })
         name,
         url,
         telephone: phone || undefined,
-        address: {
-          '@type': 'PostalAddress',
-          streetAddress: street,
-          postalCode,
-          addressLocality: city,
-          addressCountry: 'DE',
-        },
+        email: doctor.email_manual || undefined,
+        address: addressLd,
+        ...(sameAs.length && { sameAs }),
       },
       {
         '@type': 'WebSite',
@@ -373,21 +454,7 @@ function buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone })
         inLanguage: 'de-DE',
         publisher: { '@id': `${url}#organization` },
       },
-      {
-        '@type': 'Physician',
-        '@id': `${url}#physician`,
-        name,
-        telephone: phone || undefined,
-        url,
-        address: {
-          '@type': 'PostalAddress',
-          streetAddress: street,
-          postalCode,
-          addressLocality: city,
-          addressCountry: 'DE',
-        },
-        parentOrganization: { '@id': `${url}#organization` },
-      },
+      physicianEntity,
     ],
   };
 }

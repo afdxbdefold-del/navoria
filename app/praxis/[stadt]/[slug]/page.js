@@ -72,17 +72,19 @@ export async function generateMetadata({ params }) {
     const specialtyLabel = specialty || 'Arztpraxis';
     const hpTitle = `${displayName} – ${specialtyLabel} in ${cityText}`;
     const hpDesc = `Praxis ${displayName} in ${cityText}. ${d.formatted_address ? `Adresse: ${d.formatted_address}. ` : ''}${d.phone_national ? `Termine: ${d.phone_national}.` : ''}`;
+    const absoluteCanonical = `${base}${canonical}`;
     return {
       title: { absolute: hpTitle },
       description: hpDesc,
-      alternates: { canonical },
+      // Absolute Canonical – stärkeres Signal an Google, dass die Praxis-URL die maßgebliche Adresse ist.
+      alternates: { canonical: absoluteCanonical },
       robots: { index: true, follow: true },
       openGraph: {
         title: hpTitle,
         description: hpDesc,
         type: 'website',
         locale: 'de_DE',
-        url: `${base}${canonical}`,
+        url: absoluteCanonical,
         // Bewusst KEIN Navoria-siteName – Google/OG-Clients zeigen die Praxis als Herausgeber.
         siteName: displayName,
       },
