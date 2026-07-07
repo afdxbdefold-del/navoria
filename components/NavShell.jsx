@@ -40,7 +40,7 @@ function AnnouncementBar() {
   return (
     <a
       href="/praxis-beanspruchen"
-      className="group block w-full border-b border-teal-200 bg-gradient-to-r from-teal-600 via-sky-700 to-sky-800 text-white transition hover:from-teal-700 hover:via-sky-800 hover:to-sky-900"
+      className="navoria-chrome-announce group block w-full border-b border-teal-200 bg-gradient-to-r from-teal-600 via-sky-700 to-sky-800 text-white transition hover:from-teal-700 hover:via-sky-800 hover:to-sky-900"
       aria-label="Kostenloses Profil für Ihre Arztpraxis auf Navoria beanspruchen"
     >
       <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-xs font-medium sm:gap-3 sm:text-sm">
@@ -65,7 +65,7 @@ function AnnouncementBar() {
 
 function Header() {
   return (
-    <header className="w-full border-b border-slate-100 bg-white">
+    <header className="navoria-chrome w-full border-b border-slate-100 bg-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <a href="/" className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-teal-500 text-white">
@@ -94,7 +94,7 @@ function Header() {
 
 function Footer() {
   return (
-    <footer className="mt-24 border-t border-slate-100 bg-slate-50">
+    <footer className="navoria-chrome mt-24 border-t border-slate-100 bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <div className="grid gap-8 md:grid-cols-3 lg:grid-cols-5">
           <div className="lg:col-span-1 md:col-span-3 lg:row-span-1">

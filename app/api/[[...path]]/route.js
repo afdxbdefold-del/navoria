@@ -280,7 +280,7 @@ async function handleGet(request, pathParts) {
     else if (show === 'checked') filter = { ...noWebsite, ...notDiscarded, website_checked_at: { $exists: true, $ne: null } };
     else filter = { ...noWebsite, ...notDiscarded };
     if (cityFilter) filter.city = cityFilter;
-    const projection = { _id: 0, id: 1, name: 1, slug: 1, city: 1, city_slug: 1, formatted_address: 1, phone_national: 1, specialty_guess: 1, google_place_id: 1, google_maps_url: 1, website_checked_at: 1, is_active: 1, discarded_at: 1, rating: 1, user_rating_count: 1, is_verified: 1, verification_method: 1 };
+    const projection = { _id: 0, id: 1, name: 1, slug: 1, city: 1, city_slug: 1, formatted_address: 1, phone_national: 1, specialty_guess: 1, google_place_id: 1, google_maps_url: 1, website_checked_at: 1, is_active: 1, discarded_at: 1, rating: 1, user_rating_count: 1, is_verified: 1, verification_method: 1, homepage_mode: 1 };
     // Sortier-Modi
     const sortMap = {
       city: { city: 1, name: 1 },
@@ -1000,7 +1000,46 @@ async function handlePost(request, pathParts) {
     return json({ ok: true, doctor: stripId(res) });
   }
 
-  // POST /api/admin/doctors/bulk-discard – mehrere Praxen auf einmal soft-verwerfen (is_active:false)
+  // POST /api/admin/doctors/:id/homepage – Homepage-Modus toggeln
+  //   body: { enabled: true|false }
+  //   Bei enabled=true: rendert die Praxis als eigenständige One-Page-Website
+  //   (Lovable-Style) statt als Navoria-Directory-Profil. URL bleibt gleich.
+  //   Bei enabled=false: zurück zum Standard-Directory-Profil.
+  if (pathParts[0] === 'admin' && pathParts[1] === 'doctors' && pathParts[2] && pathParts[3] === 'homepage') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const { enabled } = body || {};
+    const doctors = await getCollection('doctor_places');
+    const now = new Date();
+    const set = { updated_at: now };
+    const unset = {};
+
+    if (enabled) {
+      set.homepage_mode = true;
+      set.homepage_generated_at = now;
+      // Implizit: die Praxis hat jetzt eine (Navoria-gehostete) Web-Präsenz.
+      // Website-check + verifiziert setzen, damit sie aus "Praxen ohne Website"-Liste rausfliegt.
+      set.website_checked_at = now;
+      set.is_verified = true;
+      set.verified_at = now;
+      set.verification_method = 'navoria_homepage';
+    } else {
+      unset.homepage_mode = '';
+      unset.homepage_generated_at = '';
+      // Website-check + Verifizierung zurück (nur wenn wir sie gesetzt hatten)
+      const existing = await doctors.findOne({ id: pathParts[2] }, { projection: { verification_method: 1 } });
+      if (existing?.verification_method === 'navoria_homepage') {
+        set.website_checked_at = null;
+        set.is_verified = false;
+        set.verified_at = null;
+        unset.verification_method = '';
+      }
+    }
+
+    const update = Object.keys(unset).length > 0 ? { $set: set, $unset: unset } : { $set: set };
+    const res = await doctors.findOneAndUpdate({ id: pathParts[2] }, update, { returnDocument: 'after' });
+    if (!res) return json({ error: 'Nicht gefunden' }, { status: 404 });
+    return json({ ok: true, doctor: stripId(res) });
+  }
   //   body: { ids: [uuid, uuid, ...], reason?: 'string' }
   if (pathParts[0] === 'admin' && pathParts[1] === 'doctors' && pathParts[2] === 'bulk-discard') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });

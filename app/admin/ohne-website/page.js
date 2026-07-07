@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { ArrowLeft, Globe, Phone, MapPin, ExternalLink, RefreshCw, Search, CheckCircle2, Loader2, Copy, Trash2, BadgeCheck } from 'lucide-react';
+import { ArrowLeft, Globe, Phone, MapPin, ExternalLink, RefreshCw, Search, CheckCircle2, Loader2, Copy, Trash2, BadgeCheck, Sparkles, Home } from 'lucide-react';
 
 export default function AdminOhneWebseitePage() {
   const [token, setToken] = useState(null);
@@ -63,6 +63,29 @@ function List({ token }) {
   const toggleChecked = async (doc) => {
     setBusyId(doc.id);
     try {
+      // Wenn Homepage-Modus aktiv ist und User "uncheckt", muss zusätzlich Homepage-Mode deaktiviert werden.
+      // Der bestehende website-checked-Endpoint macht das nicht → separater Call vorher.
+      if (doc.homepage_mode && doc.website_checked_at) {
+        const rh = await fetch(`/api/admin/doctors/${doc.id}/homepage`, {
+          method: 'POST', headers: authHeaders,
+          body: JSON.stringify({ enabled: false }),
+        });
+        const dh = await rh.json();
+        if (!rh.ok) throw new Error(dh.error);
+        // Lokal State reflektieren + return: der homepage-Endpoint hat schon alles zurückgesetzt
+        toast.success('Homepage-Modus deaktiviert, Praxis zurück auf Standard-Profil');
+        if (show === 'checked') setItems((prev) => prev.filter((it) => it.id !== doc.id));
+        else setItems((prev) => prev.map((it) => it.id === doc.id ? {
+          ...it,
+          homepage_mode: false,
+          website_checked_at: null,
+          is_verified: false,
+          verification_method: null,
+        } : it));
+        setTotals((t) => ({ ...t, unchecked: t.unchecked + 1, checked: Math.max(0, t.checked - 1) }));
+        setBusyId(null);
+        return;
+      }
       const r = await fetch(`/api/admin/doctors/${doc.id}/website-checked`, {
         method: 'POST', headers: authHeaders,
         body: JSON.stringify({ checked: !doc.website_checked_at }),
@@ -89,6 +112,32 @@ function List({ token }) {
         unchecked: doc.website_checked_at ? t.unchecked + 1 : Math.max(0, t.unchecked - 1),
         checked: doc.website_checked_at ? Math.max(0, t.checked - 1) : t.checked + 1,
       }));
+    } catch (err) { toast.error(String(err.message || err)); }
+    setBusyId(null);
+  };
+
+  // Homepage-Modus für eine Praxis aktivieren (Generate)
+  const generateHomepage = async (doc) => {
+    if (!confirm(`Homepage-Modus für "${doc.name}" aktivieren?\n\nDas Praxisprofil wird ab sofort als eigenständige One-Page-Website gerendert (statt als Navoria-Directory-Profil). Deaktivierung jederzeit über das Abhaken-Feld möglich.`)) return;
+    setBusyId(doc.id);
+    try {
+      const r = await fetch(`/api/admin/doctors/${doc.id}/homepage`, {
+        method: 'POST', headers: authHeaders,
+        body: JSON.stringify({ enabled: true }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error);
+      toast.success('Homepage-Modus aktiviert – Profil ist jetzt eine One-Page-Website');
+      // Die Praxis fliegt aus "unchecked" raus (weil website_checked_at gesetzt wird)
+      if (show === 'unchecked') setItems((prev) => prev.filter((it) => it.id !== doc.id));
+      else setItems((prev) => prev.map((it) => it.id === doc.id ? {
+        ...it,
+        homepage_mode: true,
+        website_checked_at: new Date().toISOString(),
+        is_verified: true,
+        verification_method: 'navoria_homepage',
+      } : it));
+      setTotals((t) => ({ ...t, unchecked: Math.max(0, t.unchecked - 1), checked: t.checked + 1 }));
     } catch (err) { toast.error(String(err.message || err)); }
     setBusyId(null);
   };
@@ -250,9 +299,17 @@ function List({ token }) {
                     {doc.is_verified && (
                       <span
                         className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800"
-                        title={doc.verification_method === 'admin_no_website_check' ? 'Verifiziert durch Abhaken auf dieser Seite' : 'Verifiziert'}
+                        title={doc.verification_method === 'admin_no_website_check' ? 'Verifiziert durch Abhaken auf dieser Seite' : doc.verification_method === 'navoria_homepage' ? 'Verifiziert durch Homepage-Modus' : 'Verifiziert'}
                       >
                         <BadgeCheck className="h-3 w-3" /> Verifiziert
+                      </span>
+                    )}
+                    {doc.homepage_mode && (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border border-purple-200 bg-purple-50 px-2 py-0.5 text-[11px] font-semibold text-purple-800"
+                        title="Praxisprofil wird als eigenständige One-Page-Homepage gerendert"
+                      >
+                        <Home className="h-3 w-3" /> Homepage-Modus
                       </span>
                     )}
                     {doc.rating != null && (
@@ -301,6 +358,26 @@ function List({ token }) {
                       >
                         <Copy className="h-3 w-3" /> Name
                       </button>
+                    )}
+                    {!isDiscarded && !doc.homepage_mode && (
+                      <button
+                        disabled={busyId === doc.id}
+                        onClick={() => generateHomepage(doc)}
+                        className="inline-flex items-center gap-1 rounded-md border border-purple-300 bg-gradient-to-br from-purple-50 to-fuchsia-50 px-2 py-1 font-semibold text-purple-800 shadow-sm transition hover:from-purple-100 hover:to-fuchsia-100 disabled:opacity-50"
+                        title="Praxisprofil als eigenständige Homepage rendern"
+                      >
+                        <Sparkles className="h-3 w-3" /> Generate Homepage
+                      </button>
+                    )}
+                    {!isDiscarded && doc.homepage_mode && (
+                      <Link
+                        href={`/praxis/${doc.city_slug}/${doc.slug}`}
+                        target="_blank"
+                        className="inline-flex items-center gap-1 rounded-md border border-purple-300 bg-purple-50 px-2 py-1 font-semibold text-purple-800 hover:bg-purple-100"
+                        title="Homepage-Preview öffnen"
+                      >
+                        <Home className="h-3 w-3" /> Homepage ansehen <ExternalLink className="h-3 w-3" />
+                      </Link>
                     )}
                     {!isDiscarded && (
                       <button

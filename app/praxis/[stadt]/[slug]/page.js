@@ -97,6 +97,13 @@ export default async function ProfilePage({ params }) {
   const d = await loadDoctor(slug);
   if (!d) notFound();
 
+  // Homepage-Modus: Praxis wird als eigenständige One-Page-Website gerendert
+  // statt als Navoria-Directory-Profil. Toggle im Admin-Bereich.
+  if (d.homepage_mode === true) {
+    const { default: PracticeHomepage } = await import('@/components/PracticeHomepage');
+    return <PracticeHomepage doctor={d} />;
+  }
+
   // Namensbestandteile ableiten (falls nicht bereits in DB gespeichert)
   const nameParts = (d.title_prefix || d.doctor_name_normalized || d.practice_name)
     ? { title_prefix: d.title_prefix, doctor_name_normalized: d.doctor_name_normalized, practice_name: d.practice_name }
