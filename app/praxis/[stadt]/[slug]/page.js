@@ -594,6 +594,28 @@ export default async function ProfilePage({ params }) {
             </dl>
           </div>
 
+          {/* Profil beanspruchen (für Praxisinhaber) */}
+          <div className="rounded-xl border border-sky-200 bg-gradient-to-br from-sky-50 to-white p-5">
+            <div className="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-white px-2 py-0.5 text-[11px] font-medium text-sky-700">
+              <BadgeCheck className="h-3 w-3" aria-hidden="true" /> Sind Sie {displayName}?
+            </div>
+            <h3 className="mt-2 text-sm font-semibold text-slate-900">Profil beanspruchen</h3>
+            <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
+              Als Praxisinhaber:in oder autorisierte Ansprechperson können Sie dieses Profil verifizieren, Angaben korrigieren und um Zusatzinformationen (Sprachen, Kassen/Privat, Schwerpunkte) ergänzen.
+            </p>
+            <Link
+              href={`/praxis-beanspruchen?doctor_id=${encodeURIComponent(d.id)}`}
+              className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-sky-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-sky-700"
+            >
+              <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
+              Profil beanspruchen
+              <ArrowRight className="h-3 w-3" aria-hidden="true" />
+            </Link>
+            <p className="mt-2 text-[10px] leading-relaxed text-slate-500">
+              Kostenlos. Wir prüfen Ihre Angaben und melden uns per E-Mail zurück.
+            </p>
+          </div>
+
           {/* 12. Ähnliche Ärzte */}
           {similar.length > 0 && (
             <div className="rounded-xl border border-slate-200 bg-white p-5">

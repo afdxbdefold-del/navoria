@@ -569,6 +569,30 @@ async function handleGet(request, pathParts) {
     });
   }
 
+  // GET /api/admin/claim-requests?status=new|approved|rejected|all&limit=50
+  if (pathParts[0] === 'admin' && pathParts[1] === 'claim-requests' && !pathParts[2]) {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const url = new URL(request.url);
+    const status = url.searchParams.get('status') || 'all';
+    const limit = Math.min(parseInt(url.searchParams.get('limit') || '100', 10), 500);
+    const filter = status === 'all' ? {} : { status };
+    const col = await getCollection('claim_requests');
+    const items = await col.find(filter).sort({ created_at: -1 }).limit(limit).toArray();
+    const counts = await col.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } },
+    ]).toArray();
+    const countsMap = counts.reduce((m, c) => { m[c._id] = c.count; return m; }, {});
+    return json({
+      items: items.map((it) => ({ ...it, _id: undefined })),
+      counts: {
+        new: countsMap.new || 0,
+        approved: countsMap.approved || 0,
+        rejected: countsMap.rejected || 0,
+        total: items.length,
+      },
+    });
+  }
+
   // GET /api/admin/analytics/live – Aktive Nutzer:innen der letzten 5 Minuten
   if (pathParts[0] === 'admin' && pathParts[1] === 'analytics' && pathParts[2] === 'live') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
@@ -732,6 +756,59 @@ async function handleGet(request, pathParts) {
 }
 
 async function handlePost(request, pathParts) {
+  // POST /api/claim-requests – öffentlich, mit Rate-Limit (max 3/h pro IP)
+  if (pathParts[0] === 'claim-requests' && !pathParts[1]) {
+    let body = {};
+    try { body = await request.json(); } catch { body = {}; }
+
+    const email = String(body.email || '').trim().toLowerCase();
+    const firstName = String(body.first_name || '').trim();
+    const lastName = String(body.last_name || '').trim();
+    const doctorName = String(body.doctor_name || '').trim();
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ error: 'Ungültige E-Mail' }, { status: 400 });
+    if (!firstName || !lastName) return json({ error: 'Vor- und Nachname erforderlich' }, { status: 400 });
+    if (!doctorName && !body.doctor_id) return json({ error: 'Praxisname erforderlich' }, { status: 400 });
+    if (body.agree !== true) return json({ error: 'Einwilligung fehlt' }, { status: 400 });
+
+    // Simples Anti-Spam: max 3 Anfragen pro IP-Hash in der letzten Stunde
+    const ip = getClientIp(request);
+    const ipHash = hashIp(ip);
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const col = await getCollection('claim_requests');
+    if (ipHash) {
+      const recent = await col.countDocuments({ ip_hash: ipHash, created_at: { $gte: oneHourAgo } });
+      if (recent >= 3) return json({ error: 'Rate-Limit: Bitte später erneut versuchen.' }, { status: 429 });
+    }
+
+    // Honeypot-artiger UA-Check: einfache Bots blockieren
+    const ua = request.headers.get('user-agent') || '';
+    if (isBot(ua)) return json({ ok: true, spam: true }); // silent-drop
+
+    const doc = {
+      id: uuidv4(),
+      doctor_id: body.doctor_id || null,
+      doctor_name: doctorName.slice(0, 200),
+      doctor_city: String(body.doctor_city || '').trim().slice(0, 100) || null,
+      role: ['inhaber', 'praxismanager', 'sonstige'].includes(body.role) ? body.role : 'sonstige',
+      first_name: firstName.slice(0, 80),
+      last_name: lastName.slice(0, 80),
+      email: email.slice(0, 160),
+      phone: String(body.phone || '').trim().slice(0, 40) || null,
+      website: String(body.website || '').trim().slice(0, 200) || null,
+      company_name: String(body.company_name || '').trim().slice(0, 160) || null,
+      message: String(body.message || '').trim().slice(0, 1500) || null,
+      ip_hash: ipHash,
+      user_agent: ua.slice(0, 300),
+      status: 'new',
+      created_at: new Date(),
+      updated_at: new Date(),
+    };
+    try { await col.createIndex({ created_at: -1 }); await col.createIndex({ status: 1 }); } catch {}
+    await col.insertOne(doc);
+    return json({ ok: true, id: doc.id });
+  }
+
   // POST /api/track – First-Party Analytics (öffentlich, kein Auth)
   if (pathParts[0] === 'track' && !pathParts[1]) {
     let body = {};
@@ -1112,6 +1189,28 @@ async function handlePut(request, pathParts) {
     const res = await col.findOneAndUpdate({ id }, { $set: allowed }, { returnDocument: 'after' });
     if (!res) return json({ error: 'Nicht gefunden' }, { status: 404 });
     return json({ ok: true, doctor: stripId(res) });
+  }
+
+  // PUT /api/admin/claim-requests/:id  – Status ändern
+  if (pathParts[0] === 'admin' && pathParts[1] === 'claim-requests' && pathParts[2]) {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const id = pathParts[2];
+    const status = body.status;
+    if (!['new', 'approved', 'rejected', 'in_review'].includes(status)) {
+      return json({ error: 'Ungültiger Status' }, { status: 400 });
+    }
+    const col = await getCollection('claim_requests');
+    const update = { status, updated_at: new Date() };
+    if (typeof body.admin_note === 'string') update.admin_note = body.admin_note.slice(0, 1000);
+    const res = await col.findOneAndUpdate({ id }, { $set: update }, { returnDocument: 'after' });
+    if (!res) return json({ error: 'Nicht gefunden' }, { status: 404 });
+
+    // Wenn approved: das zugehörige Praxis-Profil auf verified setzen
+    if (status === 'approved' && res.doctor_id) {
+      const doctorsCol = await getCollection('doctor_places');
+      await doctorsCol.updateOne({ id: res.doctor_id }, { $set: { is_verified: true, updated_at: new Date() } });
+    }
+    return json({ ok: true, claim: { ...res, _id: undefined } });
   }
 
   return json({ error: 'Not found' }, { status: 404 });
