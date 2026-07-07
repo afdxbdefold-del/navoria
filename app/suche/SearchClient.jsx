@@ -61,17 +61,44 @@ function SearchContent() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <form onSubmit={submit} className="card-soft p-3 sm:p-4" aria-label="Suche verfeinern">
+      <form
+        onSubmit={submit}
+        className="card-soft p-3 sm:p-4"
+        aria-label="Suche verfeinern"
+        toolname="refineDoctorSearch"
+        tooldescription="Verfeinert die aktuelle Arztsuche mit einem neuen Suchbegriff und/oder Ort. Ergebnis: aktualisierte Suchergebnisseite mit Praxen in Deutschland."
+        toolautosubmit="true"
+      >
         <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
           <div className="relative">
             <label htmlFor="search-q" className="sr-only">Suchbegriff (z. B. Hausarzt, Kardiologe)</label>
             <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input id="search-q" name="q" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Suchbegriff" className="input pl-9" autoComplete="off" />
+            <input
+              id="search-q"
+              name="q"
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Suchbegriff"
+              className="input pl-9"
+              autoComplete="off"
+              toolparamdescription="Fachrichtung oder Suchbegriff, z. B. 'Zahnarzt', 'Frauenarzt', 'Physiotherapeut'."
+            />
           </div>
           <div className="relative">
             <label htmlFor="search-ort" className="sr-only">Ort oder Postleitzahl</label>
             <MapPin aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input id="search-ort" name="ort" type="search" value={ort} onChange={(e) => setOrt(e.target.value)} placeholder="Ort oder PLZ" className="input pl-9" autoComplete="postal-code" />
+            <input
+              id="search-ort"
+              name="ort"
+              type="search"
+              value={ort}
+              onChange={(e) => setOrt(e.target.value)}
+              placeholder="Ort oder PLZ"
+              className="input pl-9"
+              autoComplete="postal-code"
+              toolparamdescription="Deutscher Ort oder 5-stellige PLZ, z. B. 'Hamburg' oder '20095'."
+            />
           </div>
           <button type="submit" className="btn-primary">Suchen</button>
         </div>

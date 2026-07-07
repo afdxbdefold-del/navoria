@@ -84,7 +84,12 @@ export default function ClaimForm({ doctor }) {
   const req = <span className="text-red-500" aria-hidden="true"> *</span>;
 
   return (
-    <form onSubmit={submit} className="mt-10 rounded-2xl border border-slate-200 bg-white p-6">
+    <form
+      onSubmit={submit}
+      className="mt-10 rounded-2xl border border-slate-200 bg-white p-6"
+      toolname="submitPracticeClaim"
+      tooldescription="Reicht eine Anfrage ein, um ein Praxis-Profil auf Navoria als Praxis-Inhaber:in oder autorisierte Person zu beanspruchen. Kein Auto-Submit: das Formular wird ausgefüllt, aber der User muss selbst absenden. Verwendungszweck: Praxisdaten pflegen, Website ergänzen, Öffnungszeiten korrigieren."
+    >
       <h2 className="text-xl font-semibold text-slate-900">Kontaktformular</h2>
       <p className="mt-1 text-sm text-slate-600">Alle mit <span className="text-red-500">*</span> markierten Felder sind erforderlich.</p>
 

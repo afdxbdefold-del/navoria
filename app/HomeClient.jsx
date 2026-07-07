@@ -100,18 +100,27 @@ export default function HomePage() {
           </p>
 
           {/* Suchbox */}
-          <form onSubmit={submit} className="card-soft mt-8 mx-auto max-w-3xl p-3 sm:p-4" aria-label="Arztsuche">
+          <form
+            onSubmit={submit}
+            className="card-soft mt-8 mx-auto max-w-3xl p-3 sm:p-4"
+            aria-label="Arztsuche"
+            toolname="searchDoctors"
+            tooldescription="Sucht Ärzt:innen und Praxen in Deutschland nach Fachrichtung, Stadt oder Postleitzahl. Beispiele: 'Hausarzt' in 'Berlin', 'Zahnarzt' in '80331'. Öffnet die Suchergebnisseite auf Navoria mit passenden Praxen inkl. Adresse, Bewertung und Kontaktdaten."
+            toolautosubmit="true"
+          >
             <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
               <div className="relative">
                 <label htmlFor="home-search-q" className="sr-only">Suchbegriff (z. B. Hausarzt, Kardiologe)</label>
                 <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   id="home-search-q"
+                  name="q"
                   type="search"
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="Was suchen Sie? z.B. Hausarzt, Kardiologe"
                   className="input pl-9"
+                  toolparamdescription="Fachrichtung oder freier Suchbegriff, z. B. 'Hausarzt', 'Zahnarzt', 'Kardiologe', 'Physiotherapeut'."
                 />
               </div>
               <div className="relative">
@@ -119,12 +128,14 @@ export default function HomePage() {
                 <MapPin aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   id="home-search-ort"
+                  name="ort"
                   type="text"
                   autoComplete="postal-code"
                   value={ort}
                   onChange={(e) => setOrt(e.target.value)}
                   placeholder="Ort oder PLZ"
                   className="input pl-9"
+                  toolparamdescription="Deutscher Ortsname oder 5-stellige Postleitzahl, z. B. 'Berlin' oder '10115'."
                 />
               </div>
               <button type="submit" className="btn-primary whitespace-nowrap">
@@ -147,18 +158,27 @@ export default function HomePage() {
           </div>
           <h2 className="mt-1 text-2xl font-semibold text-slate-900">Sagen Sie uns, was fehlt. Wir sagen Ihnen, wer hilft.</h2>
           <p className="mt-1 text-sm text-slate-600">Kein Fachbegriff nötig – einfach Beschwerden eintippen, wir finden die passende Fachrichtung.</p>
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <form
+            role="search"
+            onSubmit={(e) => e.preventDefault()}
+            className="mt-4 flex flex-col gap-3 sm:flex-row"
+            aria-label="Symptom-Assistent"
+            toolname="findSpecialtyForSymptom"
+            tooldescription="Empfiehlt die passende Fachrichtung (z. B. Orthopäde, Hausarzt) für ein Symptom oder eine Beschwerde. Reine Empfehlung, keine medizinische Diagnose."
+          >
             <label htmlFor="symptom-input" className="sr-only">Symptom oder Beschwerde beschreiben</label>
             <input
               id="symptom-input"
+              name="symptom"
               type="search"
               value={symptomInput}
               onChange={(e) => setSymptomInput(e.target.value)}
               placeholder="z.B. Rückenschmerzen, Herzrasen, Hautausschlag"
               className="input"
               aria-describedby="symptom-help"
+              toolparamdescription="Freitext-Beschwerde, z. B. 'Rückenschmerzen', 'Kopfschmerzen', 'Herzrasen', 'Hautausschlag'."
             />
-          </div>
+          </form>
           <p id="symptom-help" className="sr-only">Geben Sie ein Symptom ein – wir schlagen passende Fachrichtungen vor.</p>
           {suggestLoading && <p className="mt-3 text-xs text-slate-500">Suche Fachrichtungen …</p>}
           {symptomSuggestions !== null && !suggestLoading && (
