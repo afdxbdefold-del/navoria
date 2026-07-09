@@ -301,7 +301,9 @@ export default async function ProfilePage({ params }) {
     inLanguage: 'de-DE',
     isPartOf: { '@type': 'WebSite', url: base, name: 'Navoria' },
     about: { '@id': `${profileUrl}#medicalbusiness` },
-    breadcrumb: { '@type': 'BreadcrumbList', '@id': `${profileUrl}#breadcrumb` },
+    // Reine @id-Referenz auf die separat emittierte BreadcrumbList – KEIN @type wiederholen,
+    // sonst interpretiert Google das als eigene (leere) BreadcrumbList ohne itemListElement.
+    breadcrumb: { '@id': `${profileUrl}#breadcrumb` },
   };
 
   // Fachrichtung → SEO-Slug (für "Weitere Suchen")
