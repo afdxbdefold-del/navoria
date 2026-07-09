@@ -424,6 +424,7 @@ function buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone })
     ...(geoLd && { geo: geoLd }),
     ...(specialty && { medicalSpecialty: specialty }),
     ...(sameAs.length && { sameAs }),
+    ...(gmbUrl && { hasMap: gmbUrl }),
     ...(openingHoursSpec?.length && { openingHoursSpecification: openingHoursSpec }),
     ...(paymentList.length && { paymentAccepted: paymentList.join(', ') }),
     // Praxen rechnen i.d.R. mit gesetzlicher & privater Krankenversicherung ab – Standardwert.
