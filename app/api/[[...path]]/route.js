@@ -223,6 +223,7 @@ async function handleGet(request, pathParts) {
         _id: 0, id: 1, name: 1, slug: 1, city_slug: 1, city: 1, formatted_address: 1,
         phone_national: 1, homepage_slug: 1, homepage_generated_at: 1,
         rating: 1, user_rating_count: 1, gmb_verified: 1, gmb_claim_checked_at: 1,
+        google_verification_token: 1,
       } },
     ).sort({ homepage_generated_at: 1 }).toArray(); // Älteste zuerst (dringlichste Deaktivierung)
     const now = Date.now();
@@ -1149,7 +1150,40 @@ async function handlePost(request, pathParts) {
     if (!res) return json({ error: 'Nicht gefunden' }, { status: 404 });
     return json({ ok: true, doctor: stripId(res) });
   }
-  // POST /api/admin/homepages/bulk-deactivate – Deaktiviert Homepage-Modus für viele Praxen auf einmal.
+  // POST /api/admin/doctors/:id/verification – setzt/entfernt einen Google-Search-Console-Token
+  // (Meta-Tag: <meta name="google-site-verification" content="...">). Wird auf der
+  // Homepage-Modus-Seite gerendert, damit die Praxis eine URL-Präfix-Property in ihrer
+  // Search Console verifizieren kann.
+  // Body: { google_verification_token: string | null }
+  if (pathParts[0] === 'admin' && pathParts[1] === 'doctors' && pathParts[2] && pathParts[3] === 'verification') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const raw = body?.google_verification_token;
+    const doctors = await getCollection('doctor_places');
+    if (raw === null || raw === '' || raw === undefined) {
+      // Token entfernen
+      const r = await doctors.findOneAndUpdate(
+        { id: pathParts[2] },
+        { $unset: { google_verification_token: '' }, $set: { updated_at: new Date() } },
+        { returnDocument: 'after' },
+      );
+      if (!r) return json({ error: 'Nicht gefunden' }, { status: 404 });
+      return json({ ok: true, google_verification_token: null });
+    }
+    // Basic Sanity-Check: Alphanumerisch, Bindestriche, Unterstriche; max 200 Zeichen.
+    // Google-Tokens sehen aus wie: "abcDEF123_-xyz…" (43 Zeichen Base64-ähnlich).
+    const trimmed = String(raw).trim();
+    if (trimmed.length < 10 || trimmed.length > 200 || !/^[A-Za-z0-9_\-]+$/.test(trimmed)) {
+      return json({ error: 'Ungültiger Token (nur A-Z, a-z, 0-9, _, -; 10-200 Zeichen)' }, { status: 400 });
+    }
+    const r = await doctors.findOneAndUpdate(
+      { id: pathParts[2] },
+      { $set: { google_verification_token: trimmed, updated_at: new Date() } },
+      { returnDocument: 'after' },
+    );
+    if (!r) return json({ error: 'Nicht gefunden' }, { status: 404 });
+    return json({ ok: true, google_verification_token: trimmed });
+  }
+
   // Body: { ids?: [uuid, ...], all?: boolean }
   //   ids: gezielt bestimmte Praxen (Standard-Fall im Admin-UI)
   //   all: TRUE → deaktiviert ALLE aktiven Homepages (Notfall-Fallback)

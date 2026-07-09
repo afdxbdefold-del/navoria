@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { ArrowLeft, ArrowRight, Home, ExternalLink, MapPin, Phone, Loader2, RefreshCw, ShieldCheck, ShieldX, AlertTriangle, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Home, ExternalLink, MapPin, Phone, Loader2, RefreshCw, ShieldCheck, ShieldX, AlertTriangle, Trash2, Search } from 'lucide-react';
 
 export default function AdminHomepagesPage() {
   const [token, setToken] = useState(null);
@@ -74,6 +74,19 @@ function List({ token }) {
       const data = await r.json();
       if (!r.ok) throw new Error(data.error);
       toast.success('Deaktiviert – URL leitet jetzt auf Verzeichnis-Eintrag um');
+      await load();
+    } catch (err) { toast.error(`Fehler: ${err.message}`); }
+  };
+
+  const saveVerificationToken = async (doc, token) => {
+    try {
+      const r = await fetch(`/api/admin/doctors/${doc.id}/verification`, {
+        method: 'POST', headers: authHeaders,
+        body: JSON.stringify({ google_verification_token: token || null }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error);
+      toast.success(token ? 'Google-Verifikations-Token gespeichert' : 'Token entfernt');
       await load();
     } catch (err) { toast.error(`Fehler: ${err.message}`); }
   };
@@ -205,12 +218,72 @@ function List({ token }) {
                       <Trash2 className="h-3 w-3" /> Deaktivieren
                     </button>
                   </div>
+                  {/* Google Search Console Verifikation – Token pro Praxis */}
+                  <VerificationTokenRow
+                    doc={doc}
+                    onSave={(token) => saveVerificationToken(doc, token)}
+                  />
                 </div>
               </div>
             </div>
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function VerificationTokenRow({ doc, onSave }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(doc.google_verification_token || '');
+  const hasToken = !!doc.google_verification_token;
+
+  const save = async () => {
+    await onSave(value.trim());
+    setEditing(false);
+  };
+  const remove = async () => {
+    if (!confirm('Google-Verifikations-Token entfernen? Search Console verliert dann die Verifizierung dieser URL.')) return;
+    setValue('');
+    await onSave(null);
+    setEditing(false);
+  };
+
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-2 rounded-md border border-dashed border-slate-200 bg-slate-50 px-2 py-1.5 text-xs">
+      <Search className="h-3 w-3 shrink-0 text-slate-500" />
+      <span className="font-medium text-slate-600">Google Search Console:</span>
+      {!editing ? (
+        <>
+          {hasToken ? (
+            <span className="inline-flex items-center gap-1 rounded border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 font-mono text-emerald-800">
+              ✓ Token gesetzt ({doc.google_verification_token.slice(0, 12)}…)
+            </span>
+          ) : (
+            <span className="text-slate-500">Kein Verifikations-Token hinterlegt</span>
+          )}
+          <button
+            onClick={() => { setValue(doc.google_verification_token || ''); setEditing(true); }}
+            className="ml-auto rounded border border-slate-200 bg-white px-2 py-0.5 font-medium hover:bg-slate-50"
+          >
+            {hasToken ? 'Bearbeiten' : '+ Token hinzufügen'}
+          </button>
+        </>
+      ) : (
+        <>
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="content='...' aus Google Search Console"
+            className="min-w-[260px] flex-1 rounded border border-slate-300 bg-white px-2 py-0.5 font-mono text-[11px] focus:border-purple-400 focus:outline-none"
+            autoFocus
+          />
+          <button onClick={save} className="rounded bg-purple-700 px-2 py-0.5 font-semibold text-white hover:bg-purple-800">Speichern</button>
+          <button onClick={() => { setEditing(false); setValue(doc.google_verification_token || ''); }} className="rounded border border-slate-200 bg-white px-2 py-0.5 hover:bg-slate-50">Abbrechen</button>
+          {hasToken && <button onClick={remove} className="rounded border border-rose-200 bg-rose-50 px-2 py-0.5 text-rose-700 hover:bg-rose-100">Entfernen</button>}
+        </>
+      )}
     </div>
   );
 }

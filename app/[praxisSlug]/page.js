@@ -93,6 +93,20 @@ export default async function PraxisHomepagePage({ params }) {
     permanentRedirect(`/praxis/${d.city_slug}/${d.slug}`);
   }
 
-  return <PracticeHomepage doctor={d} />;
+  return (
+    <>
+      {/* Google Search Console Verifikation – wird pro Praxis vom Admin gepflegt.
+          Wenn die Praxis eine eigene URL-Präfix-Property für ihre Homepage
+          eingerichtet hat, kann sie den Token hier hinterlegen. Der Meta-Tag
+          wird von Google zur Verifizierung ausgelesen. */}
+      {d.google_verification_token && (
+        <meta
+          name="google-site-verification"
+          content={String(d.google_verification_token).trim()}
+        />
+      )}
+      <PracticeHomepage doctor={d} />
+    </>
+  );
 }
 
