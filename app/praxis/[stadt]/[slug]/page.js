@@ -462,6 +462,22 @@ export default async function ProfilePage({ params }) {
                   </dd>
                 </div>
               )}
+              {/* Wenn die Praxis KEINE externe Website hat, aber via Navoria verifiziert wurde
+                  ("abgehakt"), ist Navoria selbst die offizielle Praxis-Seite. Wir zeigen die
+                  Navoria-URL als Website + Verifizierungs-Badge. */}
+              {!d.website_url && d.is_verified && (
+                <div>
+                  <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Offizielle Website</dt>
+                  <dd className="mt-1 flex items-center justify-between gap-3 text-sm">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-medium text-sky-700 break-all">{profileUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+                      <span className="inline-flex w-fit items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-800">
+                        <BadgeCheck className="h-3 w-3" /> Auf Navoria verifiziert
+                      </span>
+                    </div>
+                  </dd>
+                </div>
+              )}
               {d.postal_code && (
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">PLZ &amp; Stadt</dt>
