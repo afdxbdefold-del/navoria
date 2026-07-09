@@ -1,15 +1,14 @@
 // Root-Level Praxis-Homepage Route: navoria.de/[praxisSlug]
-// Wird NUR gerendert, wenn eine Praxis mit homepage_mode:true und homepage_slug:<slug> existiert.
+// Verhalten:
+//   1. Praxis mit passendem homepage_slug + homepage_mode:true → rendert PracticeHomepage
+//   2. Praxis mit passendem homepage_slug + homepage_mode:false → 301-Redirect auf /praxis/[stadt]/[slug]
+//      (behält alte Root-URL als SEO-freundlichen Redirect, wenn Homepage-Modus deaktiviert wurde)
+//   3. Reservierter Slug oder kein Match → 404
 //
-// Das ist die "echte" SEO-Trennung: Die Praxis-Homepage sieht für Google wie eine
-// eigenständige Website aus (keine /praxis/[stadt]/ Route mehr).
-//
-// Reserved Slugs (admin, aerzte, praxis, api, ...) werden abgefangen und geben 404.
-// Alle statischen Routen von Next.js haben Vorrang vor dieser dynamischen Route,
-// daher entstehen keine Konflikte.
+// Statische Routen von Next.js haben Vorrang, daher entstehen keine Konflikte mit /admin, /aerzte etc.
 
 import { getCollection } from '@/lib/mongodb';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { isReservedRootSlug } from '@/lib/reservedSlugs';
 import PracticeHomepage from '@/components/PracticeHomepage';
 
@@ -17,9 +16,10 @@ async function loadByHomepageSlug(slug) {
   if (!slug) return null;
   if (isReservedRootSlug(slug)) return null;
   const col = await getCollection('doctor_places');
+  // Wir laden UNABHÄNGIG vom homepage_mode – damit wir bei mode:false auf das Verzeichnis
+  // umleiten können statt 404 zu liefern (SEO-Wert der URL bleibt erhalten).
   const doc = await col.findOne({
     homepage_slug: slug.toLowerCase(),
-    homepage_mode: true,
     is_active: { $ne: false },
   });
   if (!doc) return null;
@@ -30,7 +30,7 @@ async function loadByHomepageSlug(slug) {
 export async function generateMetadata({ params }) {
   const { praxisSlug } = await params;
   const d = await loadByHomepageSlug(praxisSlug);
-  if (!d) return { title: 'Nicht gefunden' };
+  if (!d || d.homepage_mode !== true) return { title: 'Nicht gefunden' };
 
   const cityText = d.city || '';
   const specialty = d.specialty_guess || 'Arztpraxis';
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }) {
       title, description: desc,
       type: 'website', locale: 'de_DE',
       url: absoluteCanonical,
-      siteName: displayName, // Praxis als "Publisher" – NICHT Navoria
+      siteName: displayName,
     },
     twitter: { card: 'summary', title, description: desc },
     other: {
@@ -65,5 +65,14 @@ export default async function PraxisHomepagePage({ params }) {
   const { praxisSlug } = await params;
   const d = await loadByHomepageSlug(praxisSlug);
   if (!d) notFound();
+
+  // Wenn Homepage-Modus AUS ist, leiten wir auf den Directory-Eintrag um.
+  // Damit bleibt die alte URL nutzbar (z.B. wenn sie schon verteilt / gedruckt wurde)
+  // und Google konsolidiert den Link-Juice via 301 auf den Directory-Eintrag.
+  if (d.homepage_mode !== true) {
+    permanentRedirect(`/praxis/${d.city_slug}/${d.slug}`);
+  }
+
   return <PracticeHomepage doctor={d} />;
 }
+
