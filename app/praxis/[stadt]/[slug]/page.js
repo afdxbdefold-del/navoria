@@ -78,7 +78,20 @@ export async function generateMetadata({ params }) {
       description: hpDesc,
       // Absolute Canonical – stärkeres Signal an Google, dass die Praxis-URL die maßgebliche Adresse ist.
       alternates: { canonical: absoluteCanonical },
-      robots: { index: true, follow: true },
+      // Homepage-Modus ist temporär und dient ausschließlich der Google-Business-Verifizierung.
+      // Google darf die URL crawlen, aber nicht indexieren.
+      robots: {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: {
+          index: false,
+          follow: false,
+          noimageindex: true,
+          'max-snippet': -1,
+          'max-image-preview': 'none',
+        },
+      },
       openGraph: {
         title: hpTitle,
         description: hpDesc,
@@ -92,6 +105,7 @@ export async function generateMetadata({ params }) {
       other: {
         'og:site_name': displayName,
         publisher: displayName,
+        'X-Robots-Tag': 'noindex, nofollow, noarchive, noimageindex',
       },
     };
   }

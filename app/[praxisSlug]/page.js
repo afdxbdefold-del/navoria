@@ -46,7 +46,23 @@ export async function generateMetadata({ params }) {
     title: { absolute: title },
     description: desc,
     alternates: { canonical: absoluteCanonical },
-    robots: { index: true, follow: true },
+    // WICHTIG: Homepage-Modus-Seiten sind TEMPORÄR und dienen ausschließlich der
+    // Google-Business-Profile-Verifizierung. Google darf die URL crawlen (200 OK)
+    // und den Inhalt lesen (für Name/Adresse-Match), aber sie NICHT indexieren.
+    // Sonst würde die Praxis-Homepage in Konkurrenz zum Navoria-Verzeichnis-Eintrag treten,
+    // Duplicate-Content-Signale erzeugen und nach Deaktivierung 404 in den SERPs stehen.
+    robots: {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: {
+        index: false,
+        follow: false,
+        noimageindex: true,
+        'max-snippet': -1,
+        'max-image-preview': 'none',
+      },
+    },
     openGraph: {
       title, description: desc,
       type: 'website', locale: 'de_DE',
@@ -57,6 +73,8 @@ export async function generateMetadata({ params }) {
     other: {
       'og:site_name': displayName,
       publisher: displayName,
+      // Zusätzlicher X-Robots-Tag als HTTP-Meta-Sicherheitsnetz
+      'X-Robots-Tag': 'noindex, nofollow, noarchive, noimageindex',
     },
   };
 }
