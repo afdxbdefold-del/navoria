@@ -357,8 +357,27 @@ export default async function ProfilePage({ params }) {
         </div>
 
         <h1 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-          {nameParts.title_prefix ? <span className="text-slate-500 font-medium">{nameParts.title_prefix} </span> : null}
-          {displayName}
+          {(() => {
+            // title_prefix wird grau vorangestellt. displayName enthält den Titel häufig noch mit,
+            // was zu "Dr. med. Dr. med. …"-Verdopplungen führt. Wir entfernen ihn deshalb hier
+            // aus dem sichtbaren Namen, wenn er identisch/case-insensitive vorne steht.
+            const prefix = nameParts.title_prefix;
+            let visible = displayName;
+            if (prefix) {
+              // Normalisieren (Case + überflüssige Leerzeichen ignorieren) für den Vergleich
+              const normPrefix = prefix.toLowerCase().replace(/\s+/g, ' ').trim();
+              const normVisible = visible.toLowerCase().replace(/\s+/g, ' ').trim();
+              if (normVisible.startsWith(normPrefix)) {
+                visible = visible.slice(prefix.length).replace(/^\s+/, '').replace(/^[-,·|]+\s*/, '');
+              }
+            }
+            return (
+              <>
+                {prefix ? <span className="text-slate-500 font-medium">{prefix} </span> : null}
+                {visible}
+              </>
+            );
+          })()}
         </h1>
         {specialty && (
           <p className="mt-1 text-base text-slate-600">
