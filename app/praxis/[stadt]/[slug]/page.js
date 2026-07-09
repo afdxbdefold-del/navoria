@@ -272,6 +272,10 @@ export default async function ProfilePage({ params }) {
   const breadcrumb = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
+    // @id ist erforderlich, damit die Referenz aus dem WebPage-Block (breadcrumb: { @id: … })
+    // auf diese Entität aufgelöst wird. Ohne @id sieht Google die Referenz als leeren Stub
+    // ohne itemListElement (führte zu "Feld itemListElement fehlt"-Fehler in Search Console).
+    '@id': `${profileUrl}#breadcrumb`,
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Start', item: `${base}/` },
       { '@type': 'ListItem', position: 2, name: 'Ärzte', item: `${base}/aerzte` },
