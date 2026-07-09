@@ -453,18 +453,13 @@ export default async function ProfilePage({ params }) {
                   <dd className="mt-1 text-sm italic text-slate-500">Eine Telefonnummer liegt uns aktuell nicht zuverlässig vor.</dd>
                 </div>
               )}
-              {d.website_url ? (
+              {d.website_url && (
                 <div>
                   <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Website</dt>
                   <dd className="mt-1 flex items-center justify-between gap-3 text-sm">
                     <a href={d.website_url} target="_blank" rel="nofollow noopener noreferrer" className="font-medium text-sky-700 hover:underline break-all">{d.website_url.replace(/^https?:\/\//, '').replace(/\/$/, '')}</a>
                     <ExternalLink className="h-3.5 w-3.5 shrink-0 text-slate-400" />
                   </dd>
-                </div>
-              ) : (
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">Website</dt>
-                  <dd className="mt-1 text-sm italic text-slate-500">Eine offizielle Website ist uns aktuell nicht bekannt.</dd>
                 </div>
               )}
               {d.postal_code && (
