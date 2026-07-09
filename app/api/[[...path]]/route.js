@@ -211,6 +211,31 @@ async function handleGet(request, pathParts) {
     return json(list.map(stripId));
   }
 
+  // GET /api/admin/homepages – Liste aller aktuell aktiven Praxis-Homepages (homepage_mode:true).
+  // Wird für das Admin-Widget "Aktive Homepages (temporär)" verwendet, damit klar ist,
+  // welche Homepages noch online sind und ggf. deaktiviert werden sollten.
+  if (pathParts[0] === 'admin' && pathParts[1] === 'homepages' && !pathParts[2]) {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const col = await getCollection('doctor_places');
+    const list = await col.find(
+      { homepage_mode: true, is_active: { $ne: false } },
+      { projection: {
+        _id: 0, id: 1, name: 1, slug: 1, city_slug: 1, city: 1, formatted_address: 1,
+        phone_national: 1, homepage_slug: 1, homepage_generated_at: 1,
+        rating: 1, user_rating_count: 1, gmb_verified: 1, gmb_claim_checked_at: 1,
+      } },
+    ).sort({ homepage_generated_at: 1 }).toArray(); // Älteste zuerst (dringlichste Deaktivierung)
+    const now = Date.now();
+    const items = list.map((d) => ({
+      ...d,
+      days_active: d.homepage_generated_at
+        ? Math.floor((now - new Date(d.homepage_generated_at).getTime()) / (1000 * 60 * 60 * 24))
+        : null,
+    }));
+    return json({ items, total: items.length });
+  }
+
+
   // GET /api/admin/campaigns/:id
   if (pathParts[0] === 'admin' && pathParts[1] === 'campaigns' && pathParts[2] && !pathParts[3]) {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
@@ -1124,7 +1149,43 @@ async function handlePost(request, pathParts) {
     if (!res) return json({ error: 'Nicht gefunden' }, { status: 404 });
     return json({ ok: true, doctor: stripId(res) });
   }
-  //   body: { ids: [uuid, uuid, ...], reason?: 'string' }
+  // POST /api/admin/homepages/bulk-deactivate – Deaktiviert Homepage-Modus für viele Praxen auf einmal.
+  // Body: { ids?: [uuid, ...], all?: boolean }
+  //   ids: gezielt bestimmte Praxen (Standard-Fall im Admin-UI)
+  //   all: TRUE → deaktiviert ALLE aktiven Homepages (Notfall-Fallback)
+  // Die homepage_slug bleibt erhalten → Root-URL redirected automatisch auf Verzeichnis-Eintrag.
+  // Falls verification_method='navoria_homepage' war, wird sie auf 'admin_no_website_check'
+  // umgestellt, damit die Verifizierung erhalten bleibt.
+  if (pathParts[0] === 'admin' && pathParts[1] === 'homepages' && pathParts[2] === 'bulk-deactivate') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const { ids, all } = body || {};
+    const doctors = await getCollection('doctor_places');
+    let filter;
+    if (all === true) {
+      filter = { homepage_mode: true };
+    } else if (Array.isArray(ids) && ids.length > 0) {
+      if (ids.length > 5000) return json({ error: 'Zu viele Einträge (>5000)' }, { status: 400 });
+      filter = { id: { $in: ids }, homepage_mode: true };
+    } else {
+      return json({ error: 'ids[] oder all:true erforderlich' }, { status: 400 });
+    }
+
+    // Verification-Method-Umstellung: navoria_homepage → admin_no_website_check (falls vorhanden)
+    await doctors.updateMany(
+      { ...filter, verification_method: 'navoria_homepage' },
+      { $set: { verification_method: 'admin_no_website_check', updated_at: new Date() } },
+    );
+    // Eigentliche Deaktivierung
+    const res = await doctors.updateMany(
+      filter,
+      {
+        $set: { updated_at: new Date() },
+        $unset: { homepage_mode: '', homepage_generated_at: '' },
+      },
+    );
+    return json({ ok: true, matched: res.matchedCount, modified: res.modifiedCount });
+  }
+
   if (pathParts[0] === 'admin' && pathParts[1] === 'doctors' && pathParts[2] === 'bulk-discard') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
     const { ids, reason } = body || {};
