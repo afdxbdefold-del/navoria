@@ -1,5 +1,6 @@
 import './globals.css';
 import { Suspense } from 'react';
+import { headers } from 'next/headers';
 import { Toaster } from 'sonner';
 import ConsentBanner from '@/components/ConsentBanner';
 import PageTracker from '@/components/PageTracker';
@@ -105,13 +106,22 @@ const organizationSchema = {
   areaServed: { '@type': 'Country', name: 'Deutschland' },
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  // Homepage-Modus-Seiten (via Middleware markiert) sollen KEINE Navoria-Schemas erhalten,
+  // damit sie für Google als eigenständige Praxis-Websites wirken.
+  const hdr = await headers();
+  const isHomepageMode = hdr.get('x-navoria-mode') === 'homepage';
+
   return (
     <html lang="de">
       <head>
         <meta name="google-adsense-account" content={ADSENSE_CLIENT} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+        {!isHomepageMode && (
+          <>
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+          </>
+        )}
       </head>
       <body className="min-h-screen bg-white text-slate-900 antialiased">
         {/* Skip-Link: Nur bei Fokus sichtbar, für Screenreader- und Tastatur-Nutzer:innen */}
@@ -121,10 +131,13 @@ export default function RootLayout({ children }) {
         >
           Zum Hauptinhalt springen
         </a>
-        <NavShellTop />
+        {/* NavShell (Header/Footer) und ConsentBanner nur außerhalb des Homepage-Modus –
+            damit Homepage-Modus-Seiten für Google als eigenständige Praxis-Sites wirken
+            (keine Navoria-Chrome im DOM, auch nicht versteckt). */}
+        {!isHomepageMode && <NavShellTop />}
         <main id="main-content" tabIndex={-1}>{children}</main>
-        <NavShellBottom />
-        <ConsentBanner />
+        {!isHomepageMode && <NavShellBottom />}
+        {!isHomepageMode && <ConsentBanner />}
         <Toaster position="top-center" richColors />
         <Suspense fallback={null}>
           <PageTracker />

@@ -40,16 +40,21 @@ export function middleware(request) {
   // Der noindex kommt dann via HTML-Meta-Tag aus der Page-Route.
 
   if (isRootPraxisHomepage) {
-    const response = NextResponse.next();
-    // noindex: nicht in Index aufnehmen
-    // nofollow: keinen Links auf dieser Seite folgen (interne Links zum Verzeichnis-Eintrag pflegen wir per JSON-LD)
-    // noarchive: kein "Im Cache"-Link in Google-Ergebnissen
-    // noimageindex: Bilder nicht separat indexieren
+    // Request-Header setzen, damit die Root-Layout via next/headers erkennen kann,
+    // dass wir auf einer Homepage-Modus-Seite sind → keine globalen Navoria-Schemas emittieren.
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-navoria-mode', 'homepage');
+    const response = NextResponse.next({ request: { headers: requestHeaders } });
+    // Response-Header (an Browser + Crawler):
+    // noindex/nofollow/noarchive/noimageindex – nur crawlbar für GMB-Verifizierung, nicht indexierbar.
     response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, noimageindex');
     return response;
   }
 
-  return NextResponse.next();
+  // Alle anderen Routen: Standard-Modus (mit globalen Navoria-Schemas)
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-navoria-mode', 'directory');
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {

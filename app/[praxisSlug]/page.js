@@ -46,11 +46,15 @@ export async function generateMetadata({ params }) {
     title: { absolute: title },
     description: desc,
     alternates: { canonical: absoluteCanonical },
+    // Praxis IST die App / der Autor / der Publisher – keine Navoria-Erwähnung.
+    applicationName: displayName,
+    authors: [{ name: displayName }],
+    creator: displayName,
+    publisher: displayName,
+    keywords: null, // Navoria-Keywords aus Root-Layout unterdrücken
     // WICHTIG: Homepage-Modus-Seiten sind TEMPORÄR und dienen ausschließlich der
     // Google-Business-Profile-Verifizierung. Google darf die URL crawlen (200 OK)
     // und den Inhalt lesen (für Name/Adresse-Match), aber sie NICHT indexieren.
-    // Sonst würde die Praxis-Homepage in Konkurrenz zum Navoria-Verzeichnis-Eintrag treten,
-    // Duplicate-Content-Signale erzeugen und nach Deaktivierung 404 in den SERPs stehen.
     robots: {
       index: false,
       follow: false,
@@ -72,8 +76,6 @@ export async function generateMetadata({ params }) {
     twitter: { card: 'summary', title, description: desc },
     other: {
       'og:site_name': displayName,
-      publisher: displayName,
-      // Zusätzlicher X-Robots-Tag als HTTP-Meta-Sicherheitsnetz
       'X-Robots-Tag': 'noindex, nofollow, noarchive, noimageindex',
     },
   };

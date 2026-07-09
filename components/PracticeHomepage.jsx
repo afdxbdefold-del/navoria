@@ -42,7 +42,8 @@ export default function PracticeHomepage({ doctor }) {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800">
-      {/* Navoria-Chrome per CSS verstecken (SSR, kein Flash) */}
+      {/* Navoria-Chrome ist in diesem Modus bereits im Root-Layout ausgeschlossen (via headers).
+          Wir behalten die display:none-Regel als Sicherheitsnetz, falls die Header-Erkennung fehlschlägt. */}
       <style dangerouslySetInnerHTML={{ __html: `
         header.navoria-chrome, footer.navoria-chrome, a.navoria-chrome-announce,
         .navoria-consent-banner { display: none !important; }
