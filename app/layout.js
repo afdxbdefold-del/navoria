@@ -6,12 +6,15 @@ import ConsentBanner from '@/components/ConsentBanner';
 import PageTracker from '@/components/PageTracker';
 import WebMCPRegistrar from '@/components/WebMCPRegistrar';
 import { NavShellTop, NavShellBottom } from '@/components/NavShell';
+import { getBaseUrl, getBaseUrlSync } from '@/lib/baseUrl';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
+// Statischer Fallback für Metadata (die läuft zum Build-Zeitpunkt).
+// Die JSON-LD-Schemas werden im Layout selbst mit der Runtime-URL berechnet.
+const BASE_URL_STATIC = getBaseUrlSync();
 const ADSENSE_CLIENT = 'ca-pub-8583619451045805';
 
 export const metadata = {
-  metadataBase: new URL(BASE_URL),
+  metadataBase: new URL(BASE_URL_STATIC),
   title: {
     default: 'Navoria – Ihr nächster Arzt. Ohne Umwege.',
     template: '%s | Navoria',
@@ -28,7 +31,7 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'de_DE',
-    url: BASE_URL,
+    url: BASE_URL_STATIC,
     siteName: 'Navoria',
     title: 'Navoria – Ihr nächster Arzt. Ohne Umwege.',
     description: 'Ärzte und Praxen in Deutschland finden. Adresse, Telefon, Öffnungszeiten und Bewertungen kompakt auf einer Seite.',
@@ -63,7 +66,7 @@ export const viewport = {
   initialScale: 1,
 };
 
-const websiteSchema = {
+const websiteSchemaBuilder = (BASE_URL) => ({
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: 'Navoria',
@@ -75,9 +78,9 @@ const websiteSchema = {
     target: { '@type': 'EntryPoint', urlTemplate: `${BASE_URL}/suche?q={search_term_string}` },
     'query-input': 'required name=search_term_string',
   },
-};
+});
 
-const organizationSchema = {
+const organizationSchemaBuilder = (BASE_URL) => ({
   '@context': 'https://schema.org',
   '@type': 'Organization',
   '@id': `${BASE_URL}#organization`,
@@ -104,13 +107,20 @@ const organizationSchema = {
   publishingPrinciples: `${BASE_URL}/redaktionelle-standards`,
   correctionsPolicy: `${BASE_URL}/korrekturen`,
   areaServed: { '@type': 'Country', name: 'Deutschland' },
-};
+});
 
 export default async function RootLayout({ children }) {
   // Homepage-Modus-Seiten (via Middleware markiert) sollen KEINE Navoria-Schemas erhalten,
   // damit sie für Google als eigenständige Praxis-Websites wirken.
   const hdr = await headers();
   const isHomepageMode = hdr.get('x-navoria-mode') === 'homepage';
+
+  // Base-URL zur Laufzeit ermitteln (mit Host-Header-Detection → auch wenn Env-Var
+  // fälschlicherweise auf Preview-URL zeigt, wird auf navoria.de gemappt wenn der
+  // Request tatsächlich auf navoria.de gestellt wurde).
+  const BASE_URL = await getBaseUrl();
+  const websiteSchema = websiteSchemaBuilder(BASE_URL);
+  const organizationSchema = organizationSchemaBuilder(BASE_URL);
 
   return (
     <html lang="de">
