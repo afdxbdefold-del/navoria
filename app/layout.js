@@ -2,7 +2,9 @@ import './globals.css';
 import { Suspense } from 'react';
 import { headers } from 'next/headers';
 import { Toaster } from 'sonner';
-import ConsentBanner from '@/components/ConsentBanner';
+// ConsentBanner bleibt als Backup im Repository erhalten (nicht mehr gerendert),
+// da Ezoic seinen eigenen Gatekeeper-Consent-CMP mitbringt. Bei Bedarf reaktivierbar.
+// import ConsentBanner from '@/components/ConsentBanner';
 import PageTracker from '@/components/PageTracker';
 import WebMCPRegistrar from '@/components/WebMCPRegistrar';
 import { NavShellTop, NavShellBottom } from '@/components/NavShell';
@@ -11,7 +13,8 @@ import { getBaseUrl, getBaseUrlSync } from '@/lib/baseUrl';
 // Statischer Fallback für Metadata (die läuft zum Build-Zeitpunkt).
 // Die JSON-LD-Schemas werden im Layout selbst mit der Runtime-URL berechnet.
 const BASE_URL_STATIC = getBaseUrlSync();
-const ADSENSE_CLIENT = 'ca-pub-8583619451045805';
+// Ezoic Account-ID (siehe Ezoic-Dashboard → Setup)
+const EZOIC_ACCOUNT_ID = '84335';
 
 export const metadata = {
   metadataBase: new URL(BASE_URL_STATIC),
@@ -125,7 +128,32 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="de">
       <head>
-        <meta name="google-adsense-account" content={ADSENSE_CLIENT} />
+        {/* Ezoic Gatekeeper Consent CMP + Ezoic Standalone Ads.
+            Nur außerhalb des Homepage-Modus laden – die eigenständigen
+            Praxis-Websites (/[slug]) sind noindex und sollen keine Ezoic-Ads oder
+            Navoria-Consent-Popups zeigen. */}
+        {!isHomepageMode && (
+          <>
+            {/* Gatekeeper Consent CMP (muss VOR Ezoic laden) */}
+            <script
+              data-cfasync="false"
+              src="https://cmp.gatekeeperconsent.com/min.js"
+              async
+            />
+            <script
+              data-cfasync="false"
+              src="https://the.gatekeeperconsent.com/cmp.min.js"
+              async
+            />
+            {/* Ezoic Standalone Ads */}
+            <script async src="//www.ezojs.com/ezoic/sa.min.js" />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `window.ezstandalone = window.ezstandalone || {};ezstandalone.cmd = ezstandalone.cmd || [];`,
+              }}
+            />
+          </>
+        )}
         {!isHomepageMode && (
           <>
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
@@ -147,7 +175,8 @@ export default async function RootLayout({ children }) {
         {!isHomepageMode && <NavShellTop />}
         <main id="main-content" tabIndex={-1}>{children}</main>
         {!isHomepageMode && <NavShellBottom />}
-        {!isHomepageMode && <ConsentBanner />}
+        {/* ConsentBanner deaktiviert – Ezoic Gatekeeper CMP übernimmt die Consent-Steuerung.
+            Datei bleibt als Backup unter /components/ConsentBanner.jsx. */}
         <Toaster position="top-center" richColors />
         <Suspense fallback={null}>
           <PageTracker />
