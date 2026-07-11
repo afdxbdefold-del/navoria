@@ -11,6 +11,7 @@ import RatingBadge from '@/components/RatingBadge';
 import MapEmbed from '@/components/MapEmbed';
 import FaqAccordion from '@/components/praxis/FaqAccordion';
 import MobileStickyCta from '@/components/praxis/MobileStickyCta';
+import EzoicAd from '@/components/EzoicAd';
 import { parseDisplayName } from '@/lib/doctorFormatter';
 import { humanizePrimaryType } from '@/lib/specialtyLabels';
 import { hasExternalWebsite } from '@/lib/ownUrl';
@@ -685,6 +686,11 @@ export default async function ProfilePage({ params }) {
               {lastSyncedText && <RowKv k="Zuletzt aktualisiert" v={lastSyncedText} />}
             </dl>
           </div>
+
+          {/* Ezoic MREC (300x250) – Sidebar-Slot.
+              Placeholder-ID 101 muss im Ezoic-Dashboard angelegt und einem
+              MREC-Format zugewiesen sein. */}
+          <EzoicAd id={101} className="mx-auto w-full max-w-[300px]" />
 
           {/* Profil beanspruchen (für Praxisinhaber) */}
           <div className="rounded-xl border border-sky-200 bg-gradient-to-br from-sky-50 to-white p-5">
