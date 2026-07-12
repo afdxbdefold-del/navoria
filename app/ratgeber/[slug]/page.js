@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { RATGEBER, ratgeberBySlug } from '@/lib/ratgeberContent';
 import { BookOpen, ArrowRight, HelpCircle, ShieldCheck, Calendar } from 'lucide-react';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -34,7 +35,7 @@ export default async function RatgeberDetail({ params }) {
   const r = ratgeberBySlug(slug);
   if (!r) notFound();
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const base = await getBaseUrl();
   const pageUrl = `${base}/ratgeber/${slug}`;
 
   const breadcrumb = {

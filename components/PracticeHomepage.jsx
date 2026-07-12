@@ -6,6 +6,7 @@ import { getKammerForPractice } from '@/lib/aerztekammern';
 import { getTemplateForSpecialty } from '@/lib/homepageTemplates';
 import { toSchemaOpeningHours } from '@/lib/openingHours';
 import { getEffectiveEmail } from '@/lib/emailGenerator';
+import { getBaseUrlSync } from '@/lib/baseUrl';
 
 /**
  * @param {object} doctor doctor_places Dokument (bereits stripped)
@@ -37,7 +38,7 @@ export default function PracticeHomepage({ doctor }) {
   const pagePath = doctor.homepage_slug
     ? `/${doctor.homepage_slug}`
     : `/praxis/${doctor.city_slug}/${doctor.slug}`;
-  const pageUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de'}${pagePath}`;
+  const pageUrl = `${getBaseUrlSync()}${pagePath}`;
   const initials = getInitials(name);
 
   return (
@@ -362,7 +363,7 @@ function normalizeOpeningHours(hours) {
 }
 
 function buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone }) {
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
+  const base = getBaseUrlSync();
   const url = doctor.homepage_slug
     ? `${base}/${doctor.homepage_slug}`
     : `${base}/praxis/${doctor.city_slug}/${doctor.slug}`;

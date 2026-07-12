@@ -8,6 +8,7 @@ import {
   Star, Phone, Globe,
 } from 'lucide-react';
 import RatingBadge from '@/components/RatingBadge';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 600;
@@ -104,7 +105,7 @@ export default async function SpecialtyPillarPage({ params }) {
     loadTotalCount(spec.label, spec.placeType),
   ]);
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const base = await getBaseUrl();
   const pageUrl = `${base}/aerzte/fachrichtung/${slug}`;
 
   // Schema.org

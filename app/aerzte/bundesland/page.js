@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { BUNDESLAENDER } from '@/lib/bundeslaender';
 import { getCollection } from '@/lib/mongodb';
 import { MapPin, ArrowRight, ShieldCheck, Info } from 'lucide-react';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const revalidate = 600;
 
@@ -33,7 +34,7 @@ export async function generateMetadata() {
 }
 
 export default async function BundeslandOverviewPage() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const base = await getBaseUrl();
   const counts = await loadCountsPerBundesland();
 
   // Ordnen: Bundesländer mit Praxen zuerst, alphabetisch innerhalb der Gruppen

@@ -3,13 +3,14 @@
 // (Google überspringt Sub-Sitemaps mit unverändertem lastmod).
 import { getCollection } from '@/lib/mongodb';
 import { hasExternalWebsite } from '@/lib/ownUrl';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const dynamic = 'force-dynamic';
 
 const CHUNK_SIZE = 10000; // Praxen pro Sub-Sitemap; sicher unter Google's 50k Limit
 
 export async function GET() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
+  const base = await getBaseUrl();
   const doctorsCol = await getCollection('doctor_places');
 
   // Anzahl der indexierbaren Praxen ermitteln um zu wissen, wie viele Chunks nötig sind

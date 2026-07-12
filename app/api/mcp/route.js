@@ -14,6 +14,7 @@
 
 import { NextResponse } from 'next/server';
 import { TOOLS, toolsPublicShape, findTool } from '@/lib/mcp/tools';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -65,7 +66,7 @@ export async function GET() {
     endpoint: '/api/mcp',
     capabilities: { tools: { listChanged: false } },
     tools_count: TOOLS.length,
-    documentation: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de'}/mcp`,
+    documentation: `${await getBaseUrl()}/mcp`,
     tools: toolsPublicShape().map((t) => ({ name: t.name, title: t.title, description: t.description })),
   }, {
     headers: { 'Access-Control-Allow-Origin': '*' },

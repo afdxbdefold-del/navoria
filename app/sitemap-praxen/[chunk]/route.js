@@ -6,6 +6,7 @@
 import { getCollection } from '@/lib/mongodb';
 import { hasExternalWebsite } from '@/lib/ownUrl';
 import { notFound } from 'next/navigation';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,7 +17,7 @@ export async function GET(request, { params }) {
   const chunkNum = parseInt(chunk, 10);
   if (Number.isNaN(chunkNum) || chunkNum < 1) notFound();
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
+  const base = await getBaseUrl();
   const doctorsCol = await getCollection('doctor_places');
 
   // Homepage-Modus-Praxen aus der Navoria-Sitemap ausschließen (sie sollen als

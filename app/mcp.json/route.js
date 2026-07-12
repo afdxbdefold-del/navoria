@@ -3,12 +3,13 @@
 
 import { NextResponse } from 'next/server';
 import { toolsPublicShape } from '@/lib/mcp/tools';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function GET() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
+  const base = await getBaseUrl();
   return NextResponse.json({
     // OpenAPI-artige Discovery
     schema_version: 'v1',

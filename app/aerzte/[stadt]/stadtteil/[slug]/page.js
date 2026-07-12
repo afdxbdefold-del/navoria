@@ -5,6 +5,7 @@ import { SPECIALTIES } from '@/lib/specialties';
 import { districtToSlug, districtDisplayName } from '@/lib/districtSlug';
 import { MapPin, ArrowRight, Stethoscope, ShieldCheck, Info, Sparkles } from 'lucide-react';
 import RatingBadge from '@/components/RatingBadge';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const revalidate = 600;
 
@@ -68,7 +69,7 @@ export default async function DistrictDetailPage({ params }) {
     if (d.specialty_guess) bySpecialty[d.specialty_guess] = (bySpecialty[d.specialty_guess] || 0) + 1;
   });
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const base = await getBaseUrl();
   const pageUrl = `${base}/aerzte/${stadt}/stadtteil/${slug}`;
 
   const breadcrumb = {

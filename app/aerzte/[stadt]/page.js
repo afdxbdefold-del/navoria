@@ -4,6 +4,7 @@ import { getCollection } from '@/lib/mongodb';
 import { SPECIALTIES } from '@/lib/specialties';
 import { Star, Phone, Globe, MapPin, ArrowRight } from 'lucide-react';
 import RatingBadge from '@/components/RatingBadge';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const revalidate = 300;
 
@@ -52,7 +53,7 @@ export default async function CityPage({ params }) {
     if (d.specialty_guess) bySpecialty[d.specialty_guess] = (bySpecialty[d.specialty_guess] || 0) + 1;
   });
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const base = await getBaseUrl();
   const collectionSchema = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',

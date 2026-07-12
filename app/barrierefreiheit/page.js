@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ShieldCheck, Mail, AlertTriangle, ExternalLink } from 'lucide-react';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -17,8 +18,8 @@ const p = 'mt-3 text-[15px] leading-relaxed text-slate-700';
 const ul = 'mt-3 list-disc space-y-1 pl-6 text-[15px] text-slate-700';
 const a = 'text-sky-700 underline underline-offset-2 hover:text-sky-800';
 
-export default function BarrierefreiheitPage() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+export default async function BarrierefreiheitPage() {
+  const base = await getBaseUrl();
   const today = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' });
 
   const breadcrumb = {

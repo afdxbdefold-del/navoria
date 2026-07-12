@@ -2,11 +2,12 @@
 // Bei 1000 Städten × 19 Fachrichtungen = 19.000 URLs (sicher unter 50k Limit).
 import { getCollection } from '@/lib/mongodb';
 import { SPECIALTIES } from '@/lib/specialties';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
+  const base = await getBaseUrl();
   const now = new Date().toISOString();
   const citiesCol = await getCollection('cities');
 

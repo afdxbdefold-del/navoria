@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { RATGEBER, ratgeberCategories } from '@/lib/ratgeberContent';
 import { BookOpen, ArrowRight, ShieldCheck } from 'lucide-react';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -21,8 +22,8 @@ export async function generateMetadata() {
   };
 }
 
-export default function RatgeberOverview() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+export default async function RatgeberOverview() {
+  const base = await getBaseUrl();
   const cats = ratgeberCategories();
 
   const breadcrumb = {

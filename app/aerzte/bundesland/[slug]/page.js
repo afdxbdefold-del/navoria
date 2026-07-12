@@ -5,6 +5,7 @@ import { SPECIALTIES } from '@/lib/specialties';
 import { getCollection } from '@/lib/mongodb';
 import { MapPin, ArrowRight, Stethoscope, ShieldCheck, Info, Sparkles } from 'lucide-react';
 import RatingBadge from '@/components/RatingBadge';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const revalidate = 600;
 
@@ -70,7 +71,7 @@ export default async function BundeslandDetailPage({ params }) {
   const b = bundeslandBySlug(slug);
   if (!b) notFound();
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const base = await getBaseUrl();
   const pageUrl = `${base}/aerzte/bundesland/${slug}`;
 
   const { total, cities, specs, featured } = await loadStats(b.stateNames);

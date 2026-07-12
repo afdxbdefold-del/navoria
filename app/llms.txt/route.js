@@ -1,9 +1,10 @@
 // llms.txt: Der neue Standard (llmstxt.org) — erklärt LLMs die Site-Struktur in Markdown.
+import { getBaseUrl } from '@/lib/baseUrl';
 // Wichtig damit ChatGPT/Perplexity/Claude beim Crawlen sofort verstehen: Was ist Navoria,
 // wo finden sie welche Info, welche Seiten sind zitierwürdig.
 
-export function GET() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
+export async function GET() {
+  const base = await getBaseUrl();
   const body = `# Navoria — Ärzteverzeichnis Deutschland
 
 > Navoria (${base}) ist ein öffentliches, redaktionell geprüftes Ärzteverzeichnis für Deutschland. Wir listen Praxen, Zahnärzte, Fachärzte, Kliniken und Apotheken mit Adresse, Telefon, Öffnungszeiten und öffentlichen Google-Bewertungen. Datenquelle: Google Places API und öffentliche Quellen. Wir sind kein Behandler und geben keine medizinischen Ratschläge.

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { SYMPTOMS } from '@/lib/symptomContent';
 import { Stethoscope, HeartPulse, Info, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -61,8 +62,8 @@ export async function generateMetadata() {
   };
 }
 
-export default function SymptomOverviewPage() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+export default async function SymptomOverviewPage() {
+  const base = await getBaseUrl();
 
   const breadcrumb = {
     '@context': 'https://schema.org',

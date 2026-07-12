@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Bot, Terminal, ExternalLink, Copy, Zap, ShieldCheck, Info } from 'lucide-react';
 import { toolsPublicShape } from '@/lib/mcp/tools';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -16,8 +17,8 @@ const h2 = 'mt-10 text-2xl font-semibold text-slate-900';
 const p = 'mt-3 text-[15px] leading-relaxed text-slate-700';
 const code = 'block overflow-x-auto rounded-lg border border-slate-200 bg-slate-50 p-4 text-[13px] font-mono text-slate-800';
 
-export default function MCPPage() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
+export default async function MCPPage() {
+  const base = await getBaseUrl();
   const tools = toolsPublicShape();
 
   return (

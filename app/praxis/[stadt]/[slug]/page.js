@@ -19,6 +19,7 @@ import { isOpenNow, nextOpening, buildWeekTable, toSchemaOpeningHours, todayLabe
 import { buildProfileText } from '@/lib/profileText';
 import { buildFaqs } from '@/lib/faqBuilder';
 import { SPECIALTIES } from '@/lib/specialties';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 async function loadDoctor(slug) {
   const col = await getCollection('doctor_places');
@@ -65,7 +66,7 @@ export async function generateMetadata({ params }) {
   const specialty = d.specialty_guess;
   const displayName = d.name;
   const canonical = `/praxis/${d.city_slug}/${d.slug}`;
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const base = await getBaseUrl();
 
   // HOMEPAGE-MODUS: Metadaten so gestalten, dass Google diese Seite als
   // eigenständige Praxis-Website erkennt (kein Navoria-Bezug).
@@ -191,7 +192,7 @@ export default async function ProfilePage({ params }) {
     ? `https://www.openstreetmap.org/export/embed.html?bbox=${d.longitude - 0.01},${d.latitude - 0.007},${d.longitude + 0.01},${d.latitude + 0.007}&layer=mapnik&marker=${d.latitude},${d.longitude}`
     : null;
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const base = await getBaseUrl();
   const profileUrl = `${base}/praxis/${d.city_slug}/${d.slug}`;
 
   // Schema.org Type

@@ -1,8 +1,9 @@
 // robots.txt: Alle Crawler werden ausdrücklich zugelassen (klassische Search + LLM-Bots).
+import { getBaseUrl } from '@/lib/baseUrl';
 // Wichtig für AI-Sichtbarkeit: GPTBot, PerplexityBot, ClaudeBot, Google-Extended, CCBot.
 
-export function GET() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
+export async function GET() {
+  const base = await getBaseUrl();
   const body = `# robots.txt für Navoria – ${base}
 # Wir sind ein öffentliches Arztverzeichnis. Klassische Suchmaschinen UND LLM-Crawler
 # dürfen alle öffentlichen Bereiche crawlen. LLMs sind ausdrücklich willkommen (AI-freundlich).

@@ -4,6 +4,7 @@ import { getCollection } from '@/lib/mongodb';
 import { specialtyBySlug, SPECIALTIES } from '@/lib/specialties';
 import { Star, Phone, Globe, MapPin, ArrowRight } from 'lucide-react';
 import RatingBadge from '@/components/RatingBadge';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const revalidate = 300;
 
@@ -58,7 +59,7 @@ export default async function CitySpecialtyPage({ params }) {
   const cityName = city?.name || stadt.charAt(0).toUpperCase() + stadt.slice(1);
   const doctors = await loadDoctorsForSpecialty(stadt, spec.label, spec.placeType);
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const base = await getBaseUrl();
   const collectionSchema = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',

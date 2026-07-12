@@ -4,11 +4,12 @@ import { SPECIALTIES } from '@/lib/specialties';
 import { SYMPTOMS } from '@/lib/symptomContent';
 import { BUNDESLAENDER } from '@/lib/bundeslaender';
 import { RATGEBER } from '@/lib/ratgeberContent';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://navoria.de';
+  const base = await getBaseUrl();
   const now = new Date().toISOString();
 
   const urls = [];

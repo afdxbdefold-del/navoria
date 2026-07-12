@@ -11,6 +11,7 @@ import { getCollection } from '@/lib/mongodb';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { isReservedRootSlug } from '@/lib/reservedSlugs';
 import PracticeHomepage from '@/components/PracticeHomepage';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 async function loadByHomepageSlug(slug) {
   if (!slug) return null;
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }) {
   const specialty = d.specialty_guess || 'Arztpraxis';
   const displayName = d.name;
   const canonical = `/${d.homepage_slug}`;
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const base = await getBaseUrl();
   const absoluteCanonical = `${base}${canonical}`;
 
   const title = `${displayName} – ${specialty} in ${cityText}`;

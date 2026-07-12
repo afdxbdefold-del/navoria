@@ -6,6 +6,7 @@ import {
   Stethoscope, HeartPulse, AlertTriangle, PhoneCall, HelpCircle,
   ShieldCheck, ArrowRight, Info, MapPin, Sparkles,
 } from 'lucide-react';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -44,7 +45,7 @@ export default async function SymptomDetailPage({ params }) {
   const s = symptomBySlug(slug);
   if (!s) notFound();
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const base = await getBaseUrl();
   const pageUrl = `${base}/symptome/${slug}`;
 
   // JSON-LD: Breadcrumb

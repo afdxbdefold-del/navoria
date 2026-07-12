@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getCollection } from '@/lib/mongodb';
 import { districtToSlug, districtDisplayName } from '@/lib/districtSlug';
 import { MapPin, ArrowRight, Info, ShieldCheck } from 'lucide-react';
+import { getBaseUrl } from '@/lib/baseUrl';
 
 export const revalidate = 600;
 
@@ -75,7 +76,7 @@ export default async function CityDistrictOverviewPage({ params }) {
     );
   }
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || '';
+  const base = await getBaseUrl();
   const breadcrumb = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
