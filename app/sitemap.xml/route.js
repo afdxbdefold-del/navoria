@@ -1,24 +1,21 @@
 // Sitemap-Index: verweist auf die eigentlichen Sub-Sitemaps.
-// Vorteile: keine 50k-URL-Grenze pro Datei, schnelleres Crawling durch Google
-// (Google überspringt Sub-Sitemaps mit unverändertem lastmod).
+// Vorteile: keine 50k-URL-Grenze pro Datei, schnelleres Crawling.
 import { getCollection } from '@/lib/mongodb';
 import { hasExternalWebsite } from '@/lib/ownUrl';
 import { getBaseUrl } from '@/lib/baseUrl';
+import { getCitySpecialtyCombos } from '@/lib/cityContent';
 
 export const dynamic = 'force-dynamic';
 
-const CHUNK_SIZE = 10000; // Praxen pro Sub-Sitemap; sicher unter Google's 50k Limit
+const PRAXIS_CHUNK = 10000;
+const CITY_SPEC_CHUNK = 10000;
 
 export async function GET() {
   const base = await getBaseUrl();
   const doctorsCol = await getCollection('doctor_places');
 
-  // Anzahl der indexierbaren Praxen ermitteln um zu wissen, wie viele Chunks nötig sind.
-  // Muss dem Filter in /sitemap-praxen/[chunk] entsprechen:
-  //   - is_active: true
-  //   - nicht im homepage_mode
-  //   - website_checked_at gesetzt ("abgehakt")
-  //   - keine externe Website
+  // Praxen-Chunks: nur abgehakt (website_checked_at gesetzt), aktiv, kein homepage_mode,
+  // ohne externe Website.
   const doctorsRaw = await doctorsCol.find(
     {
       is_active: true,
@@ -27,14 +24,21 @@ export async function GET() {
     },
     { projection: { website_url: 1 } }
   ).toArray();
-  const indexableCount = doctorsRaw.filter((d) => !hasExternalWebsite(d.website_url)).length;
-  const chunkCount = Math.max(1, Math.ceil(indexableCount / CHUNK_SIZE));
+  const indexablePraxen = doctorsRaw.filter((d) => !hasExternalWebsite(d.website_url)).length;
+  const praxisChunks = Math.max(1, Math.ceil(indexablePraxen / PRAXIS_CHUNK));
+
+  // City×Fach-Chunks: nur Kombinationen mit >= CITY_SPEC_MIN_DOCTORS.
+  const combos = await getCitySpecialtyCombos();
+  const citySpecChunks = Math.max(0, Math.ceil(combos.length / CITY_SPEC_CHUNK));
 
   const now = new Date().toISOString();
   const sitemaps = [];
   sitemaps.push(sitemap(base, '/sitemap-pages.xml', now));
   sitemaps.push(sitemap(base, '/sitemap-cities.xml', now));
-  for (let i = 1; i <= chunkCount; i += 1) {
+  for (let i = 1; i <= citySpecChunks; i += 1) {
+    sitemaps.push(sitemap(base, `/sitemap-city-specs/${i}`, now));
+  }
+  for (let i = 1; i <= praxisChunks; i += 1) {
     sitemaps.push(sitemap(base, `/sitemap-praxen/${i}`, now));
   }
 

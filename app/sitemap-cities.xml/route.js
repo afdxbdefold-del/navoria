@@ -1,29 +1,17 @@
-// Sub-Sitemap für Städte + Stadt×Fachrichtung-Kombinationen.
-// Bei 1000 Städten × 19 Fachrichtungen = 19.000 URLs (sicher unter 50k Limit).
-import { getCollection } from '@/lib/mongodb';
-import { SPECIALTIES } from '@/lib/specialties';
+// Sub-Sitemap für Stadt-Übersichts-Seiten (/aerzte/{stadt}).
+// Enthält nur Städte mit >= CITY_MIN_DOCTORS aktiven Praxen (Adsense-Thin-Content-Schutz).
+// City×Fachrichtung-URLs liegen separat in /sitemap-city-specs/[chunk].
 import { getBaseUrl } from '@/lib/baseUrl';
+import { getIndexableCities } from '@/lib/cityContent';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const base = await getBaseUrl();
   const now = new Date().toISOString();
-  const citiesCol = await getCollection('cities');
+  const cities = await getIndexableCities();
 
-  // Alle Städte mit mindestens einer aktiven Praxis (kein Hard-Cap mehr!)
-  const cities = await citiesCol.find(
-    { doctor_count: { $gt: 0 } },
-    { projection: { slug: 1, name: 1, doctor_count: 1 } }
-  ).toArray();
-
-  const urls = [];
-  for (const c of cities) {
-    urls.push(url(base, `/aerzte/${c.slug}`, 0.7, now));
-    for (const s of SPECIALTIES) {
-      urls.push(url(base, `/aerzte/${c.slug}/${s.slug}`, 0.5, now));
-    }
-  }
+  const urls = cities.map((c) => `  <url><loc>${base}/aerzte/${c.slug}</loc><lastmod>${now}</lastmod><priority>0.7</priority></url>`);
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>`;
   return new Response(xml, {
@@ -32,8 +20,4 @@ export async function GET() {
       'Cache-Control': 'public, max-age=3600, s-maxage=3600',
     },
   });
-}
-
-function url(base, path, priority, lastmod) {
-  return `  <url><loc>${base}${path}</loc><lastmod>${lastmod}</lastmod><priority>${priority.toFixed(1)}</priority></url>`;
 }
