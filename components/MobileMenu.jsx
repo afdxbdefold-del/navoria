@@ -5,10 +5,11 @@ import { Menu, X } from 'lucide-react';
 
 const LINKS = [
   { href: '/', label: 'Start' },
-  { href: '/suche', label: 'Suche' },
-  { href: '/aerzte', label: 'Ärzte-Verzeichnis' },
-  { href: '/symptome', label: 'Symptome' },
+  { href: '/magazin', label: 'Magazin' },
   { href: '/ratgeber', label: 'Ratgeber' },
+  { href: '/symptome', label: 'Symptome' },
+  { href: '/aerzte/fachrichtung', label: 'Fachrichtungen' },
+  { href: '/finden', label: 'Praxis finden' },
   { href: '/aerzte/bundesland', label: 'Nach Bundesland' },
 ];
 

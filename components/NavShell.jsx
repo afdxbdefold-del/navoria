@@ -76,15 +76,16 @@ function Header() {
           </div>
           <div className="flex flex-col leading-none">
             <span className="text-lg font-semibold tracking-tight text-slate-900">Navoria</span>
-            <span className="text-[10px] font-medium text-slate-500">Der klare Weg zum Arzt.</span>
+            <span className="text-[10px] font-medium text-slate-500">Gesundheit verständlich.</span>
           </div>
         </a>
         <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
           <a href="/" className="hover:text-sky-600">Start</a>
-          <a href="/suche" className="hover:text-sky-600">Suche</a>
-          <a href="/aerzte" className="hover:text-sky-600">Ärzte-Verzeichnis</a>
-          <a href="/symptome" className="hover:text-sky-600">Symptome</a>
+          <a href="/magazin" className="hover:text-sky-600">Magazin</a>
           <a href="/ratgeber" className="hover:text-sky-600">Ratgeber</a>
+          <a href="/symptome" className="hover:text-sky-600">Symptome</a>
+          <a href="/aerzte/fachrichtung" className="hover:text-sky-600">Fachrichtungen</a>
+          <a href="/finden" className="hover:text-sky-600">Praxis finden</a>
         </nav>
         <MobileMenu />
       </div>
