@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { articleBySlug, MAGAZINE_ARTICLES, categoryBySlug } from '@/lib/magazineArticles';
 import { specialtyBySlug } from '@/lib/specialties';
@@ -132,8 +133,22 @@ export default async function ArticlePage({ params }) {
         </div>
       </div>
 
-      <div className={`mt-8 flex h-48 items-center justify-center rounded-2xl bg-gradient-to-br ${a.heroGradient} text-8xl`}>
-        <CategoryEmoji slug={a.category} />
+      <div className={`relative mt-8 h-64 w-full overflow-hidden rounded-2xl bg-slate-100 sm:h-96 ${a.heroImage ? '' : `bg-gradient-to-br ${a.heroGradient}`}`}>
+        {a.heroImage ? (
+          <Image
+            src={a.heroImage}
+            alt={a.heroImageAlt || a.title}
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 768px"
+            className="object-cover"
+            unoptimized
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center text-8xl">
+            <CategoryEmoji slug={a.category} />
+          </div>
+        )}
       </div>
 
       <article className="prose prose-slate mt-10 max-w-none">
@@ -199,12 +214,27 @@ export default async function ArticlePage({ params }) {
           <h2 className="text-xl font-semibold text-slate-900">Weiterlesen</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
             {relatedArticles.map((r) => (
-              <Link key={r.slug} href={`/magazin/${r.slug}`} className="group flex flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md">
-                <div className={`flex h-20 items-center justify-center rounded-lg bg-gradient-to-br ${r.heroGradient} text-3xl`}>
-                  <CategoryEmoji slug={r.category} />
+              <Link key={r.slug} href={`/magazin/${r.slug}`} className="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
+                <div className="relative h-24 w-full overflow-hidden bg-slate-100">
+                  {r.heroImage ? (
+                    <Image
+                      src={r.heroImage}
+                      alt={r.heroImageAlt || r.title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 33vw"
+                      className="object-cover transition duration-500 group-hover:scale-105"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className={`flex h-full items-center justify-center bg-gradient-to-br ${r.heroGradient} text-3xl`}>
+                      <CategoryEmoji slug={r.category} />
+                    </div>
+                  )}
                 </div>
-                <div className="mt-3 text-xs font-medium text-sky-700">{labelForCategory(r.category)}</div>
-                <h3 className="mt-1 text-sm font-semibold text-slate-900 group-hover:text-sky-700">{r.title}</h3>
+                <div className="p-4">
+                  <div className="text-xs font-medium text-sky-700">{labelForCategory(r.category)}</div>
+                  <h3 className="mt-1 text-sm font-semibold text-slate-900 group-hover:text-sky-700">{r.title}</h3>
+                </div>
               </Link>
             ))}
           </div>

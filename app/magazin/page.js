@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { MAGAZINE_ARTICLES, CATEGORIES } from '@/lib/magazineArticles';
 import { getBaseUrl } from '@/lib/baseUrl';
 import { Clock, ArrowRight, BookOpen } from 'lucide-react';
@@ -65,11 +66,25 @@ export default async function MagazinePage() {
 
       {featured && (
         <Link href={`/magazin/${featured.slug}`} className="group mt-12 block">
-          <article className="grid gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md sm:grid-cols-[1fr_1.2fr] sm:p-10">
-            <div className={`flex items-center justify-center rounded-2xl bg-gradient-to-br ${featured.heroGradient} min-h-[200px] p-10 text-6xl`}>
-              <CategoryEmoji slug={featured.category} />
+          <article className="grid gap-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md sm:grid-cols-[1fr_1.2fr]">
+            <div className="relative min-h-[240px] w-full overflow-hidden bg-slate-100 sm:min-h-[320px]">
+              {featured.heroImage ? (
+                <Image
+                  src={featured.heroImage}
+                  alt={featured.heroImageAlt || featured.title}
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover transition duration-500 group-hover:scale-105"
+                  unoptimized
+                />
+              ) : (
+                <div className={`flex h-full items-center justify-center bg-gradient-to-br ${featured.heroGradient} text-6xl`}>
+                  <CategoryEmoji slug={featured.category} />
+                </div>
+              )}
             </div>
-            <div className="flex flex-col justify-center">
+            <div className="flex flex-col justify-center p-6 sm:p-10">
               <div className="inline-flex items-center gap-2 text-xs font-medium text-sky-700">
                 <span className="rounded-full bg-sky-50 px-2 py-0.5">Featured</span>
                 <span className="text-slate-400">·</span>

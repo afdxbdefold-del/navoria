@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { getBaseUrl } from '@/lib/baseUrl';
 import { MAGAZINE_ARTICLES, CATEGORIES } from '@/lib/magazineArticles';
 import { SPECIALTIES } from '@/lib/specialties';
@@ -101,11 +102,25 @@ export default async function HomePage() {
           <section className="mt-8">
             <SectionHeader eyebrow="Heute im Magazin" title="Aktueller Schwerpunkt" />
             <Link href={`/magazin/${featured.slug}`} className="group mt-6 block">
-              <article className="grid gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md sm:grid-cols-[1fr_1.3fr] sm:p-10">
-                <div className={`flex items-center justify-center rounded-2xl bg-gradient-to-br ${featured.heroGradient} min-h-[220px] text-7xl`}>
-                  <CategoryEmoji slug={featured.category} />
+              <article className="grid gap-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md sm:grid-cols-[1fr_1.3fr]">
+                <div className="relative min-h-[260px] w-full overflow-hidden bg-slate-100 sm:min-h-[320px]">
+                  {featured.heroImage ? (
+                    <Image
+                      src={featured.heroImage}
+                      alt={featured.heroImageAlt || featured.title}
+                      fill
+                      priority
+                      sizes="(max-width: 640px) 100vw, 45vw"
+                      className="object-cover transition duration-500 group-hover:scale-105"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${featured.heroGradient} text-7xl`}>
+                      <CategoryEmoji slug={featured.category} />
+                    </div>
+                  )}
                 </div>
-                <div className="flex flex-col justify-center">
+                <div className="flex flex-col justify-center p-6 sm:p-10">
                   <div className="text-xs font-medium text-sky-700">{labelForCategory(featured.category)}</div>
                   <h2 className="mt-2 text-2xl font-semibold text-slate-900 group-hover:text-sky-700 sm:text-3xl">{featured.title}</h2>
                   <p className="mt-3 text-slate-600">{featured.lead}</p>
