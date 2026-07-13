@@ -13,9 +13,18 @@ export async function GET() {
   const base = await getBaseUrl();
   const doctorsCol = await getCollection('doctor_places');
 
-  // Anzahl der indexierbaren Praxen ermitteln um zu wissen, wie viele Chunks nötig sind
+  // Anzahl der indexierbaren Praxen ermitteln um zu wissen, wie viele Chunks nötig sind.
+  // Muss dem Filter in /sitemap-praxen/[chunk] entsprechen:
+  //   - is_active: true
+  //   - nicht im homepage_mode
+  //   - website_checked_at gesetzt ("abgehakt")
+  //   - keine externe Website
   const doctorsRaw = await doctorsCol.find(
-    { is_active: true },
+    {
+      is_active: true,
+      homepage_mode: { $ne: true },
+      website_checked_at: { $ne: null },
+    },
     { projection: { website_url: 1 } }
   ).toArray();
   const indexableCount = doctorsRaw.filter((d) => !hasExternalWebsite(d.website_url)).length;

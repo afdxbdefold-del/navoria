@@ -1,8 +1,10 @@
 // Sub-Sitemap für Praxen, chunked à 10.000 URLs.
 // URL-Schema: /sitemap-praxen/1, /sitemap-praxen/2, ...
-// Enthält NUR Praxen ohne externe Website und NICHT im Homepage-Modus.
+// Enthält NUR Praxen, die im Admin als "abgehakt" markiert sind (website_checked_at gesetzt),
+// ohne externe Website und NICHT im Homepage-Modus.
 // - Praxen mit eigener externer Website: noindex,follow
 // - Praxen im Homepage-Modus: eigenständige Praxis-Website – nicht als Navoria-URL indexieren
+// - Nicht-abgehakte Praxen: noch nicht qualitätsgeprüft → nicht in Sitemap
 import { getCollection } from '@/lib/mongodb';
 import { hasExternalWebsite } from '@/lib/ownUrl';
 import { notFound } from 'next/navigation';
@@ -22,9 +24,15 @@ export async function GET(request, { params }) {
 
   // Homepage-Modus-Praxen aus der Navoria-Sitemap ausschließen (sie sollen als
   // eigenständige Websites gecrawlt werden, nicht als Navoria-Kind-URLs).
+  // Zusätzlich: nur "abgehakte" Praxen (website_checked_at gesetzt) aufnehmen –
+  // ungeprüfte Einträge sollen nicht in die Sitemap gelangen.
   const doctorsRaw = await doctorsCol.find(
-    { is_active: true, homepage_mode: { $ne: true } },
-    { projection: { slug: 1, city_slug: 1, updated_at: 1, website_url: 1, _id: 1 } }
+    {
+      is_active: true,
+      homepage_mode: { $ne: true },
+      website_checked_at: { $ne: null },
+    },
+    { projection: { slug: 1, city_slug: 1, updated_at: 1, website_url: 1, website_checked_at: 1, _id: 1 } }
   ).sort({ _id: 1 }).toArray();
 
   // Nur Praxen ohne externe Website behalten und mit gültigen URL-Feldern

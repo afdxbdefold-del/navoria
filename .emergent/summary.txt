@@ -1,0 +1,169 @@
+<analysis>**original_problem_statement**: Navoria.de - A German doctor search and recommendation directory. Goal: Allow users to search for doctors, specialties, symptoms, clinics, or cities/zip codes. The app pulls data from the Google Places API via a manual admin import system. 
+PRODUCT REQUIREMENTS:
+- Stack: Next.js (React), Tailwind CSS, MongoDB.
+- Features: Home page with search/symptom mapping, Search Results with filters, SEO-friendly Doctor/Clinic Profiles, Admin Dashboard for manual/bulk Google Places imports.
+- Modern, medical, trustworthy blue/teal branding.
+- SEO-focused (SSR) with fully indexable URLs, deeply clustered categorization, and AI-crawler fitness.
+- The platform also acts as a white-label website generator for doctors. Admin can toggle directory profiles into standalone, Lovable-style single-page websites to offer to doctors without websites.
+
+**User's preferred language**: GERMAN (INSTRUCT NEXT AGENT: Respond in GERMAN only)
+
+**what currently exists?** 
+A Next.js/MongoDB application serving as an SEO hub for medical practices. It features standalone generated homepages for doctors. The app now includes an Ezoic Ads integration (Gatekeeper CMP, ads.txt redirect, and a sidebar placeholder component). A robust URL resolution mechanism () was aggressively enforced across the entire codebase to prevent the preview environment domain from leaking into production canonical URLs and JSON-LDs.
+
+**Last working item**:
+    - Last item agent was working: Fixing a critical SEO bug where the preview domain was still leaking into meta tags and JSON-LD on the production environment. The agent replaced hardcoded  with  across all dynamic routes/pages, adjusted  to correctly prioritize , and fixed /.
+    - Status: USER VERIFICATION PENDING (Awaiting user to redeploy to production to see the fix)
+    - Agent Testing Done: Y
+    - Which testing method agent to use?: manual testing by curl/bash to simulate production environment headers.
+    - User Testing Done: N
+
+**All Pending/In progress Issue list**:
+  - Issue 1: Vercel Production Migration / Deployment Verification (P0)
+     - Attempted fixes: Agent fixed the URL leak in the codebase locally, but it requires the user to deploy it.
+     - Next debug checklist: Await user confirmation that they have deployed the changes to  and verified the fix.
+     - Why fix this issue and what will be achieved with the fix?: Production must reflect the preview environment fixes to restore SEO integrity.
+     - Status: USER VERIFICATION PENDING / BLOCKED (Awaiting user action)
+     - Is recurring issue?: Y (URL leaking recurred due to hardcoded ENV variables, now patched)
+     - Should Test frontend/backend/both after fix?: NA
+     - Blocked on other issue: None
+
+**In progress Task List**:
+  *(None actively in progress. The agent completed the Ezoic integration and SEO URL leak fix, awaiting user input on what to tackle next).*
+
+**Upcoming and Future Tasks**
+  Upcoming Tasks:
+  - P1: Meta-Tag Trimming (P0 priority for SEO) - Trim Titles >60 chars and Descriptions >155 chars across all  functions.
+  - P1: Global  defaults - Add a static Navoria brand fallback  and dynamic  for content hubs/articles.
+  - P1: E-E-A-T Content Improvements - Implement Author Bylines, , , and Data Source Disclosures for medical Ratgeber articles. Add images to Thin Content pages (Ratgeber, Symptome).
+  - P1: AI Symptom Recommendation - Replace static symptom-to-specialty mapping with an Emergent LLM integration in .
+  - P1: Admin Detail UI per practice with manual overrides and conflict display.
+  - P1: Add more Ezoic ad placeholders (e.g., In-content search results, In-content Ratgeber, Above Footer).
+
+  Future Tasks:
+  - P2:  component optimization across the entire app for LCP improvements.
+  - P2: Auch interessant internal links on practice detail pages.
+  - P2: Terminweiterleitung (Appointment forwarding).
+
+**Completed work in this session**
+- Ezoic CMP & Scripts Integration: Redirected  (301) to Ezoic Manager. Injected Gatekeeper CMP and Standalone scripts into  while strictly excluding them from decoupled  pages. (DONE)
+- Ezoic Ad Placeholder: Created reusable  and injected a MREC placeholder (ID: 101) into the sidebar of . (DONE)
+- SEO URL Leak Fix: Rewrote  to correctly prioritize  headers and enforce a hard fallback to  on . (DONE)
+- Codebase-wide Base URL Refactoring: Batch replaced  with  (or ) across all pages, dynamic routes, sitemaps, robots.txt, and llms.txt. Made several page components  to support this. (DONE)
+
+**Earlier issues found/mentioned but not fixed**
+   Issue 1: Thin Content Risk & Missing Visuals
+   - Debug checklist: Add Hero Images (via Unsplash) and Lucide icons to  and  detail pages. 
+   - Why to solve this issue and what will be achieved with this?: Improves Google E-E-A-T score and user engagement.
+   - Should Test frontend/backend/both after fix: Frontend
+   - Is recurring issue?: N
+
+   Issue 2: SEO Meta tag length and missing OG Images
+   - Debug checklist: Audit and trim meta descriptions and titles. Add global default .
+   - Why to solve this issue and what will be achieved with this?: Prevents SERP truncation and fixes broken social sharing cards.
+   - Should Test frontend/backend/both after fix: Frontend / Bash check
+   - Is recurring issue?: N
+
+**Known issue recurrence from previous fork**
+  - Issue recurrence in previous fork: URL Leak (Preview URL showing on production canonicals). The previous fix was incomplete because components still directly referenced  and  evaluated  before .
+  - Recurrence count: 1
+  - Status: RESOLVED (Locally; awaiting user deployment to production)
+
+**Code Architecture**
+/app
+├── app/
+│   ├── [praxisSlug]/      # Root route for decoupled Standalone Homepages
+│   ├── admin/             # Dashboard, analytics, homepages
+│   ├── aerzte/            # Hubs
+│   ├── api/               # API Routes
+│   ├── praxis/            # Standard Directory Doctor profile pages
+│   ├── ads.txt/           # Now returns 301 to Ezoic Manager
+│   ├── llms.txt/          # Updated to use dynamic base URL
+│   ├── robots.txt/        # Updated to use dynamic base URL
+│   ├── sitemap*.xml/      # Updated to use dynamic base URL
+│   └── layout.js          # Main layout (injects Ezoic CMP & scripts)
+├── components/
+│   ├── EzoicAd.jsx        # NEW: Renders Ezoic placeholders
+│   ├── NavShell.jsx
+│   └── PracticeHomepage.jsx
+├── lib/
+│   ├── baseUrl.js         # FIXED: prioritizes x-forwarded-host & enforces navoria.de on prod
+│   ├── emailGenerator.js  
+│   └── outscraperClaim.js 
+└── middleware.js          
+
+**Key Technical Concepts**
+Frontend: Next.js 15 App Router, React 18, Tailwind CSS.
+Backend: Next.js API routes (SSR).
+Database: MongoDB.
+Monetization: Ezoic Ads (MCM) Standalone integration via .
+SEO: Multi-entity JSON-LD, Dynamic Canonical URL generation based on request headers ().
+
+**key DB schema**
+  - : 
+    - 
+    - 
+    - 
+
+**changes in tech stack**
+  - Integrated Ezoic CMP and Standalone Ads scripts.
+
+**All files of reference**
+  - : Redirects to Ezoic Manager.
+  - : Global Ezoic scripts implementation.
+  - : Reusable Ezoic placeholder component.
+  - : Core logic for determining the canonical domain securely. NEVER remove this.
+
+**Areas that need refactoring**: 
+  - N/A right now. A massive batch refactoring just occurred to enforce  over hardcoded env vars.
+
+**key api endpoints**
+  -  (Outscraper batch check)
+  -  (List of active decoupled homepages)
+
+**Critical Info for New Agent**
+  - **Environment Context:** The user has deployed the app to PRODUCTION (). You are working in the PREVIEW environment. Fixes for production issues MUST be deployed by the user to take effect. If the user complains about an issue persisting on live, remind them (in German) to deploy the latest changes.
+  - **Base URLs:** NEVER use  directly in components/pages. ALWAYS use  from  for async components/routes, or  for synchronous components where headers cannot be awaited.
+  - **Ezoic Ads:** Ezoic requires specific placeholder IDs to show ads.  is used for this. Ezoic ads do not render on the preview environment, only on the approved production domain.
+  - **Admin Pass:**  is  in  and .
+
+**documents and test reports created in this job**
+  -  (Exists from previous)
+
+**Last 10 User Messages and any pending HUMAN messages** 
+ 1. Ja (Confirmed starting Ezoic integration) -> Done.
+ 2. Ausgeschlossen (Keep Ezoic off homepage mode) -> Done.
+ 3. Backup (Keep ConsentBanner as backup) -> Done.
+ 4. Alles eingebunden aber sehe keine ezoic ads -> Agent explained Ezoic needs placeholders and doesn't run on preview domains.
+ 5. Dann adde Einen placeholder auf der Praxisseite. Mrec in der sidebar. -> Agent added .
+ 6. Du willst mich doch verarschen (With image showing URL leak) -> Agent debugged and executed codebase-wide URL resolution fix.
+ 7. **(PENDING HUMAN MESSAGE)** Agent asked the user to verify the URL leak fix (by deploying to production) and asked whether to proceed with more ad slots or the SEO-Backlog tasks.
+
+**Project Health Check:**
+  - Broken: None
+  - Mocked: None
+
+**3rd Party Integrations**
+  - Google Places API (Business Data) — requires User API Key
+  - Outscraper API (GMB Claim checking) — requires User API Key ()
+  - Ezoic Ads & CMP — requires User Account IDs (Integrated)
+
+**Testing status**
+  - Testing agent used after significant changes: NO (Heavy Bash/cURL testing used to verify Headers).
+  - Troubleshoot agent used after agent stuck in loop: NO
+  - Test files created: None
+  - Known regressions: None
+
+**Credentials to test flow:**
+  - Path: 
+  - Email: 
+  - Password: 
+
+**What agent forgot to execute**
+Nothing was forgotten. The agent implemented the required fixes and is currently awaiting the user to deploy the changes to production to verify the URL leak fix.
+
+**Debugging checklist for current issue**
+    Issue: Wait for User Deployment & Verification
+    Frontend files to check: NA
+    Backend files to check: NA
+    Action: Await user response to confirm if  is now generating correct canonicals and JSON-LDs after deployment. If confirmed, proceed to  (SEO Backlog).</analysis>
