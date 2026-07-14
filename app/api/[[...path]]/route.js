@@ -737,11 +737,93 @@ async function handleGet(request, pathParts) {
       return col.countDocuments({ timestamp: { $gte: from, $lt: to }, is_bot: true });
     }
 
-    async function topPaths(from, to, limit = 10) {
+    async function topPaths(from, to, limit = 50) {
       return col.aggregate([
         { $match: { timestamp: { $gte: from, $lt: to }, is_bot: { $ne: true } } },
         { $group: { _id: '$path', views: { $sum: 1 }, sessions: { $addToSet: '$session_id' } } },
         { $project: { path: '$_id', views: 1, uniques: { $size: '$sessions' }, _id: 0 } },
+        { $sort: { views: -1 } },
+        { $limit: limit },
+      ]).toArray();
+    }
+
+    // Top-Städte aus dem Directory: paths /aerzte/{stadt}[/...] und /praxis/{stadt}[/...]
+    // Ausgeschlossen: /aerzte/fachrichtung, /aerzte/bundesland, /aerzte/stadtteil
+    async function topDirectoryCities(from, to, limit = 50) {
+      return col.aggregate([
+        {
+          $match: {
+            timestamp: { $gte: from, $lt: to },
+            is_bot: { $ne: true },
+            path: { $regex: /^\/(aerzte|praxis)\/[a-z0-9][a-z0-9-]+/ },
+          },
+        },
+        { $addFields: { segments: { $split: ['$path', '/'] } } },
+        { $addFields: { city_slug: { $arrayElemAt: ['$segments', 2] } } },
+        {
+          $match: {
+            city_slug: { $nin: [null, '', 'fachrichtung', 'bundesland', 'stadtteil', 'praxis-beanspruchen'] },
+          },
+        },
+        {
+          $group: {
+            _id: '$city_slug',
+            views: { $sum: 1 },
+            sessions: { $addToSet: '$session_id' },
+          },
+        },
+        { $project: { city_slug: '$_id', views: 1, uniques: { $size: '$sessions' }, _id: 0 } },
+        { $sort: { views: -1 } },
+        { $limit: limit },
+      ]).toArray();
+    }
+
+    // Top-Fachrichtungen: paths /aerzte/fachrichtung/{slug} (Pillar) und /aerzte/{stadt}/{slug} (Stadt+Fach)
+    async function topDirectorySpecialties(from, to, limit = 50) {
+      return col.aggregate([
+        {
+          $match: {
+            timestamp: { $gte: from, $lt: to },
+            is_bot: { $ne: true },
+            path: { $regex: /^\/aerzte\/[^/]+\/[^/]+/ },
+          },
+        },
+        { $addFields: { segments: { $split: ['$path', '/'] } } },
+        {
+          $addFields: {
+            seg2: { $arrayElemAt: ['$segments', 2] },
+            seg3: { $arrayElemAt: ['$segments', 3] },
+          },
+        },
+        {
+          $addFields: {
+            spec_slug: {
+              $switch: {
+                branches: [
+                  // /aerzte/fachrichtung/{slug} → seg3
+                  { case: { $eq: ['$seg2', 'fachrichtung'] }, then: '$seg3' },
+                  // /aerzte/{stadt}/{fach} → seg3, ausschließen wenn seg2 ein Meta-Slug ist
+                  {
+                    case: {
+                      $not: { $in: ['$seg2', ['fachrichtung', 'bundesland', 'stadtteil', 'praxis-beanspruchen']] },
+                    },
+                    then: '$seg3',
+                  },
+                ],
+                default: null,
+              },
+            },
+          },
+        },
+        { $match: { spec_slug: { $nin: [null, ''] } } },
+        {
+          $group: {
+            _id: '$spec_slug',
+            views: { $sum: 1 },
+            sessions: { $addToSet: '$session_id' },
+          },
+        },
+        { $project: { spec_slug: '$_id', views: 1, uniques: { $size: '$sessions' }, _id: 0 } },
         { $sort: { views: -1 } },
         { $limit: limit },
       ]).toArray();
@@ -803,19 +885,22 @@ async function handleGet(request, pathParts) {
       todayBots, yesterdayBots,
       topPathsToday, topCitiesToday, topCountriesToday,
       devicesToday, topBotsToday, hourlyToday, hourlyYesterday,
+      topDirectoryCitiesToday, topDirectorySpecialtiesToday,
     ] = await Promise.all([
       bucketStats(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
       bucketStats(yesterdayStart, todayStart),
       bucketStats(sevenDaysStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
       botCount(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
       botCount(yesterdayStart, todayStart),
-      topPaths(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
+      topPaths(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000), 50),
       topCities(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
       topCountries(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
       devices(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
       topBots(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
       hourly(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
       hourly(yesterdayStart, todayStart),
+      topDirectoryCities(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000), 50),
+      topDirectorySpecialties(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000), 50),
     ]);
 
     return json({
@@ -827,6 +912,8 @@ async function handleGet(request, pathParts) {
       top_countries_today: topCountriesToday,
       devices_today: devicesToday,
       top_bots_today: topBotsToday,
+      top_directory_cities_today: topDirectoryCitiesToday,
+      top_directory_specialties_today: topDirectorySpecialtiesToday,
       generated_at: new Date().toISOString(),
     });
   }

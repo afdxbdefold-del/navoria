@@ -2,7 +2,20 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { Activity, MapPin, Users, TrendingUp, Bot, Smartphone, Monitor, Tablet, RefreshCw, ArrowUp, ArrowDown, Minus, ExternalLink, Globe } from 'lucide-react';
+import { Activity, MapPin, Users, TrendingUp, Bot, Smartphone, Monitor, Tablet, RefreshCw, ArrowUp, ArrowDown, Minus, ExternalLink, Globe, Building2, Stethoscope, ChevronDown } from 'lucide-react';
+import { SPECIALTIES } from '@/lib/specialties';
+
+// City-Slug → Anzeigename (formatiert)
+function cityLabel(slug) {
+  if (!slug) return '?';
+  return slug.split('-').map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+}
+// Specialty-Slug → Plural-Label aus SPECIALTIES-Katalog
+function specialtyLabel(slug) {
+  if (!slug) return '?';
+  const spec = SPECIALTIES.find((s) => s.slug === slug);
+  return spec ? spec.plural : slug;
+}
 
 const REFRESH_MS = 15000;
 
@@ -186,7 +199,7 @@ export default function AdminAnalytics() {
       {/* Grid: Top-Städte / Top-Länder / Top-Seiten / Bots */}
       <section className="grid gap-4 md:grid-cols-2">
         <ListCard
-          title="Top-Städte heute"
+          title="Top-Städte (Besucher) heute"
           icon={<MapPin className="h-4 w-4 text-sky-600" />}
           items={summary?.top_cities_today?.map((c) => ({
             label: `${c.city}${c.country ? ` (${c.country})` : ''}`,
@@ -204,6 +217,30 @@ export default function AdminAnalytics() {
           valueLabel="Unique"
         />
         <ListCard
+          title="Top-Directory-Städte heute"
+          icon={<Building2 className="h-4 w-4 text-teal-600" />}
+          items={summary?.top_directory_cities_today?.map((c) => ({
+            label: cityLabel(c.city_slug),
+            value: c.views,
+            secondary: `${c.uniques} unique`,
+            link: `/aerzte/${c.city_slug}`,
+          })) || []}
+          valueLabel="PV"
+          initialLimit={10}
+        />
+        <ListCard
+          title="Top-Fachrichtungen heute"
+          icon={<Stethoscope className="h-4 w-4 text-teal-600" />}
+          items={summary?.top_directory_specialties_today?.map((c) => ({
+            label: specialtyLabel(c.spec_slug),
+            value: c.views,
+            secondary: `${c.uniques} unique`,
+            link: `/aerzte/fachrichtung/${c.spec_slug}`,
+          })) || []}
+          valueLabel="PV"
+          initialLimit={10}
+        />
+        <ListCard
           title="Top-Seiten heute"
           icon={<TrendingUp className="h-4 w-4 text-sky-600" />}
           items={summary?.top_paths_today?.map((p) => ({
@@ -213,6 +250,7 @@ export default function AdminAnalytics() {
             link: p.path,
           })) || []}
           valueLabel="PV"
+          initialLimit={10}
         />
         <ListCard
           title="Bot-Traffic heute"
@@ -292,31 +330,50 @@ function SmallStat({ label, value }) {
   );
 }
 
-function ListCard({ title, icon, items, valueLabel }) {
+function ListCard({ title, icon, items, valueLabel, initialLimit = 10 }) {
+  const [expanded, setExpanded] = useState(false);
+  const hasMore = items.length > initialLimit;
+  const visible = expanded ? items : items.slice(0, initialLimit);
   return (
     <div className="rounded-2xl border border-slate-200 bg-white">
       <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3">
         <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
           {icon} {title}
         </h3>
-        <span className="text-[10px] uppercase tracking-wide text-slate-600">{valueLabel}</span>
+        <span className="text-[10px] uppercase tracking-wide text-slate-600">
+          {items.length > 0 && <span className="mr-2 text-slate-400">{items.length}</span>}
+          {valueLabel}
+        </span>
       </div>
       {items.length ? (
-        <ul className="divide-y divide-slate-50">
-          {items.map((it, i) => (
-            <li key={i} className="flex items-center justify-between px-5 py-2 text-sm hover:bg-sky-50/40">
-              <div className="min-w-0 flex-1 truncate pr-4">
-                {it.link ? (
-                  <a href={it.link} target="_blank" rel="noreferrer" className="text-slate-800 hover:text-sky-700">{it.label}</a>
-                ) : (
-                  <span className="text-slate-800">{it.label}</span>
-                )}
-                {it.secondary && <span className="ml-2 text-xs text-slate-400">{it.secondary}</span>}
-              </div>
-              <span className="tabular-nums text-slate-600">{typeof it.value === 'number' ? it.value.toLocaleString('de-DE') : it.value}</span>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="divide-y divide-slate-50">
+            {visible.map((it, i) => (
+              <li key={i} className="flex items-center justify-between px-5 py-2 text-sm hover:bg-sky-50/40">
+                <div className="flex min-w-0 flex-1 items-center gap-2 truncate pr-4">
+                  <span className="w-6 shrink-0 text-right text-[11px] tabular-nums text-slate-400">{i + 1}.</span>
+                  {it.link ? (
+                    <a href={it.link} target="_blank" rel="noreferrer" className="truncate text-slate-800 hover:text-sky-700">{it.label}</a>
+                  ) : (
+                    <span className="truncate text-slate-800">{it.label}</span>
+                  )}
+                  {it.secondary && <span className="ml-1 shrink-0 text-xs text-slate-400">{it.secondary}</span>}
+                </div>
+                <span className="tabular-nums text-slate-600">{typeof it.value === 'number' ? it.value.toLocaleString('de-DE') : it.value}</span>
+              </li>
+            ))}
+          </ul>
+          {hasMore && (
+            <button
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
+              className="flex w-full items-center justify-center gap-1 border-t border-slate-100 px-5 py-2 text-xs font-medium text-sky-700 hover:bg-sky-50"
+            >
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+              {expanded ? 'Weniger anzeigen' : `Alle ${items.length} anzeigen`}
+            </button>
+          )}
+        </>
       ) : (
         <div className="px-5 py-6 text-center text-sm text-slate-400">Noch keine Daten.</div>
       )}
