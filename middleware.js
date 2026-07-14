@@ -24,7 +24,7 @@ const RESERVED = new Set([
   'sitemap-city-specs', 'sitemap-pages.xml', 'robots.txt', 'robots',
   'favicon.ico', 'favicon', 'manifest.json', 'manifest', 'icon.svg', 'icon',
   'ads.txt', 'llms.txt', 'opengraph-image',
-  'webmcp', '404', '500', 'not-found', 'error',
+  'webmcp', 'mcp', '404', '500', 'not-found', 'error',
   'blog', 'news', 'events', 'karriere', 'jobs', 'presse', 'partner',
   'login', 'register', 'signup', 'signin', 'logout', 'account', 'profil', 'profile',
   'settings', 'dashboard', 'help', 'hilfe', 'faq', 'support',
