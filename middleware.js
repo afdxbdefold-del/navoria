@@ -16,11 +16,14 @@ import { NextResponse } from 'next/server';
 // Reservierte Root-Slugs, die statische Routen sind (kein Homepage-Modus)
 const RESERVED = new Set([
   'admin', 'aerzte', 'praxis', 'suche', 'symptome', 'symptom', 'ratgeber',
+  'magazin', 'finden',
   'impressum', 'datenschutz', 'agb', 'barrierefreiheit', 'korrekturen',
   'redaktionelle-standards', 'ueber-uns', 'kontakt', 'praxis-beanspruchen',
   'beanspruchen', 'beanspruchungen', 'api', '_next', '_vercel',
-  'sitemap.xml', 'sitemap', 'sitemap-praxen', 'robots.txt', 'robots',
+  'sitemap.xml', 'sitemap', 'sitemap-praxen', 'sitemap-cities.xml',
+  'sitemap-city-specs', 'sitemap-pages.xml', 'robots.txt', 'robots',
   'favicon.ico', 'favicon', 'manifest.json', 'manifest', 'icon.svg', 'icon',
+  'ads.txt', 'llms.txt', 'opengraph-image',
   'webmcp', '404', '500', 'not-found', 'error',
   'blog', 'news', 'events', 'karriere', 'jobs', 'presse', 'partner',
   'login', 'register', 'signup', 'signin', 'logout', 'account', 'profil', 'profile',
