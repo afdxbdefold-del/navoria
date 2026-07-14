@@ -1130,10 +1130,15 @@ async function handlePost(request, pathParts) {
         // Website-check + Verifizierung zurück (nur wenn wir sie gesetzt hatten)
         const existing = await doctors.findOne({ id: pathParts[2] }, { projection: { verification_method: 1 } });
         if (existing?.verification_method === 'navoria_homepage') {
-          set.website_checked_at = null;
-          set.is_verified = false;
-          set.verified_at = null;
-          unset.verification_method = '';
+          // WICHTIG: website_checked_at bewusst BEIBEHALTEN (auf now), damit die Praxis
+          // nach Deaktivierung automatisch in der Sitemap landet. Der Admin hat die
+          // Praxis manuell qualifiziert (durch das Aktivieren der Homepage). Beim
+          // Zurückschalten auf das Standard-Profil soll dieser Prüfstatus erhalten
+          // bleiben, damit das jetzt indexierbare Directory-Profil crawlbar wird.
+          set.website_checked_at = now;
+          set.is_verified = true;
+          set.verified_at = now;
+          set.verification_method = 'admin_no_website_check';
         }
       } else {
         // mode_only: wenn verification_method='navoria_homepage' war, auf editoriell umstellen,

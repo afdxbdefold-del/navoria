@@ -101,17 +101,18 @@ function List({ token }) {
         });
         const dh = await rh.json();
         if (!rh.ok) throw new Error(dh.error);
-        // Lokal State reflektieren + return: der homepage-Endpoint hat schon alles zurückgesetzt
-        toast.success('Homepage-Modus deaktiviert, Praxis zurück auf Standard-Profil');
-        if (show === 'checked') setItems((prev) => prev.filter((it) => it.id !== doc.id));
+        // Backend hält jetzt website_checked_at bewusst gesetzt (Praxis bleibt "abgehakt"),
+        // damit sie sofort in die Sitemap kommt und indexierbar wird.
+        toast.success('Homepage deaktiviert – Praxis läuft als Standard-Profil (in Sitemap)');
+        if (show === 'unchecked') setItems((prev) => prev.filter((it) => it.id !== doc.id));
         else setItems((prev) => prev.map((it) => it.id === doc.id ? {
           ...it,
           homepage_mode: false,
-          website_checked_at: null,
-          is_verified: false,
-          verification_method: null,
+          website_checked_at: new Date().toISOString(),
+          is_verified: true,
+          verification_method: 'admin_no_website_check',
         } : it));
-        setTotals((t) => ({ ...t, unchecked: t.unchecked + 1, checked: Math.max(0, t.checked - 1) }));
+        // Falls Praxis vorher in "unchecked" war (theoretisch möglich), wechselt sie jetzt in "checked".
         setBusyId(null);
         return;
       }
