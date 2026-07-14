@@ -1372,12 +1372,22 @@ async function handlePost(request, pathParts) {
       return json({ ok: true, checked: 0, claimed: 0, unclaimed: 0, errors: 0, cost_estimate_usd: 0, batches: 0, message: 'Keine Kandidaten gefunden.' });
     }
 
-    // Batch-Größe: 10 place_ids pro Outscraper-Request (guter Kompromiss zwischen Speed & Timeout)
-    const BATCH_SIZE = 10;
-    const DELAY_MS = 300; // 300ms Pause zwischen Batches
-    let checked = 0, claimed = 0, unclaimed = 0, errors = 0, batches = 0;
+    // Batch-Größe: 5 place_ids pro Outscraper-Request (kleinerer Batch = schnellere Antwortzeiten)
+    const BATCH_SIZE = 5;
+    const DELAY_MS = 200; // 200ms Pause zwischen Batches
+    // Zeit-Budget: Vercel Serverless-Function hat maxDuration=60s. Wir stoppen neue Batches
+    // nach 45s, damit die Response garantiert vor dem Kill zurückgehen kann.
+    const TIME_BUDGET_MS = 45000;
+    const startedAt = Date.now();
+    let checked = 0, claimed = 0, unclaimed = 0, errors = 0, batches = 0, aborted = false;
 
     for (let i = 0; i < candidates.length; i += BATCH_SIZE) {
+      // Time-Budget-Check: wenn wir bald das Function-Timeout treffen, brechen wir sauber ab
+      // und geben die bisherigen Ergebnisse zurück (partial=true).
+      if (Date.now() - startedAt > TIME_BUDGET_MS) {
+        aborted = true;
+        break;
+      }
       const batch = candidates.slice(i, i + BATCH_SIZE);
       const placeIds = batch.map((c) => c.google_place_id);
       const results = await checkClaimStatusBatch(placeIds);
@@ -1416,6 +1426,7 @@ async function handlePost(request, pathParts) {
 
     // Kosten-Schätzung (Outscraper ~$0.001 pro Query)
     const costEstimate = (checked + errors) * 0.001;
+    const elapsedMs = Date.now() - startedAt;
 
     return json({
       ok: true,
@@ -1426,6 +1437,9 @@ async function handlePost(request, pathParts) {
       batches,
       cost_estimate_usd: Number(costEstimate.toFixed(3)),
       total_candidates_scanned: candidates.length,
+      partial: aborted,
+      elapsed_ms: elapsedMs,
+      remaining_candidates: aborted ? Math.max(0, candidates.length - (checked + errors)) : 0,
     });
   }
 

@@ -14,7 +14,7 @@ from typing import Dict, Any, Optional
 # Configuration from .env
 BASE_URL = os.environ.get('NEXT_PUBLIC_BASE_URL', 'http://localhost:3000') + '/api'
 ADMIN_EMAIL = "admin@navoria.de"
-ADMIN_PASSWORD = "navoria2025"
+ADMIN_PASSWORD = "one4all1"
 
 # Test results tracking
 test_results = {
@@ -665,6 +665,169 @@ def test_cors_headers():
     except Exception as e:
         log_fail("CORS Headers", f"Exception: {str(e)}")
 
+def test_claim_check_auth_guard():
+    """Test POST /api/admin/claim-check without Authorization header → expect 401"""
+    print("\n" + "="*80)
+    print("TEST: Claim Check - Auth Guard (No Authorization)")
+    print("="*80)
+    
+    try:
+        response = requests.post(
+            f"{BASE_URL}/admin/claim-check",
+            json={"limit": 5, "only_stale": True},
+            headers={"Content-Type": "application/json"},
+            timeout=10
+        )
+        
+        if response.status_code == 401:
+            data = response.json()
+            if data.get('error') == 'Nicht autorisiert':
+                log_pass("Claim Check Auth Guard", "Correctly rejected with 401 'Nicht autorisiert'")
+            else:
+                log_fail("Claim Check Auth Guard", f"Got 401 but wrong error message: {data}")
+        else:
+            log_fail("Claim Check Auth Guard", f"Expected 401, got {response.status_code}")
+            
+    except Exception as e:
+        log_fail("Claim Check Auth Guard", f"Exception: {str(e)}")
+
+def test_claim_check_integration(token: str):
+    """Test POST /api/admin/claim-check with real integration (OUTSCRAPER_API_KEY configured)"""
+    print("\n" + "="*80)
+    print("TEST: Claim Check - Real Integration (limit=10)")
+    print("="*80)
+    
+    try:
+        start_time = time.time()
+        
+        response = requests.post(
+            f"{BASE_URL}/admin/claim-check",
+            json={"limit": 10, "only_stale": True},
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {token}"
+            },
+            timeout=55  # Allow up to 55s (should complete within 50s per requirements)
+        )
+        
+        elapsed_time = time.time() - start_time
+        
+        print(f"Status Code: {response.status_code}")
+        print(f"Request elapsed time: {elapsed_time:.2f}s")
+        
+        if response.status_code != 200:
+            log_fail("Claim Check Integration", f"Expected 200, got {response.status_code}: {response.text}")
+            return
+        
+        data = response.json()
+        print(f"Response: {json.dumps(data, indent=2)}")
+        
+        # Verify response structure
+        required_keys = ['ok', 'checked', 'claimed', 'unclaimed', 'errors', 'batches', 
+                        'cost_estimate_usd', 'total_candidates_scanned', 'partial', 
+                        'elapsed_ms', 'remaining_candidates']
+        
+        missing_keys = [key for key in required_keys if key not in data]
+        if missing_keys:
+            log_fail("Claim Check Integration", f"Missing required keys: {missing_keys}")
+            return
+        
+        # Verify data types
+        if not isinstance(data['partial'], bool):
+            log_fail("Claim Check Integration", f"'partial' should be boolean, got {type(data['partial'])}")
+            return
+        
+        if not isinstance(data['elapsed_ms'], (int, float)):
+            log_fail("Claim Check Integration", f"'elapsed_ms' should be number, got {type(data['elapsed_ms'])}")
+            return
+        
+        # Verify elapsed_ms is reasonable (< 50000ms as per requirements)
+        if data['elapsed_ms'] >= 50000:
+            log_warning("Claim Check Integration", f"elapsed_ms ({data['elapsed_ms']}ms) is >= 50000ms")
+        
+        # Verify request completed without timeout
+        if elapsed_time >= 55:
+            log_fail("Claim Check Integration", f"Request took {elapsed_time:.2f}s, approaching timeout")
+            return
+        
+        # Check results
+        if data['total_candidates_scanned'] == 0:
+            print(f"INFO: No candidates found (message: {data.get('message', 'N/A')})")
+            if data.get('message') == 'Keine Kandidaten gefunden.':
+                log_pass("Claim Check Integration", f"No candidates scenario handled correctly")
+            else:
+                log_pass("Claim Check Integration", f"Completed with 0 candidates")
+        else:
+            print(f"INFO: Scanned {data['total_candidates_scanned']} candidates")
+            print(f"INFO: Checked={data['checked']}, Claimed={data['claimed']}, Unclaimed={data['unclaimed']}, Errors={data['errors']}")
+            print(f"INFO: Batches={data['batches']}, Cost=${data['cost_estimate_usd']}, Partial={data['partial']}")
+            
+            details = f"Scanned {data['total_candidates_scanned']} in {elapsed_time:.2f}s, elapsed_ms={data['elapsed_ms']}ms, partial={data['partial']}"
+            log_pass("Claim Check Integration", details)
+        
+    except requests.exceptions.Timeout:
+        log_fail("Claim Check Integration", "Request timed out after 55s")
+    except Exception as e:
+        log_fail("Claim Check Integration", f"Exception: {str(e)}")
+
+def test_claim_check_code_verification():
+    """Verify code changes are in place (BATCH_SIZE=5, DELAY_MS=200, TIME_BUDGET_MS=45000, timeout=20000)"""
+    print("\n" + "="*80)
+    print("TEST: Claim Check - Code Verification")
+    print("="*80)
+    
+    try:
+        # Read route.js
+        with open('/app/app/api/[[...path]]/route.js', 'r') as f:
+            route_content = f.read()
+        
+        # Read outscraperClaim.js
+        with open('/app/lib/outscraperClaim.js', 'r') as f:
+            outscraper_content = f.read()
+        
+        checks = []
+        details = []
+        
+        # Check BATCH_SIZE = 5
+        if 'const BATCH_SIZE = 5;' in route_content:
+            checks.append(True)
+            details.append("BATCH_SIZE=5")
+        else:
+            checks.append(False)
+            details.append("BATCH_SIZE≠5")
+        
+        # Check DELAY_MS = 200
+        if 'const DELAY_MS = 200;' in route_content:
+            checks.append(True)
+            details.append("DELAY_MS=200")
+        else:
+            checks.append(False)
+            details.append("DELAY_MS≠200")
+        
+        # Check TIME_BUDGET_MS = 45000
+        if 'const TIME_BUDGET_MS = 45000;' in route_content:
+            checks.append(True)
+            details.append("TIME_BUDGET_MS=45000")
+        else:
+            checks.append(False)
+            details.append("TIME_BUDGET_MS≠45000")
+        
+        # Check default timeout 20000 in outscraperClaim.js
+        if 'const timeout = options.timeout || 20000;' in outscraper_content:
+            checks.append(True)
+            details.append("timeout=20000")
+        else:
+            checks.append(False)
+            details.append("timeout≠20000")
+        
+        if all(checks):
+            log_pass("Claim Check Code Verification", ", ".join(details))
+        else:
+            log_fail("Claim Check Code Verification", f"Some checks failed: {', '.join(details)}")
+            
+    except Exception as e:
+        log_fail("Claim Check Code Verification", f"Exception: {str(e)}")
+
 def print_summary():
     """Print test summary"""
     print("\n" + "="*80)
@@ -714,6 +877,11 @@ def main():
     job_id = test_admin_jobs(token)
     test_admin_logs(token, job_id)
     test_cors_headers()
+    
+    # Claim Check tests (timeout/abort fix)
+    test_claim_check_code_verification()
+    test_claim_check_auth_guard()
+    test_claim_check_integration(token)
     
     # Print summary
     all_passed = print_summary()

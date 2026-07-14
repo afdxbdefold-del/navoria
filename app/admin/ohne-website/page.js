@@ -30,7 +30,7 @@ function List({ token }) {
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
   const [claimChecking, setClaimChecking] = useState(false);
-  const [claimCheckLimit, setClaimCheckLimit] = useState(100);
+  const [claimCheckLimit, setClaimCheckLimit] = useState(30);
 
   const PAGE_SIZE = 100;
   const authHeaders = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
@@ -63,9 +63,9 @@ function List({ token }) {
 
   // Batch-Claim-Check via Outscraper API
   const runClaimCheck = async () => {
-    const limit = Math.max(1, Math.min(500, parseInt(claimCheckLimit, 10) || 100));
+    const limit = Math.max(1, Math.min(500, parseInt(claimCheckLimit, 10) || 30));
     const estCost = (limit * 0.001).toFixed(3);
-    if (!confirm(`Claim-Status via Outscraper prüfen für bis zu ${limit} Praxen ohne Website?\n\nKostenschätzung: ~$${estCost} USD.\nEs werden bevorzugt Praxen mit vielen Google-Bewertungen geprüft (Sales-Priorität).\n\nFortsetzen?`)) return;
+    if (!confirm(`Claim-Status via Outscraper prüfen für bis zu ${limit} Praxen ohne Website?\n\nKostenschätzung: ~$${estCost} USD.\nEs werden bevorzugt Praxen mit vielen Google-Bewertungen geprüft (Sales-Priorität).\n\nHinweis: Pro Aufruf werden ca. 30–50 Praxen in ~45s geprüft (Vercel-Limit). Bei größeren Läufen mehrfach starten – bereits geprüfte Praxen werden übersprungen.\n\nFortsetzen?`)) return;
     setClaimChecking(true);
     try {
       const r = await fetch('/api/admin/claim-check', {
@@ -75,10 +75,14 @@ function List({ token }) {
       });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || 'Fehler');
+      const partialNote = data.partial
+        ? ` · ⚠ Teilweise (Zeit-Budget) — ${data.remaining_candidates} übrig, bitte erneut starten`
+        : '';
       toast.success(
         `Geprüft: ${data.checked} · Unclaimed: ${data.unclaimed} · Claimed: ${data.claimed}` +
         (data.errors ? ` · Fehler: ${data.errors}` : '') +
-        ` · Kosten: ~$${data.cost_estimate_usd}`
+        ` · Kosten: ~$${data.cost_estimate_usd}` +
+        partialNote
       );
       await load();
     } catch (err) {
