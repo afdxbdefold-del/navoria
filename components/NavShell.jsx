@@ -98,12 +98,7 @@ function Header() {
         {/* Logo + Wordmark */}
         <a href="/" className="flex items-center gap-3 text-white" aria-label="Navoria Startseite">
           <LogoMark variant="dark" />
-          <div className="flex flex-col leading-none">
-            <span className="text-[19px] font-semibold tracking-tight">Navoria</span>
-            <span className="mt-0.5 text-[11px] font-medium" style={{ color: 'var(--color-primary-light)' }}>
-              Gesundheit verständlich.
-            </span>
-          </div>
+          <span className="text-[19px] font-semibold tracking-tight leading-none">Navoria</span>
         </a>
 
         {/* Desktop Nav */}
