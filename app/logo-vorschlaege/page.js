@@ -74,22 +74,20 @@ function LogoD({ size = 40, color = '#0875C9', bg = '#ffffff' }) {
   );
 }
 
-// E: N-Blossom — vollständiges N mit „Blossom"-Punkt am oberen Ende der rechten Säule
+// E: N — vollständiges N in abgerundeter Kachel (ohne Punkt)
 function LogoE({ size = 40, color = '#0875C9', bg = '#ffffff' }) {
   return (
     <svg viewBox="0 0 40 40" width={size} height={size} aria-hidden="true">
       <rect x="2" y="2" width="36" height="36" rx="12" fill={color} />
       {/* Vollständiges N: linke Säule aufwärts, Diagonale abwärts, rechte Säule aufwärts */}
       <path
-        d="M12 28 V13 L28 28 V14"
+        d="M12 29 V11 L28 29 V11"
         stroke={bg}
-        strokeWidth="3.2"
+        strokeWidth="3.4"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
       />
-      {/* Blossom-Punkt über der rechten Säule */}
-      <circle cx="28" cy="10.2" r="2.6" fill={bg} />
     </svg>
   );
 }
@@ -116,7 +114,7 @@ const CONCEPTS = [
   { key: 'B', Comp: LogoB, name: 'N-Kompass',    tag: 'Navigation, Orientierung',             note: 'Spielt auf den „Nav"-Wortstamm in Navoria. Wir helfen Menschen, sich im Gesundheitssystem zu orientieren.' },
   { key: 'C', Comp: LogoC, name: 'N-Pulse',      tag: 'Editorial, EKG, modern',               note: 'Das N wird durch eine EKG-Kurve gezeichnet. Passt zur Magazin-Positionierung.' },
   { key: 'D', Comp: LogoD, name: 'N-Schild',     tag: 'Vertrauen, Schutz, Autorität',         note: 'Schildform signalisiert Verlässlichkeit. N-Buchstabe im Inneren.' },
-  { key: 'E', Comp: LogoE, name: 'N-Blossom',    tag: 'Weich, gerundet, Prävention',          note: 'Weiches N mit Punkt-Detail. Freundliche, präventionsorientierte Anmutung.' },
+  { key: 'E', Comp: LogoE, name: 'Nur N',        tag: 'Minimal, geometrisch, ruhig',           note: 'Klares, vollständiges N in einer abgerundeten Kachel. Reduzierte, moderne Marken-Anmutung ohne Zusatzdekoration.' },
   { key: 'F', Comp: LogoF, name: 'N-Cross',      tag: 'Medizinisch + geometrisch',            note: 'N-Säulen umrahmen ein klassisches medizinisches Plus. Klar als Gesundheits-Marke erkennbar.' },
 ];
 
@@ -213,7 +211,7 @@ export default function LogoVorschlaegePage() {
             <li><strong>B · N-Kompass:</strong> wenn die Positionierung &bdquo;wir helfen navigieren&ldquo; priorisiert wird.</li>
             <li><strong>C · N-Pulse:</strong> wenn die redaktionelle Magazin-Identität dominieren soll.</li>
             <li><strong>D · N-Schild:</strong> wenn Vertrauen und Autorität im Vordergrund stehen.</li>
-            <li><strong>E · N-Blossom:</strong> wenn Prävention, Wellness und Ratgeber-Thematik dominant sind.</li>
+            <li><strong>E · Nur N:</strong> minimal, ruhig, ohne Dekoration — funktioniert von Favicon bis Print.</li>
             <li><strong>F · N-Cross:</strong> wenn das medizinische Signal (Kreuz) sofort erkennbar sein muss.</li>
           </ul>
         </div>
