@@ -86,7 +86,7 @@ export default function HomePage({ latestArticles = [], bigCities = null }) {
     <>
       {/* HERO — solid Primary Blue mit integrierter Suche */}
       <section className="nv-surface-primary relative overflow-hidden">
-        <div className="nv-container py-16 sm:py-20 lg:py-24">
+        <div className="nv-container pb-16 pt-8 sm:pb-20 sm:pt-10 lg:pb-24 lg:pt-12">
           <div className="mx-auto max-w-3xl text-center">
             <h1 className="text-[38px] font-bold leading-[1.05] tracking-tight text-white sm:text-[48px] lg:text-[56px]">
               Ärzte in Ihrer Nähe finden
