@@ -17,7 +17,25 @@ module.exports = {
         }
       },
       extend: {
+        fontFamily: {
+          sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        },
         colors: {
+          /* Navoria Palette – solid, doctolib-inspiriert */
+          'nv-navy': '#073B5C',
+          'nv-navy-dark': '#052F49',
+          'nv-primary': '#0875C9',
+          'nv-primary-hover': '#0665AE',
+          'nv-primary-light': '#DDF0FC',
+          'nv-primary-soft': '#EFF8FE',
+          'nv-page': '#F4F8FB',
+          'nv-surface': '#FFFFFF',
+          'nv-text': '#17324A',
+          'nv-muted': '#607487',
+          'nv-border': '#D8E5EE',
+          'nv-success': '#168767',
+          'nv-warning': '#E59A16',
+          'nv-danger': '#C94A54',
           border: 'hsl(var(--border))',
           input: 'hsl(var(--input))',
           ring: 'hsl(var(--ring))',

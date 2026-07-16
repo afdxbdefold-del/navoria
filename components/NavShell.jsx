@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import MobileMenu from '@/components/MobileMenu';
 import { ConsentResetLink } from '@/components/ConsentBanner';
+import { Check, ArrowRight, Phone } from 'lucide-react';
 
 // Routen, auf denen das Navoria-Chrome (Announcement + Header + Footer) NICHT gerendert wird.
 // Praxis-eigene One-Page-Websites sollen eigenständig wirken.
@@ -30,32 +31,29 @@ export function NavShellBottom() {
   return <Footer />;
 }
 
-/** Prüft clientseitig, ob auf Standalone-Route – z.B. um ConsentBanner zu verstecken */
+/** Prüft clientseitig, ob auf Standalone-Route */
 export function useIsStandaloneRoute() {
   const pathname = usePathname();
   return isStandaloneRoute(pathname);
 }
 
+/* ---------- Announcement Bar: solid Primary-Blue ---------- */
 function AnnouncementBar() {
   return (
     <a
       href="/praxis-beanspruchen"
-      className="navoria-chrome-announce group block w-full border-b border-teal-200 bg-gradient-to-r from-teal-600 via-sky-700 to-sky-800 text-white transition hover:from-teal-700 hover:via-sky-800 hover:to-sky-900"
+      className="navoria-chrome-announce group block w-full transition-colors"
+      style={{ background: 'var(--color-primary)', color: '#ffffff' }}
       aria-label="Kostenloses Profil für Ihre Arztpraxis auf Navoria beanspruchen"
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-xs font-medium sm:gap-3 sm:text-sm">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 shrink-0" aria-hidden="true">
-          <path d="M20 7 9 18l-5-5" />
-        </svg>
+      <div className="mx-auto flex max-w-[1200px] items-center justify-center gap-2 px-4 py-2 text-center text-xs font-medium sm:gap-3 sm:text-sm">
+        <Check className="h-4 w-4 shrink-0" aria-hidden="true" />
         <span>
           <strong className="font-semibold">Sie sind Arzt oder Praxis-Team?</strong>{' '}
-          <span className="hidden sm:inline">Kostenloses Profil für Ihre Arztpraxis auf Navoria&nbsp;·</span>{' '}
-          <span className="sm:hidden">Kostenloses Profil beanspruchen</span>{' '}
-          <span className="inline-flex items-center gap-0.5 underline underline-offset-2 group-hover:no-underline">
-            <span className="hidden sm:inline">Jetzt Profil beanspruchen</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5" aria-hidden="true">
-              <path d="M5 12h14M13 5l7 7-7 7" />
-            </svg>
+          <span className="hidden sm:inline">Kostenloses Profil auf Navoria beanspruchen ·</span>{' '}
+          <span className="inline-flex items-center gap-1 underline-offset-2 group-hover:underline">
+            Jetzt beanspruchen
+            <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </span>
         </span>
       </div>
@@ -63,96 +61,171 @@ function AnnouncementBar() {
   );
 }
 
+/* ---------- Logo (weiß-kompatibel) ---------- */
+function LogoMark({ variant = 'dark' }) {
+  // Für dunkle Header: weißes Icon-Feld auf Navy; für Light: Primary-Blue
+  const bg = variant === 'dark' ? '#ffffff' : 'var(--color-primary)';
+  const fg = variant === 'dark' ? 'var(--color-primary)' : '#ffffff';
+  return (
+    <div
+      className="flex h-9 w-9 items-center justify-center rounded-lg"
+      style={{ background: bg, color: fg }}
+      aria-hidden="true"
+    >
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        <path d="M12 9v5M9.5 11.5h5" />
+      </svg>
+    </div>
+  );
+}
+
+/* ---------- Header: solid Navy ---------- */
 function Header() {
   return (
-    <header className="navoria-chrome w-full border-b border-slate-100 bg-white">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        <a href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-teal-500 text-white">
-            <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              <path d="M12 9v5M9.5 11.5h5" strokeWidth="2.2" />
-            </svg>
-          </div>
+    <header
+      className="navoria-chrome sticky top-0 z-30 w-full"
+      style={{ background: 'var(--color-navy)' }}
+    >
+      <div className="mx-auto flex h-[72px] max-w-[1200px] items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Logo + Wordmark */}
+        <a href="/" className="flex items-center gap-3 text-white" aria-label="Navoria Startseite">
+          <LogoMark variant="dark" />
           <div className="flex flex-col leading-none">
-            <span className="text-lg font-semibold tracking-tight text-slate-900">Navoria</span>
-            <span className="text-[10px] font-medium text-slate-500">Gesundheit verständlich.</span>
+            <span className="text-[19px] font-semibold tracking-tight">Navoria</span>
+            <span className="mt-0.5 text-[11px] font-medium" style={{ color: 'var(--color-primary-light)' }}>
+              Gesundheit verständlich.
+            </span>
           </div>
         </a>
-        <nav className="hidden items-center gap-6 text-sm font-medium text-slate-600 md:flex">
-          <a href="/" className="hover:text-sky-600">Start</a>
-          <a href="/magazin" className="hover:text-sky-600">Magazin</a>
-          <a href="/ratgeber" className="hover:text-sky-600">Ratgeber</a>
-          <a href="/symptome" className="hover:text-sky-600">Symptome</a>
-          <a href="/aerzte/fachrichtung" className="hover:text-sky-600">Fachrichtungen</a>
-          <a href="/finden" className="hover:text-sky-600">Praxis finden</a>
+
+        {/* Desktop Nav */}
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Hauptnavigation">
+          <NavLink href="/">Start</NavLink>
+          <NavLink href="/magazin">Magazin</NavLink>
+          <NavLink href="/ratgeber">Ratgeber</NavLink>
+          <NavLink href="/symptome">Symptome</NavLink>
+          <NavLink href="/aerzte/fachrichtung">Fachrichtungen</NavLink>
         </nav>
-        <MobileMenu />
+
+        {/* Rechte Aktionen */}
+        <div className="flex items-center gap-2">
+          <a
+            href="/finden"
+            className="hidden items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition md:inline-flex"
+            style={{ background: '#ffffff', color: 'var(--color-primary)' }}
+          >
+            Praxis finden
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </a>
+          <MobileMenu />
+        </div>
       </div>
     </header>
   );
 }
 
+function NavLink({ href, children }) {
+  return (
+    <a
+      href={href}
+      className="rounded-lg px-3 py-2 text-[14.5px] font-medium text-white/90 transition hover:bg-white/10 hover:text-white"
+    >
+      {children}
+    </a>
+  );
+}
+
+/* ---------- Footer: solid Navy ---------- */
 function Footer() {
   return (
-    <footer className="navoria-chrome mt-24 border-t border-slate-100 bg-slate-50">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-        <div className="grid gap-8 md:grid-cols-3 lg:grid-cols-5">
-          <div className="lg:col-span-1 md:col-span-3 lg:row-span-1">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-sky-500 to-teal-500 text-white">
-                <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                  <path d="M12 9v5M9.5 11.5h5" strokeWidth="2.2" />
-                </svg>
-              </div>
-              <span className="font-semibold text-slate-900">Navoria</span>
-            </div>
-            <p className="mt-3 text-sm text-slate-500">Verzeichnis für Arztpraxen in Deutschland.</p>
-            <p className="mt-2 text-xs text-slate-500">Betrieben von AF Consulting seit 2025.</p>
+    <footer
+      className="navoria-chrome mt-20"
+      style={{ background: 'var(--color-navy)', color: '#ffffff' }}
+    >
+      <div className="mx-auto max-w-[1200px] px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid gap-10 md:grid-cols-3 lg:grid-cols-5">
+          {/* Brand-Column */}
+          <div className="lg:col-span-2">
+            <a href="/" className="flex items-center gap-3">
+              <LogoMark variant="dark" />
+              <span className="text-lg font-semibold text-white">Navoria</span>
+            </a>
+            <p className="mt-4 max-w-sm text-[15px]" style={{ color: 'var(--color-primary-light)' }}>
+              Verzeichnis für Arztpraxen in Deutschland. Verständliche
+              Gesundheitsinformationen. Unabhängig, transparent, redaktionell geprüft.
+            </p>
+            <p className="mt-4 text-xs" style={{ color: 'rgba(221,240,252,0.6)' }}>
+              Betrieben von AF Consulting seit 2025.
+            </p>
           </div>
-          <div>
-            <h4 className="text-sm font-semibold text-slate-900">Suchen</h4>
-            <ul className="mt-3 space-y-2 text-sm text-slate-600">
-              <li><a className="hover:text-sky-600" href="/aerzte/fachrichtung/hausarzt">Hausarzt</a></li>
-              <li><a className="hover:text-sky-600" href="/aerzte/fachrichtung/zahnarzt">Zahnarzt</a></li>
-              <li><a className="hover:text-sky-600" href="/aerzte/fachrichtung/kardiologe">Kardiologe</a></li>
-              <li><a className="hover:text-sky-600" href="/aerzte/fachrichtung/orthopaede">Orthopäde</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-slate-900">Städte</h4>
-            <ul className="mt-3 space-y-2 text-sm text-slate-600">
-              <li><a className="hover:text-sky-600" href="/aerzte/berlin">Berlin</a></li>
-              <li><a className="hover:text-sky-600" href="/aerzte/hamburg">Hamburg</a></li>
-              <li><a className="hover:text-sky-600" href="/aerzte/muenchen">München</a></li>
-              <li><a className="hover:text-sky-600" href="/aerzte/koeln">Köln</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-slate-900">Über Navoria</h4>
-            <ul className="mt-3 space-y-2 text-sm text-slate-600">
-              <li><a className="hover:text-sky-600" href="/ueber-uns">Über uns</a></li>
-              <li><a className="hover:text-sky-600" href="/redaktionelle-standards">Redaktionelle Standards</a></li>
-              <li><a className="hover:text-sky-600" href="/korrekturen">Korrekturen melden</a></li>
-              <li><a className="hover:text-sky-600" href="mailto:mail@navoria.de">Kontakt</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-slate-900">Rechtliches</h4>
-            <ul className="mt-3 space-y-2 text-sm text-slate-600">
-              <li><a className="hover:text-sky-600" href="/impressum">Impressum</a></li>
-              <li><a className="hover:text-sky-600" href="/datenschutz">Datenschutz</a></li>
-              <li><a className="hover:text-sky-600" href="/barrierefreiheit">Barrierefreiheit</a></li>
-              <li><ConsentResetLink className="hover:text-sky-600" /></li>
-            </ul>
-            <p className="mt-4 text-xs text-slate-500">Betreiber: AF Consulting, 26789 Leer. Datenquelle: öffentliche Karten- und Verzeichnisdienste.</p>
-          </div>
+
+          <FooterCol title="Suchen">
+            <FooterLink href="/aerzte/fachrichtung/hausarzt">Hausarzt</FooterLink>
+            <FooterLink href="/aerzte/fachrichtung/zahnarzt">Zahnarzt</FooterLink>
+            <FooterLink href="/aerzte/fachrichtung/kardiologe">Kardiologe</FooterLink>
+            <FooterLink href="/aerzte/fachrichtung/orthopaede">Orthopäde</FooterLink>
+          </FooterCol>
+
+          <FooterCol title="Städte">
+            <FooterLink href="/aerzte/berlin">Berlin</FooterLink>
+            <FooterLink href="/aerzte/hamburg">Hamburg</FooterLink>
+            <FooterLink href="/aerzte/muenchen">München</FooterLink>
+            <FooterLink href="/aerzte/koeln">Köln</FooterLink>
+          </FooterCol>
+
+          <FooterCol title="Über Navoria">
+            <FooterLink href="/ueber-uns">Über uns</FooterLink>
+            <FooterLink href="/redaktionelle-standards">Redaktionelle Standards</FooterLink>
+            <FooterLink href="/korrekturen">Korrekturen melden</FooterLink>
+            <FooterLink href="mailto:mail@navoria.de">Kontakt</FooterLink>
+          </FooterCol>
         </div>
-        <div className="mt-8 border-t border-slate-200 pt-6 text-center text-xs text-slate-500">
-          Kein Ersatz für ärztliche Beratung. Bei akutem Notfall 112, bei dringenden Beschwerden 116 117. © {new Date().getFullYear()} Navoria · AF Consulting
+
+        {/* Rechtliche Zeile */}
+        <div
+          className="mt-14 flex flex-wrap items-center gap-x-6 gap-y-3 border-t pt-8 text-sm"
+          style={{ borderColor: 'rgba(255,255,255,0.14)', color: 'var(--color-primary-light)' }}
+        >
+          <a href="/impressum" className="hover:text-white">Impressum</a>
+          <a href="/datenschutz" className="hover:text-white">Datenschutz</a>
+          <a href="/barrierefreiheit" className="hover:text-white">Barrierefreiheit</a>
+          <ConsentResetLink className="hover:text-white" />
+          <span className="ml-auto text-xs" style={{ color: 'rgba(221,240,252,0.7)' }}>
+            © {new Date().getFullYear()} Navoria · AF Consulting
+          </span>
+        </div>
+
+        {/* Notfallzeile */}
+        <div
+          className="mt-6 flex flex-wrap items-center gap-2 rounded-xl px-4 py-3 text-xs"
+          style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(221,240,252,0.85)' }}
+        >
+          <Phone className="h-3.5 w-3.5" aria-hidden="true" />
+          <span>Kein Ersatz für ärztliche Beratung. Bei akutem Notfall <strong className="text-white">112</strong>, bei dringenden Beschwerden ärztlicher Bereitschaftsdienst <strong className="text-white">116 117</strong>.</span>
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterCol({ title, children }) {
+  return (
+    <div>
+      <h4 className="text-sm font-semibold uppercase tracking-wide text-white">{title}</h4>
+      <ul className="mt-4 space-y-2.5 text-[15px]" style={{ color: 'var(--color-primary-light)' }}>
+        {children}
+      </ul>
+    </div>
+  );
+}
+
+function FooterLink({ href, children }) {
+  return (
+    <li>
+      <a href={href} className="transition hover:text-white">
+        {children}
+      </a>
+    </li>
   );
 }

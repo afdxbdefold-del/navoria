@@ -97,38 +97,39 @@ export default async function ArticlePage({ params }) {
     : null;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+    <div className="nv-page-bg py-10">
+      <div className="mx-auto max-w-3xl px-4 sm:px-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
 
-      <nav className="mb-4 text-xs text-slate-500">
-        <Link href="/" className="hover:text-sky-700">Start</Link> <span>/</span>
-        <Link href="/magazin" className="hover:text-sky-700"> Magazin</Link> <span>/</span>
-        <span className="text-slate-700">{category?.label}</span>
+      <nav className="mb-4 text-xs nv-text-muted">
+        <Link href="/" className="hover:underline">Start</Link> <span>/</span>
+        <Link href="/magazin" className="hover:underline"> Magazin</Link> <span>/</span>
+        <span style={{ color: 'var(--color-navy)' }}>{category?.label}</span>
       </nav>
 
-      <Link href="/magazin" className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-sky-700">
+      <Link href="/magazin" className="inline-flex items-center gap-1 text-xs font-medium nv-text-muted hover:underline">
         <ArrowLeft className="h-3 w-3" /> Zurück zum Magazin
       </Link>
 
-      <div className="mt-6">
-        <div className="inline-flex items-center gap-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700">
+      <div className="mt-6 rounded-2xl bg-white p-6 sm:p-10" style={{ border: '1px solid var(--color-border)' }}>
+        <div className="nv-chip">
           <BookOpen className="h-3 w-3" /> {category?.label}
         </div>
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">{a.title}</h1>
-        <p className="mt-4 text-lg leading-relaxed text-slate-700">{a.lead}</p>
-        <div className="mt-6 flex flex-wrap items-center gap-4 border-y border-slate-200 py-3 text-xs text-slate-500">
-          <span className="font-medium text-slate-700">Navoria Redaktion</span>
-          <span className="text-slate-300">|</span>
+        <h1 className="mt-4 text-3xl font-bold tracking-tight sm:text-[42px]" style={{ color: 'var(--color-navy)', lineHeight: 1.15 }}>{a.title}</h1>
+        <p className="mt-4 text-lg leading-relaxed" style={{ color: 'var(--color-text)' }}>{a.lead}</p>
+        <div className="mt-6 flex flex-wrap items-center gap-4 border-y py-3 text-xs nv-text-muted" style={{ borderColor: 'var(--color-border)' }}>
+          <span className="font-medium" style={{ color: 'var(--color-text)' }}>Navoria Redaktion</span>
+          <span style={{ color: 'var(--color-border)' }}>|</span>
           <span>Veröffentlicht {formatDate(a.publishedAt)}</span>
           {a.updatedAt && (
             <>
-              <span className="text-slate-300">|</span>
+              <span style={{ color: 'var(--color-border)' }}>|</span>
               <span>Zuletzt redaktionell aktualisiert {formatDate(a.updatedAt)}</span>
             </>
           )}
-          <span className="text-slate-300">|</span>
+          <span style={{ color: 'var(--color-border)' }}>|</span>
           <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {a.readingMinutes} Min. Lesezeit</span>
         </div>
       </div>
@@ -137,17 +138,18 @@ export default async function ArticlePage({ params }) {
       <aside
         role="note"
         aria-label="Medizinischer Hinweis"
-        className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-[13px] leading-relaxed text-slate-700"
+        className="mt-6 rounded-xl p-4 text-[13px] leading-relaxed"
+        style={{ background: 'var(--color-primary-soft)', border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
       >
         <div className="flex items-start gap-2">
-          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
           <p>
-            Dieser Beitrag bietet allgemeine Gesundheitsinformationen. Er dient nicht der Selbstdiagnose oder Selbstbehandlung und ersetzt keine individuelle ärztliche oder pharmazeutische Beratung. Die Eignung und Dosierung von Medikamenten hängt unter anderem von Alter, Gewicht, Vorerkrankungen, Schwangerschaft und Begleitmedikation ab. Bei lebensbedrohlichen Beschwerden wählen Sie <a href="tel:112" className="font-semibold text-slate-900 underline underline-offset-2">112</a>. Bei dringenden, aber nicht lebensbedrohlichen Beschwerden erreichen Sie den ärztlichen Bereitschaftsdienst unter <a href="tel:116117" className="font-semibold text-slate-900 underline underline-offset-2">116 117</a>.
+            Dieser Beitrag bietet allgemeine Gesundheitsinformationen. Er dient nicht der Selbstdiagnose oder Selbstbehandlung und ersetzt keine individuelle ärztliche oder pharmazeutische Beratung. Die Eignung und Dosierung von Medikamenten hängt unter anderem von Alter, Gewicht, Vorerkrankungen, Schwangerschaft und Begleitmedikation ab. Bei lebensbedrohlichen Beschwerden wählen Sie <a href="tel:112" className="font-semibold underline underline-offset-2" style={{ color: 'var(--color-navy)' }}>112</a>. Bei dringenden, aber nicht lebensbedrohlichen Beschwerden erreichen Sie den ärztlichen Bereitschaftsdienst unter <a href="tel:116117" className="font-semibold underline underline-offset-2" style={{ color: 'var(--color-navy)' }}>116 117</a>.
           </p>
         </div>
       </aside>
 
-      <div className={`relative mt-8 h-64 w-full overflow-hidden rounded-2xl bg-slate-100 sm:h-96 ${a.heroImage ? '' : `bg-gradient-to-br ${a.heroGradient}`}`}>
+      <div className={`relative mt-8 h-64 w-full overflow-hidden rounded-2xl sm:h-96`} style={{ background: 'var(--color-primary-soft)' }}>
         {a.heroImage ? (
           <Image
             src={a.heroImage}
@@ -165,7 +167,7 @@ export default async function ArticlePage({ params }) {
         )}
       </div>
 
-      <article className="prose prose-slate mt-10 max-w-none">
+      <article className="prose prose-slate mt-10 max-w-none rounded-2xl bg-white p-6 sm:p-10" style={{ border: '1px solid var(--color-border)' }}>
         {a.sections.map((s, i) => (
           <RenderSection key={i} section={s} />
         ))}
@@ -276,6 +278,7 @@ export default async function ArticlePage({ params }) {
           </div>
         </section>
       )}
+      </div>
     </div>
   );
 }

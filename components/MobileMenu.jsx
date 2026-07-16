@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ArrowRight } from 'lucide-react';
 
 const LINKS = [
   { href: '/', label: 'Start' },
@@ -9,14 +9,12 @@ const LINKS = [
   { href: '/ratgeber', label: 'Ratgeber' },
   { href: '/symptome', label: 'Symptome' },
   { href: '/aerzte/fachrichtung', label: 'Fachrichtungen' },
-  { href: '/finden', label: 'Praxis finden' },
   { href: '/aerzte/bundesland', label: 'Nach Bundesland' },
 ];
 
 export default function MobileMenu() {
   const [open, setOpen] = useState(false);
 
-  // Body scroll lock while menu open
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
@@ -26,7 +24,6 @@ export default function MobileMenu() {
     return () => { document.body.style.overflow = ''; };
   }, [open]);
 
-  // Close on Escape
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
@@ -41,38 +38,47 @@ export default function MobileMenu() {
         aria-label={open ? 'Menü schließen' : 'Menü öffnen'}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 transition hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700 md:hidden"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-lg text-white transition hover:bg-white/10 lg:hidden"
       >
         {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
-      {/* Mobile Overlay Menu */}
       {open && (
         <>
-          {/* Backdrop */}
           <div
             aria-hidden="true"
-            className="fixed inset-0 top-16 z-40 bg-slate-900/40 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 top-[72px] z-40 bg-black/40 lg:hidden"
             onClick={() => setOpen(false)}
           />
-          {/* Slide-in Panel */}
           <nav
             aria-label="Mobile Navigation"
-            className="fixed inset-x-0 top-16 z-50 border-b border-slate-200 bg-white shadow-lg md:hidden"
+            className="fixed inset-x-0 top-[72px] z-50 shadow-lg lg:hidden"
+            style={{ background: 'var(--color-navy)' }}
           >
-            <ul className="mx-auto max-w-7xl divide-y divide-slate-100 px-4 py-2 sm:px-6">
+            <ul className="mx-auto max-w-[1200px] px-4 py-3 sm:px-6">
               {LINKS.map((l) => (
                 <li key={l.href}>
                   <a
                     href={l.href}
                     onClick={() => setOpen(false)}
-                    className="flex items-center justify-between py-3 text-base font-medium text-slate-800 hover:text-sky-700"
+                    className="flex items-center justify-between rounded-lg px-3 py-3.5 text-base font-medium text-white/90 transition hover:bg-white/10 hover:text-white"
                   >
                     {l.label}
-                    <span aria-hidden="true" className="text-slate-400">›</span>
+                    <span aria-hidden="true" className="text-white/50">›</span>
                   </a>
                 </li>
               ))}
+              <li className="mt-3 border-t pt-4" style={{ borderColor: 'rgba(255,255,255,0.14)' }}>
+                <a
+                  href="/finden"
+                  onClick={() => setOpen(false)}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-base font-semibold"
+                  style={{ background: '#ffffff', color: 'var(--color-primary)' }}
+                >
+                  Praxis finden
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </a>
+              </li>
             </ul>
           </nav>
         </>

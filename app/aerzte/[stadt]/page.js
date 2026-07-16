@@ -243,10 +243,10 @@ export default async function CityPage({ params }) {
 
 function StatCard({ label, value, sub }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
-      <div className="text-[11px] uppercase tracking-wide text-slate-500">{label}</div>
-      <div className="mt-1 text-lg font-semibold text-slate-900">{value}</div>
-      {sub && <div className="text-[11px] text-slate-500">{sub}</div>}
+    <div className="nv-stat">
+      <div className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: 'var(--color-text-muted)' }}>{label}</div>
+      <div className="mt-2 nv-stat-value">{value}</div>
+      {sub && <div className="mt-1 text-[12px]" style={{ color: 'var(--color-text-muted)' }}>{sub}</div>}
     </div>
   );
 }

@@ -1,25 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------------------------------------------------------
+   Navoria Design Tokens
+   Zentrale Design-System-Variablen. Doctolib-inspiriert (aber unabhängig):
+   solid blue, ruhig, medizinisch, vertrauenswürdig.
+--------------------------------------------------------------------------- */
 :root {
+  /* Legacy shadcn Kompatibilität – nicht entfernen */
   --background: 0 0% 100%;
   --foreground: 222 47% 11%;
+
+  /* Navoria Palette (solid) */
+  --color-navy: #073B5C;
+  --color-navy-dark: #052F49;
+  --color-primary: #0875C9;
+  --color-primary-hover: #0665AE;
+  --color-primary-light: #DDF0FC;
+  --color-primary-soft: #EFF8FE;
+  --color-page-background: #F4F8FB;
+  --color-surface: #FFFFFF;
+  --color-text: #17324A;
+  --color-text-muted: #607487;
+  --color-border: #D8E5EE;
+  --color-success: #168767;
+  --color-warning: #E59A16;
+  --color-danger: #C94A54;
 }
 
 html, body { height: 100%; }
-body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--color-text);
+  background-color: var(--color-page-background);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-/* Global accessible focus indicator – gilt für alle interaktiven Elemente,
-   die nicht bereits über eine spezifische focus-visible-Klasse verfügen.
-   WCAG 2.4.7 (Focus Visible) & 2.4.11 (Focus Not Obscured). */
+/* Globaler Fokus – WCAG 2.4.7 & 2.4.11 */
 @layer base {
   :focus-visible {
-    outline: 2px solid #0284c7; /* sky-600 */
+    outline: 2px solid var(--color-primary);
     outline-offset: 2px;
     border-radius: 6px;
   }
-  /* Reduzierte Bewegung respektieren – WCAG 2.3.3 */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
@@ -28,14 +57,184 @@ body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neu
       scroll-behavior: auto !important;
     }
   }
+  /* Grunddisziplin für Überschriften */
+  h1, h2, h3, h4, h5, h6 { color: var(--color-text); letter-spacing: -0.01em; }
 }
 
-/* Feine, ruhige Design-Tokens – innerhalb @layer components, damit Utility-Klassen (pl-9 etc.) überschreiben können */
+/* ---------------------------------------------------------------------------
+   Navoria Design-System Utility-Klassen
+   Wiederverwendbar für Buttons, Karten, Chips, Sektionen, Inputs.
+--------------------------------------------------------------------------- */
 @layer components {
-  .card-soft { @apply rounded-2xl border border-slate-100 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04),0_4px_16px_-8px_rgba(15,23,42,0.08)]; }
-  .chip { @apply inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700; }
-  .btn-primary { @apply inline-flex items-center justify-center rounded-xl bg-sky-700 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 disabled:opacity-60; }
-  .btn-secondary { @apply inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50; }
-  .input { @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100; }
-  .label { @apply text-xs font-semibold uppercase tracking-wide text-slate-500; }
+  /* Layout-Container */
+  .nv-container { @apply mx-auto w-full max-w-[1200px] px-4 sm:px-6 lg:px-8; }
+
+  /* Sektionen (Deckflächen, alternierend) */
+  .nv-section         { @apply py-14 sm:py-20 lg:py-24; }
+  .nv-section-tight   { @apply py-10 sm:py-14; }
+  .nv-surface-white   { background: var(--color-surface); color: var(--color-text); }
+  .nv-surface-soft    { background: var(--color-primary-soft); color: var(--color-text); }
+  .nv-surface-navy    { background: var(--color-navy); color: #ffffff; }
+  .nv-surface-primary { background: var(--color-primary); color: #ffffff; }
+  .nv-page-bg         { background: var(--color-page-background); }
+
+  /* Karten */
+  .nv-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+  .nv-card-lg { padding: 2rem; }
+  .nv-card-elevated {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(7, 59, 92, 0.08);
+    padding: 1.5rem;
+  }
+  .nv-panel-soft {
+    background: var(--color-primary-soft);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    color: var(--color-text);
+  }
+  .nv-panel-light {
+    background: var(--color-primary-light);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    color: var(--color-navy);
+  }
+
+  /* Buttons */
+  .nv-btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold transition;
+    height: 48px;
+    padding: 0 1.25rem;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1;
+  }
+  .nv-btn-lg { height: 52px; padding: 0 1.5rem; font-size: 16px; }
+  .nv-btn-sm { height: 40px; padding: 0 1rem; font-size: 14px; }
+  .nv-btn-primary {
+    background: var(--color-primary);
+    color: #ffffff;
+  }
+  .nv-btn-primary:hover { background: var(--color-primary-hover); }
+  .nv-btn-on-navy {
+    background: #ffffff;
+    color: var(--color-primary);
+  }
+  .nv-btn-on-navy:hover { background: var(--color-primary-light); color: var(--color-primary-hover); }
+  .nv-btn-outline-white {
+    background: transparent;
+    color: #ffffff;
+    border: 1.5px solid rgba(255,255,255,0.7);
+  }
+  .nv-btn-outline-white:hover { background: rgba(255,255,255,0.1); border-color: #ffffff; }
+  .nv-btn-secondary {
+    background: #ffffff;
+    color: var(--color-navy);
+    border: 1px solid var(--color-border);
+  }
+  .nv-btn-secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
+  .nv-btn-ghost {
+    background: transparent;
+    color: var(--color-navy);
+  }
+  .nv-btn-ghost:hover { color: var(--color-primary); }
+
+  /* Chips / Badges */
+  .nv-chip {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium;
+    background: var(--color-primary-light);
+    color: var(--color-navy);
+  }
+  .nv-chip-solid {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold;
+    background: var(--color-primary);
+    color: #ffffff;
+  }
+  .nv-badge {
+    @apply inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium;
+    background: var(--color-primary-light);
+    color: var(--color-navy);
+  }
+  .nv-badge-rating {
+    @apply inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold;
+    background: #FEF6D6; color: #7A5A11;
+  }
+  .nv-badge-success { background: #DFF3EB; color: #0C6249; }
+  .nv-badge-warning { background: #FDF0D7; color: #7A5D14; }
+
+  /* Statistik-Kachel */
+  .nv-stat {
+    background: var(--color-primary-light);
+    border-radius: 14px;
+    padding: 1.25rem 1.25rem;
+    color: var(--color-navy);
+  }
+  .nv-stat-value { @apply text-3xl font-bold leading-none; color: var(--color-navy); letter-spacing: -0.02em; }
+  .nv-stat-label { @apply mt-2 text-sm font-medium; color: var(--color-text-muted); }
+
+  /* Input */
+  .nv-input {
+    @apply block w-full outline-none transition;
+    background: #ffffff;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+  .nv-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(8, 117, 201, 0.15); }
+  .nv-input::placeholder { color: var(--color-text-muted); }
+
+  /* Text-Utilities */
+  .nv-text-muted { color: var(--color-text-muted); }
+  .nv-text-navy { color: var(--color-navy); }
+  .nv-link { color: var(--color-primary); text-decoration: underline; text-underline-offset: 2px; }
+  .nv-link:hover { color: var(--color-primary-hover); }
+
+  /* Divider */
+  .nv-divider { border-top: 1px solid var(--color-border); }
+
+  /* Legacy Aliase (Kompatibilität mit bestehenden Klassen) */
+  .card-soft {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(15,23,42,0.03), 0 4px 16px -8px rgba(7,59,92,0.06);
+  }
+  .chip {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium;
+    background: var(--color-primary-light);
+    color: var(--color-navy);
+    border: 1px solid transparent;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white transition;
+    background: var(--color-primary);
+  }
+  .btn-primary:hover { background: var(--color-primary-hover); }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition;
+    background: #ffffff;
+    color: var(--color-navy);
+    border: 1px solid var(--color-border);
+  }
+  .btn-secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
+  .input {
+    @apply block w-full outline-none transition;
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 15px;
+    color: var(--color-text);
+  }
+  .input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(8, 117, 201, 0.15); }
+  .label { @apply text-xs font-semibold uppercase tracking-wide; color: var(--color-text-muted); }
 }
