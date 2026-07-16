@@ -67,15 +67,12 @@ export default async function HomePage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
 
-      {/* HERO — solid Navy, links-ausgerichtet, Doctolib-inspiriert */}
-      <section className="nv-surface-navy relative overflow-hidden">
+      {/* HERO — solid Primary Blue, links-ausgerichtet, Doctolib-inspiriert */}
+      <section className="nv-surface-primary relative overflow-hidden">
         <div className="nv-container py-16 sm:py-20 lg:py-24">
           <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_420px]">
             <div>
-              <p className="text-sm font-semibold tracking-wide" style={{ color: 'var(--color-primary-light)' }}>
-                Redaktionelles Gesundheits-Magazin
-              </p>
-              <h1 className="mt-4 text-[38px] font-bold leading-[1.05] tracking-tight text-white sm:text-[48px] lg:text-[56px]">
+              <h1 className="text-[38px] font-bold leading-[1.05] tracking-tight text-white sm:text-[48px] lg:text-[56px]">
                 Gesundheit ohne Fachchinesisch
               </h1>
               <p className="mt-5 max-w-xl text-[17px] leading-relaxed sm:text-[18px]" style={{ color: 'var(--color-primary-light)' }}>
@@ -248,8 +245,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* FACHRICHTUNGEN — Navy Konversions-Sektion */}
-      <section className="nv-surface-navy">
+      {/* FACHRICHTUNGEN — Primary Blue Konversions-Sektion */}
+      <section className="nv-surface-primary">
         <div className="nv-container nv-section">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold" style={{ color: 'var(--color-primary-light)' }}>Von A bis Z</p>

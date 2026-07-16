@@ -53,7 +53,7 @@ export default function MobileMenu() {
           <nav
             aria-label="Mobile Navigation"
             className="fixed inset-x-0 top-[72px] z-50 shadow-lg lg:hidden"
-            style={{ background: 'var(--color-navy)' }}
+            style={{ background: 'var(--color-primary)' }}
           >
             <ul className="mx-auto max-w-[1200px] px-4 py-3 sm:px-6">
               {LINKS.map((l) => (

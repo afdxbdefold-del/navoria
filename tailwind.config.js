@@ -24,8 +24,8 @@ module.exports = {
           /* Navoria Palette – solid, doctolib-inspiriert */
           'nv-navy': '#073B5C',
           'nv-navy-dark': '#052F49',
-          'nv-primary': '#0875C9',
-          'nv-primary-hover': '#0665AE',
+          'nv-primary': '#0F7ACA',
+          'nv-primary-hover': '#0C68AF',
           'nv-primary-light': '#DDF0FC',
           'nv-primary-soft': '#EFF8FE',
           'nv-page': '#F4F8FB',

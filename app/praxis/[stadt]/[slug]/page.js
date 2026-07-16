@@ -338,11 +338,11 @@ export default async function ProfilePage({ params }) {
         <span className="text-slate-700">{displayName}</span>
       </nav>
 
-      {/* 2. Hero — Navy-Header nach Doctolib-Muster (aber unabhängig branded) */}
+      {/* 2. Hero — Primary Blue Header nach Doctolib-Muster (aber unabhängig branded) */}
       <header className="-mx-4 sm:-mx-6">
         <div
           className="relative overflow-hidden px-4 pb-16 pt-4 sm:px-6 sm:pb-20 sm:pt-6"
-          style={{ background: 'var(--color-navy)' }}
+          style={{ background: 'var(--color-primary)' }}
         >
           {/* Top-Bar: Zurück-Pfeil links, Favorit-Stern rechts */}
           <div className="mx-auto flex max-w-4xl items-center justify-between">

@@ -92,7 +92,7 @@ function Header() {
   return (
     <header
       className="navoria-chrome sticky top-0 z-30 w-full"
-      style={{ background: 'var(--color-navy)' }}
+      style={{ background: 'var(--color-primary)' }}
     >
       <div className="mx-auto flex h-[72px] max-w-[1200px] items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo + Wordmark */}
@@ -148,7 +148,7 @@ function Footer() {
   return (
     <footer
       className="navoria-chrome mt-20"
-      style={{ background: 'var(--color-navy)', color: '#ffffff' }}
+      style={{ background: 'var(--color-primary)', color: '#ffffff' }}
     >
       <div className="mx-auto max-w-[1200px] px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-3 lg:grid-cols-5">
