@@ -44,6 +44,12 @@ const nextConfig = {
       { source: '/.well-known/mcp', destination: '/api/mcp' },
     ];
   },
+  async redirects() {
+    return [
+      // /finden Content ist jetzt die Startseite — 301 Permanent
+      { source: '/finden', destination: '/', permanent: true },
+    ];
+  },
 };
 
 module.exports = nextConfig;

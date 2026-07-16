@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, MapPin, Stethoscope, Heart, Baby, Smile, Eye, Ear, Bone, Brain, Sparkles, ArrowRight, Info, HeartPulse, BookOpen } from 'lucide-react';
+import { Search, MapPin, Stethoscope, Heart, Baby, Smile, Eye, Ear, Bone, Brain, Sparkles, ArrowRight, Info, HeartPulse, BookOpen, Clock, Newspaper } from 'lucide-react';
+import { ArticleCard, labelForCategory } from '@/components/MagazineCard';
 
 const POPULAR_SPECIALTIES = [
   { name: 'Hausarzt', icon: Stethoscope, slug: 'hausarzt' },
@@ -47,7 +48,7 @@ const POPULAR_SYMPTOMS = [
   { label: 'Herzstolpern', slug: 'herzstolpern' },
 ];
 
-export default function HomePage() {
+export default function HomePage({ latestArticles = [] }) {
   const router = useRouter();
   const [q, setQ] = useState('');
   const [ort, setOrt] = useState('');
@@ -146,6 +147,38 @@ export default function HomePage() {
           </p>
         </div>
       </section>
+
+      {/* AKTUELL IM MAGAZIN — 3 neueste Artikel */}
+      {latestArticles && latestArticles.length > 0 && (
+        <section className="nv-surface-white">
+          <div className="nv-container nv-section-tight">
+            <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold" style={{ color: 'var(--color-primary)' }}>Neu im Magazin</p>
+                <h2 className="mt-2 flex items-center gap-2 text-2xl font-bold sm:text-3xl" style={{ color: 'var(--color-navy)' }}>
+                  <Newspaper className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
+                  Aktuelle Artikel
+                </h2>
+                <p className="mt-2 text-[15px] nv-text-muted">
+                  Redaktionell geprüfte Gesundheits-Beiträge — verständlich und alltagstauglich.
+                </p>
+              </div>
+              <a
+                href="/magazin"
+                className="inline-flex items-center gap-1 text-sm font-semibold"
+                style={{ color: 'var(--color-primary)' }}
+              >
+                Alle Artikel <ArrowRight className="h-3.5 w-3.5" />
+              </a>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {latestArticles.slice(0, 3).map((a) => (
+                <ArticleCard key={a.slug} article={a} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Symptom-Assistent — White Surface Card */}
       <section className="nv-surface-white">
