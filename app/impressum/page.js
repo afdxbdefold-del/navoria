@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'Impressum',
-  description: 'Impressum und Anbieterkennzeichnung nach § 5 TMG für Navoria.',
+  description: 'Impressum und Anbieterkennzeichnung nach § 5 DDG für Navoria.',
   alternates: { canonical: '/impressum' },
   robots: { index: true, follow: false },
 };
@@ -15,21 +15,17 @@ export default function ImpressumPage() {
       </nav>
 
       <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Impressum</h1>
-      <p className="mt-2 text-sm text-slate-500">Angaben gemäß § 5 TMG</p>
+      <p className="mt-2 text-sm text-slate-500">Angaben gemäß § 5 DDG</p>
 
       <section className="mt-8 space-y-6 text-slate-700">
         <div>
           <h2 className="text-base font-semibold text-slate-900">Anbieter</h2>
           <address className="not-italic mt-2 leading-relaxed">
-            AF Consulting<br />
+            Andreas Frey<br />
+            handelnd unter AF Consulting<br />
             Am Nesseufer 1<br />
             26789 Leer
           </address>
-        </div>
-
-        <div>
-          <h2 className="text-base font-semibold text-slate-900">Vertreten durch</h2>
-          <p className="mt-2">Andreas Frey</p>
         </div>
 
         <div>
@@ -76,10 +72,8 @@ export default function ImpressumPage() {
         </div>
 
         <div>
-          <h2 className="text-base font-semibold text-slate-900">Streitschlichtung</h2>
+          <h2 className="text-base font-semibold text-slate-900">Verbraucherstreitbeilegung</h2>
           <p className="mt-2">
-            Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:{' '}
-            <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noreferrer" className="text-sky-700 hover:underline">https://ec.europa.eu/consumers/odr/</a>.
             Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer
             Verbraucherschlichtungsstelle teilzunehmen.
           </p>

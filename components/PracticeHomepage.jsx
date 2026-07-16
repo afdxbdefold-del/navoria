@@ -195,7 +195,7 @@ export default function PracticeHomepage({ doctor }) {
           <h2 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-4xl">Impressum</h2>
 
           <div className="mt-10 space-y-8 text-sm text-slate-700 sm:text-base">
-            <ImpressumSection title="Angaben gemäß § 5 DDG (Digitale-Dienste-Gesetz) / § 5 TMG">
+            <ImpressumSection title="Angaben gemäß § 5 DDG">
               <p itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
                 <strong itemProp="name">{name}</strong><br />
                 {berufsbezeichnung.full}<br />
@@ -238,8 +238,7 @@ export default function PracticeHomepage({ doctor }) {
             </ImpressumSection>
 
             <ImpressumSection title="Streitschlichtung">
-              <p>Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer" className="text-emerald-700 underline underline-offset-2">ec.europa.eu/consumers/odr</a>.</p>
-              <p className="mt-3">Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+              <p>Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
             </ImpressumSection>
 
             <ImpressumSection title="Haftung für Inhalte">

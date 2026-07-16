@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { articleBySlug, MAGAZINE_ARTICLES, categoryBySlug } from '@/lib/magazineArticles';
 import { specialtyBySlug } from '@/lib/specialties';
 import { getBaseUrl } from '@/lib/baseUrl';
-import { Clock, ArrowLeft, ArrowRight, Info, AlertTriangle, CheckCircle2, HelpCircle, BookOpen } from 'lucide-react';
+import { Clock, ArrowLeft, ArrowRight, Info, AlertTriangle, CheckCircle2, HelpCircle, BookOpen, ShieldAlert, ExternalLink, Phone } from 'lucide-react';
 import { CategoryEmoji, labelForCategory, formatDate } from '@/components/MagazineCard';
 
 export const revalidate = 3600;
@@ -122,16 +122,30 @@ export default async function ArticlePage({ params }) {
           <span className="font-medium text-slate-700">Navoria Redaktion</span>
           <span className="text-slate-300">|</span>
           <span>Veröffentlicht {formatDate(a.publishedAt)}</span>
-          {a.updatedAt && a.updatedAt !== a.publishedAt && (
+          {a.updatedAt && (
             <>
               <span className="text-slate-300">|</span>
-              <span>Aktualisiert {formatDate(a.updatedAt)}</span>
+              <span>Zuletzt redaktionell aktualisiert {formatDate(a.updatedAt)}</span>
             </>
           )}
           <span className="text-slate-300">|</span>
           <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {a.readingMinutes} Min. Lesezeit</span>
         </div>
       </div>
+
+      {/* Globaler medizinischer Hinweis – erscheint auf jedem Artikel direkt nach dem Lead */}
+      <aside
+        role="note"
+        aria-label="Medizinischer Hinweis"
+        className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-[13px] leading-relaxed text-slate-700"
+      >
+        <div className="flex items-start gap-2">
+          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+          <p>
+            Dieser Beitrag bietet allgemeine Gesundheitsinformationen. Er dient nicht der Selbstdiagnose oder Selbstbehandlung und ersetzt keine individuelle ärztliche oder pharmazeutische Beratung. Die Eignung und Dosierung von Medikamenten hängt unter anderem von Alter, Gewicht, Vorerkrankungen, Schwangerschaft und Begleitmedikation ab. Bei lebensbedrohlichen Beschwerden wählen Sie <a href="tel:112" className="font-semibold text-slate-900 underline underline-offset-2">112</a>. Bei dringenden, aber nicht lebensbedrohlichen Beschwerden erreichen Sie den ärztlichen Bereitschaftsdienst unter <a href="tel:116117" className="font-semibold text-slate-900 underline underline-offset-2">116 117</a>.
+          </p>
+        </div>
+      </aside>
 
       <div className={`relative mt-8 h-64 w-full overflow-hidden rounded-2xl bg-slate-100 sm:h-96 ${a.heroImage ? '' : `bg-gradient-to-br ${a.heroGradient}`}`}>
         {a.heroImage ? (
@@ -197,10 +211,32 @@ export default async function ArticlePage({ params }) {
       {a.sources && a.sources.length > 0 && (
         <section className="mt-10 rounded-xl border border-slate-200 bg-white p-4 text-xs text-slate-500">
           <p className="font-semibold text-slate-700">Quellen und Leitlinien</p>
-          <ul className="mt-2 list-disc space-y-1 pl-5">
-            {a.sources.map((s, i) => (
-              <li key={i}>{s}</li>
-            ))}
+          <ul className="mt-2 list-disc space-y-1.5 pl-5">
+            {a.sources.map((s, i) => {
+              // Legacy: einfacher String
+              if (typeof s === 'string') return <li key={i}>{s}</li>;
+              // Neues Schema: { publisher, title, version?, url?, accessed? }
+              const label = [s.publisher, s.title].filter(Boolean).join(' – ');
+              return (
+                <li key={i} className="leading-relaxed">
+                  {s.url ? (
+                    <a
+                      href={s.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sky-700 underline underline-offset-2 hover:text-sky-800"
+                    >
+                      {label || s.url}
+                    </a>
+                  ) : (
+                    <span className="text-slate-700">{label}</span>
+                  )}
+                  {s.version && <span className="ml-1 text-slate-500">({s.version})</span>}
+                  {s.accessed && <span className="ml-1 text-slate-400"> · abgerufen {s.accessed}</span>}
+                  {s.url && <ExternalLink className="ml-1 inline h-3 w-3 text-slate-400" aria-hidden="true" />}
+                </li>
+              );
+            })}
           </ul>
           <p className="mt-3 text-[11px] italic text-slate-400">
             Redaktioneller Hinweis: Dieser Artikel ist eine informierende Aufbereitung und ersetzt keine ärztliche Beratung. Bei konkreten Beschwerden fragen Sie Ihren Haus- oder Facharzt.
@@ -269,10 +305,16 @@ function RenderSection({ section }) {
       info: { bg: 'bg-sky-50', border: 'border-sky-200', icon: <Info className="h-4 w-4 text-sky-700" />, textColor: 'text-sky-900' },
       warning: { bg: 'bg-amber-50', border: 'border-amber-200', icon: <AlertTriangle className="h-4 w-4 text-amber-700" />, textColor: 'text-amber-900' },
       success: { bg: 'bg-emerald-50', border: 'border-emerald-200', icon: <CheckCircle2 className="h-4 w-4 text-emerald-700" />, textColor: 'text-emerald-900' },
+      emergency: { bg: 'bg-red-50', border: 'border-red-300', icon: <Phone className="h-4 w-4 text-red-700" />, textColor: 'text-red-900' },
     };
     const t = toneMap[section.tone] || toneMap.info;
+    const isEmergency = section.tone === 'emergency';
     return (
-      <div className={`mt-6 rounded-2xl border ${t.border} ${t.bg} p-5`}>
+      <div
+        role={isEmergency ? 'alert' : undefined}
+        aria-label={isEmergency ? 'Notfallhinweis' : undefined}
+        className={`mt-6 rounded-2xl border ${t.border} ${t.bg} p-5`}
+      >
         <div className={`flex items-center gap-2 text-sm font-semibold ${t.textColor}`}>
           {t.icon}
           <span>{section.title}</span>

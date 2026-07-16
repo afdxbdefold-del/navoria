@@ -65,9 +65,14 @@ export default function RedaktionellePage() {
       <h2 className={h2}>7. Beschwerden und Widersprüche</h2>
       <p className={p}>Betreiber einer Praxis, die ihren Eintrag geändert, entfernt oder unter eigener Kontrolle sehen möchten, kontaktieren <a href="mailto:mail@navoria.de" className={a}>mail@navoria.de</a>. Bearbeitung werktags, in der Regel innerhalb von zwei Arbeitstagen. Bis zur Klärung können einzelne Einträge temporär offline genommen werden.</p>
 
-      <h2 className={h2}>8. Änderungen an diesen Standards</h2>
+      <h2 className={h2}>8. Gesundheitsmagazin</h2>
+      <p className={p}>Die Beiträge im Navoria-Gesundheitsmagazin dienen der allgemeinen Gesundheitsinformation. Medizinische Aussagen werden anhand öffentlich zugänglicher Leitlinien und Informationen anerkannter Institutionen erstellt und redaktionell geprüft. Als Quellen werden vorrangig AWMF-Leitlinien, G-BA, KBV, RKI, BfArM, BfS, STIKO und medizinische Fachgesellschaften verwendet.</p>
+      <p className={p}>Die Beiträge ersetzen keine individuelle Diagnose oder Behandlung. Medikamentendosierungen und konkrete Therapieentscheidungen werden nur dargestellt, wenn dies für das Verständnis erforderlich ist und die notwendige Einordnung zu Risiken, Gegenanzeigen und ärztlicher Beratung möglich ist.</p>
+      <p className={p}>Jeder Beitrag trägt ein Veröffentlichungsdatum und nach einer wesentlichen Überarbeitung ein Aktualisierungsdatum. Abgelaufene Leitlinien, geänderte Kassenleistungen und neue Sicherheitsinformationen werden bei der Aktualisierung berücksichtigt. Fehler können über die Korrekturfunktion oder per E-Mail an <a href="mailto:mail@navoria.de" className={a}>mail@navoria.de</a> gemeldet werden.</p>
+
+      <h2 className={h2}>9. Änderungen an diesen Standards</h2>
       <p className={p}>Diese Seite kann sich ändern, wenn sich Prozesse ändern. Wesentliche Änderungen werden im Abschnitt <em>Zuständigkeit</em> mit einem Datum markiert.</p>
-      <p className="mt-3 text-sm text-slate-500">Stand: Juli 2026.</p>
+      <p className="mt-3 text-sm text-slate-500">Stand: Februar 2026.</p>
     </div>
   );
 }
