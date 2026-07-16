@@ -74,20 +74,22 @@ function LogoD({ size = 40, color = '#0875C9', bg = '#ffffff' }) {
   );
 }
 
-// E: N-Blossom
+// E: N-Blossom — vollständiges N mit „Blossom"-Punkt am oberen Ende der rechten Säule
 function LogoE({ size = 40, color = '#0875C9', bg = '#ffffff' }) {
   return (
     <svg viewBox="0 0 40 40" width={size} height={size} aria-hidden="true">
       <rect x="2" y="2" width="36" height="36" rx="12" fill={color} />
+      {/* Vollständiges N: linke Säule aufwärts, Diagonale abwärts, rechte Säule aufwärts */}
       <path
-        d="M12 28 V13 C12 12 12.7 11.5 13.6 12.1 L27 22.5 V13"
+        d="M12 28 V13 L28 28 V14"
         stroke={bg}
-        strokeWidth="3"
+        strokeWidth="3.2"
         strokeLinecap="round"
         strokeLinejoin="round"
         fill="none"
       />
-      <circle cx="27" cy="12.5" r="2.5" fill={bg} />
+      {/* Blossom-Punkt über der rechten Säule */}
+      <circle cx="28" cy="10.2" r="2.6" fill={bg} />
     </svg>
   );
 }
