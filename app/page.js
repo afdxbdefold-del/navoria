@@ -73,12 +73,11 @@ export default async function HomePage() {
           <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_420px]">
             <div>
               <h1 className="text-[38px] font-bold leading-[1.05] tracking-tight text-white sm:text-[48px] lg:text-[56px]">
-                Gesundheit ohne Fachchinesisch
+                Ärzte in Ihrer Nähe finden
               </h1>
               <p className="mt-5 max-w-xl text-[17px] leading-relaxed sm:text-[18px]" style={{ color: 'var(--color-primary-light)' }}>
-                Was tun bei Rückenschmerzen im Homeoffice? Ab wann ist ein Hautkrebs-Screening
-                sinnvoll? Wir schreiben über die Themen, die Sie im Alltag betreffen.
-                Verständlich, sorgfältig recherchiert und ohne Panikmache.
+                Navoria verbindet eine deutschlandweite Arztsuche mit sorgfältig
+                recherchierten Ratgebern und aktuellen Beiträgen aus dem Gesundheitsmagazin.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
