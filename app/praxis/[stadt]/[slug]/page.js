@@ -450,19 +450,20 @@ export default async function ProfilePage({ params }) {
           </div>
         </div>
 
-        {/* Telefon-CTA — statt „Termin buchen" die tatsächliche Rufnummer */}
+        {/* Telefon-CTA — weißer Button mit blauem Text auf blauem Hero-Hintergrund */}
         {phone ? (
-          <div className="-mx-4 sm:-mx-6">
+          <div className="relative -mx-4 sm:-mx-6" style={{ zIndex: 10 }}>
             <div className="mx-auto max-w-4xl px-4 sm:px-6" style={{ marginTop: '-32px' }}>
               <a
                 href={`tel:${phone}`}
                 className="flex w-full items-center justify-center gap-3 rounded-2xl px-6 text-base font-bold uppercase tracking-wide transition sm:text-lg"
                 style={{
                   height: '64px',
-                  background: 'var(--color-primary)',
-                  color: '#ffffff',
-                  boxShadow: '0 12px 28px rgba(7, 59, 92, 0.22)',
+                  background: '#ffffff',
+                  color: 'var(--color-primary)',
+                  boxShadow: '0 14px 32px rgba(7, 59, 92, 0.28)',
                   letterSpacing: '0.04em',
+                  border: '1px solid rgba(15, 122, 202, 0.15)',
                 }}
               >
                 <Phone className="h-5 w-5" aria-hidden="true" />
