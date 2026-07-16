@@ -3,7 +3,7 @@ import { notFound, redirect, permanentRedirect } from 'next/navigation';
 import Link from 'next/link';
 import {
   Phone, Globe, MapPin, ExternalLink, Clock, ShieldAlert, Info, CalendarClock,
-  Accessibility, CreditCard, ParkingCircle, HelpCircle, Stethoscope, ArrowRight, RefreshCw, BadgeCheck,
+  Accessibility, CreditCard, ParkingCircle, HelpCircle, Stethoscope, ArrowRight, ArrowLeft, RefreshCw, BadgeCheck, Star, Mail, Building2,
 } from 'lucide-react';
 import CopyButton from '@/components/CopyButton';
 import CorrectionButton from '@/components/CorrectionButton';
@@ -338,83 +338,218 @@ export default async function ProfilePage({ params }) {
         <span className="text-slate-700">{displayName}</span>
       </nav>
 
-      {/* 2. Hero */}
-      <header className="rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-sky-50/40 p-6 sm:p-8">
-        <div className="flex flex-wrap items-center gap-2">
-          {specialty && <span className="inline-flex items-center gap-1 rounded-full border border-sky-100 bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-700"><Stethoscope className="h-3 w-3" />{specialty}</span>}
-          {humanizedType && humanizedType !== specialty && humanizedType !== `${specialty}praxis` && (
-            <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600">{humanizedType}</span>
-          )}
-          {d.business_status === 'OPERATIONAL' && <span className="inline-flex items-center rounded-full border border-emerald-100 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">Aktiv</span>}
-          {d.is_verified && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800" title="Vom Praxis-Team oder redaktionell bestätigt">
-              <BadgeCheck className="h-3.5 w-3.5" /> Verifiziert
+      {/* 2. Hero — Navy-Header nach Doctolib-Muster (aber unabhängig branded) */}
+      <header className="-mx-4 sm:-mx-6">
+        <div
+          className="relative overflow-hidden px-4 pb-16 pt-4 sm:px-6 sm:pb-20 sm:pt-6"
+          style={{ background: 'var(--color-navy)' }}
+        >
+          {/* Top-Bar: Zurück-Pfeil links, Favorit-Stern rechts */}
+          <div className="mx-auto flex max-w-4xl items-center justify-between">
+            <Link
+              href={city ? `/aerzte/${d.city_slug}` : '/aerzte'}
+              aria-label="Zurück"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white/90 transition hover:bg-white/10"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+            <span
+              aria-hidden="true"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-white/90"
+              title="Favorit"
+            >
+              <Star className="h-5 w-5" />
             </span>
-          )}
-          {d.rating != null && (
-            <RatingBadge rating={d.rating} count={d.user_rating_count} size="md" showAttribution={false} />
-          )}
-          {openNow === true && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800"><span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />Jetzt geöffnet</span>}
-          {openNow === false && <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-xs font-medium text-slate-600"><span className="inline-block h-1.5 w-1.5 rounded-full bg-slate-400" />Aktuell geschlossen{nextOpen ? ` · öffnet ${nextOpen.dayLabel} ${String(nextOpen.hour).padStart(2, '0')}:${String(nextOpen.minute).padStart(2, '0')}` : ''}</span>}
+          </div>
+
+          {/* Zentrierter Avatar-Kreis */}
+          <div className="mx-auto mt-4 flex max-w-4xl flex-col items-center text-center">
+            <div
+              className="flex h-24 w-24 items-center justify-center rounded-full sm:h-28 sm:w-28"
+              style={{ background: '#ffffff', boxShadow: '0 8px 24px rgba(0,0,0,0.18)' }}
+              aria-hidden="true"
+            >
+              <span
+                className="text-2xl font-bold uppercase tracking-wide sm:text-3xl"
+                style={{ color: 'var(--color-navy)' }}
+              >
+                {(displayName || '?')
+                  .replace(/^(dr\.?|prof\.?|med\.?)\s+/i, '')
+                  .split(/\s+/)
+                  .filter(Boolean)
+                  .slice(0, 2)
+                  .map((w) => w[0])
+                  .join('')
+                  .slice(0, 2)}
+              </span>
+            </div>
+
+            {/* Praxis-Name */}
+            <h1 className="mt-5 max-w-3xl text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-[34px]">
+              {(() => {
+                // title_prefix wird grau vorangestellt, sichtbaren Namen ggf. bereinigen.
+                const prefix = nameParts.title_prefix;
+                let visible = displayName;
+                if (prefix) {
+                  const normPrefix = prefix.toLowerCase().replace(/\s+/g, ' ').trim();
+                  const normVisible = visible.toLowerCase().replace(/\s+/g, ' ').trim();
+                  if (normVisible.startsWith(normPrefix)) {
+                    visible = visible.slice(prefix.length).replace(/^\s+/, '').replace(/^[-,·|]+\s*/, '');
+                  }
+                }
+                return (
+                  <>
+                    {prefix ? <span style={{ color: 'var(--color-primary-light)', fontWeight: 500 }}>{prefix} </span> : null}
+                    {visible}
+                  </>
+                );
+              })()}
+            </h1>
+
+            {/* Praxis-Typ-Chip */}
+            <p
+              className="mt-3 inline-flex items-center gap-2 text-[15px] font-medium"
+              style={{ color: 'var(--color-primary-light)' }}
+            >
+              <Building2 className="h-4 w-4" aria-hidden="true" />
+              <span>{humanizedType || 'Einzelpraxis'}</span>
+            </p>
+
+            {/* Fachrichtung + Stadt-Unterzeile */}
+            {(specialty || city) && (
+              <p className="mt-1 text-sm text-white/70">
+                {specialty}
+                {specialty && city ? ' · ' : ''}
+                {city ? city : ''}
+              </p>
+            )}
+
+            {/* Meta-Chips: Rating / Status */}
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+              {d.rating != null && (
+                <RatingBadge rating={d.rating} count={d.user_rating_count} size="md" showAttribution={false} />
+              )}
+              {openNow === true && (
+                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold" style={{ background: 'rgba(22,135,103,0.15)', color: '#8FEBBF' }}>
+                  <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: '#8FEBBF' }} />
+                  Jetzt geöffnet
+                </span>
+              )}
+              {openNow === false && (
+                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium" style={{ background: 'rgba(255,255,255,0.14)', color: '#ffffff' }}>
+                  <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.6)' }} />
+                  Aktuell geschlossen{nextOpen ? ` · öffnet ${nextOpen.dayLabel} ${String(nextOpen.hour).padStart(2, '0')}:${String(nextOpen.minute).padStart(2, '0')}` : ''}
+                </span>
+              )}
+              {d.is_verified && (
+                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold" style={{ background: 'rgba(255,255,255,0.14)', color: '#ffffff' }} title="Vom Praxis-Team oder redaktionell bestätigt">
+                  <BadgeCheck className="h-3.5 w-3.5" /> Verifiziert
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
-        <h1 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-          {(() => {
-            // title_prefix wird grau vorangestellt. displayName enthält den Titel häufig noch mit,
-            // was zu "Dr. med. Dr. med. …"-Verdopplungen führt. Wir entfernen ihn deshalb hier
-            // aus dem sichtbaren Namen, wenn er identisch/case-insensitive vorne steht.
-            const prefix = nameParts.title_prefix;
-            let visible = displayName;
-            if (prefix) {
-              // Normalisieren (Case + überflüssige Leerzeichen ignorieren) für den Vergleich
-              const normPrefix = prefix.toLowerCase().replace(/\s+/g, ' ').trim();
-              const normVisible = visible.toLowerCase().replace(/\s+/g, ' ').trim();
-              if (normVisible.startsWith(normPrefix)) {
-                visible = visible.slice(prefix.length).replace(/^\s+/, '').replace(/^[-,·|]+\s*/, '');
-              }
-            }
-            return (
-              <>
-                {prefix ? <span className="text-slate-500 font-medium">{prefix} </span> : null}
-                {visible}
-              </>
-            );
-          })()}
-        </h1>
-        {specialty && (
-          <p className="mt-1 text-base text-slate-600">
-            {specialty}
-            {humanizedType && humanizedType !== specialty && humanizedType !== `${specialty}praxis` ? ` · ${humanizedType}` : ''}
-            {city ? ` in ${city}` : ''}
-          </p>
+        {/* Telefon-CTA — statt „Termin buchen" die tatsächliche Rufnummer */}
+        {phone ? (
+          <div className="-mx-4 sm:-mx-6">
+            <div className="mx-auto max-w-4xl px-4 sm:px-6" style={{ marginTop: '-32px' }}>
+              <a
+                href={`tel:${phone}`}
+                className="flex w-full items-center justify-center gap-3 rounded-2xl px-6 text-base font-bold uppercase tracking-wide transition sm:text-lg"
+                style={{
+                  height: '64px',
+                  background: 'var(--color-primary)',
+                  color: '#ffffff',
+                  boxShadow: '0 12px 28px rgba(7, 59, 92, 0.22)',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                <Phone className="h-5 w-5" aria-hidden="true" />
+                <span>{d.phone_national || d.phone_international || phone}</span>
+              </a>
+            </div>
+          </div>
+        ) : null}
+
+        {/* Sekundär-Aktionen (Route / Website) */}
+        {(routeUrl || d.website_url) && (
+          <div className="mx-auto mt-4 flex max-w-4xl flex-wrap items-center justify-center gap-2 px-4 sm:px-6">
+            {routeUrl && (
+              <a
+                href={routeUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="nv-btn nv-btn-secondary"
+              >
+                <MapPin className="h-4 w-4" /> Route planen
+              </a>
+            )}
+            {d.website_url && (
+              <a
+                href={d.website_url}
+                target="_blank"
+                rel="nofollow noopener noreferrer"
+                className="nv-btn nv-btn-secondary"
+              >
+                <Globe className="h-4 w-4" /> Website öffnen
+              </a>
+            )}
+          </div>
         )}
 
+        {/* E-Mail-Kontakt-Panel — nur wenn Adresse hinterlegt ist */}
+        {(() => {
+          const email = (d.email || d.contact_email || '').trim();
+          if (!email) return null;
+          return (
+            <div className="mx-auto mt-6 max-w-4xl px-0">
+              <div
+                className="flex items-center gap-4 rounded-2xl p-5 sm:p-6"
+                style={{ background: '#ffffff', border: '1px solid var(--color-border)' }}
+              >
+                <div className="flex-1">
+                  <p className="text-[15px] leading-relaxed" style={{ color: 'var(--color-text)' }}>
+                    Kontaktieren Sie die Praxis für einfache Anfragen außerhalb eines Termins.
+                  </p>
+                  <a
+                    href={`mailto:${email}`}
+                    className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-bold uppercase tracking-wide sm:w-auto"
+                    style={{
+                      border: '1.5px solid var(--color-primary)',
+                      color: 'var(--color-primary)',
+                      background: '#ffffff',
+                      letterSpacing: '0.04em',
+                    }}
+                  >
+                    <Mail className="h-4 w-4" aria-hidden="true" />
+                    E-Mail senden
+                  </a>
+                </div>
+                <div
+                  className="hidden h-20 w-20 shrink-0 items-center justify-center rounded-full sm:flex"
+                  style={{ background: 'var(--color-primary-soft)' }}
+                  aria-hidden="true"
+                >
+                  <Mail className="h-9 w-9" style={{ color: 'var(--color-primary)' }} />
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Adresse als kleine Zeile unter den Aktionen */}
         {d.formatted_address && (
-          <p className="mt-4 flex items-start gap-2 text-sm text-slate-700 sm:text-base">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+          <p className="mx-auto mt-6 flex max-w-4xl items-start justify-center gap-2 px-4 text-center text-sm sm:px-6" style={{ color: 'var(--color-text-muted)' }}>
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{d.formatted_address}{d.district ? ` · ${d.district}` : ''}</span>
           </p>
         )}
 
-        <div className="mt-5 flex flex-wrap gap-2">
-          {phone && (
-            <a href={`tel:${phone}`} className="inline-flex items-center gap-2 rounded-lg bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-sky-700">
-              <Phone className="h-4 w-4" /> {d.phone_national || d.phone_international}
-            </a>
-          )}
-          {routeUrl && (
-            <a href={routeUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50">
-              <MapPin className="h-4 w-4" /> Route planen
-            </a>
-          )}
-          {d.website_url && (
-            <a href={d.website_url} target="_blank" rel="nofollow noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50">
-              <Globe className="h-4 w-4" /> Website öffnen
-            </a>
-          )}
-        </div>
         {d.rating != null && d.user_rating_count > 0 && (
-          <p className="mt-3 text-xs text-slate-500">Bewertungen von Google (öffentliche Google-Rezensionen)</p>
+          <p className="mx-auto mt-2 max-w-4xl px-4 text-center text-xs sm:px-6" style={{ color: 'var(--color-text-muted)' }}>
+            Bewertungen von Google (öffentliche Google-Rezensionen)
+          </p>
         )}
       </header>
 
