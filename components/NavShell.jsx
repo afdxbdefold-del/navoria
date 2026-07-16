@@ -17,12 +17,7 @@ function isStandaloneRoute(pathname) {
 export function NavShellTop() {
   const pathname = usePathname();
   if (isStandaloneRoute(pathname)) return null;
-  return (
-    <>
-      <AnnouncementBar />
-      <Header />
-    </>
-  );
+  return <Header />;
 }
 
 export function NavShellBottom() {
@@ -108,6 +103,7 @@ function Header() {
           <NavLink href="/ratgeber">Ratgeber</NavLink>
           <NavLink href="/symptome">Symptome</NavLink>
           <NavLink href="/aerzte/fachrichtung">Fachrichtungen</NavLink>
+          <NavLink href="/praxis-beanspruchen">Für Ärzte</NavLink>
         </nav>
 
         {/* Rechte Aktionen */}

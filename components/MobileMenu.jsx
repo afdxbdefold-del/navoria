@@ -10,6 +10,7 @@ const LINKS = [
   { href: '/symptome', label: 'Symptome' },
   { href: '/aerzte/fachrichtung', label: 'Fachrichtungen' },
   { href: '/aerzte/bundesland', label: 'Nach Bundesland' },
+  { href: '/praxis-beanspruchen', label: 'Für Ärzte' },
 ];
 
 export default function MobileMenu() {
