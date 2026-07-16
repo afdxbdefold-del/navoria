@@ -16,7 +16,7 @@ import { NextResponse } from 'next/server';
 // Reservierte Root-Slugs, die statische Routen sind (kein Homepage-Modus)
 const RESERVED = new Set([
   'admin', 'aerzte', 'praxis', 'suche', 'symptome', 'symptom', 'ratgeber',
-  'magazin', 'finden', 'logo-vorschlaege',
+  'magazin', 'finden',
   'impressum', 'datenschutz', 'agb', 'barrierefreiheit', 'korrekturen',
   'redaktionelle-standards', 'ueber-uns', 'kontakt', 'praxis-beanspruchen',
   'beanspruchen', 'beanspruchungen', 'api', '_next', '_vercel',

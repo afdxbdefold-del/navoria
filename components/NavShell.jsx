@@ -61,22 +61,29 @@ function AnnouncementBar() {
   );
 }
 
-/* ---------- Logo (weiß-kompatibel) ---------- */
+/* ---------- Logo (weiß-kompatibel) — „Nur N" ---------- */
 function LogoMark({ variant = 'dark' }) {
-  // Für dunkle Header: weißes Icon-Feld auf Navy; für Light: Primary-Blue
+  // variant='dark' → weiße Kachel mit primary-blauem N (auf navy Header)
+  // variant='light' → primary-blaue Kachel mit weißem N
   const bg = variant === 'dark' ? '#ffffff' : 'var(--color-primary)';
   const fg = variant === 'dark' ? 'var(--color-primary)' : '#ffffff';
   return (
-    <div
-      className="flex h-9 w-9 items-center justify-center rounded-lg"
-      style={{ background: bg, color: fg }}
+    <span
+      className="inline-flex h-9 w-9 items-center justify-center rounded-[10px]"
+      style={{ background: bg }}
       aria-hidden="true"
     >
-      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-        <path d="M12 9v5M9.5 11.5h5" />
+      <svg viewBox="0 0 40 40" className="h-6 w-6" aria-hidden="true">
+        <path
+          d="M12 29 V11 L28 29 V11"
+          stroke={fg}
+          strokeWidth="3.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
       </svg>
-    </div>
+    </span>
   );
 }
 
