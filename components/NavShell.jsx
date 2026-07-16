@@ -68,11 +68,11 @@ function LogoMark({ variant = 'dark' }) {
       style={{ background: bg }}
       aria-hidden="true"
     >
-      <svg viewBox="0 0 40 40" className="h-6 w-6" aria-hidden="true">
+      <svg viewBox="0 0 40 40" className="h-7 w-7" aria-hidden="true">
         <path
-          d="M12 29 V11 L28 29 V11"
+          d="M8 32 V8 L32 32 V8"
           stroke={fg}
-          strokeWidth="3.4"
+          strokeWidth="4.2"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
