@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, MapPin, Stethoscope, Heart, Baby, Smile, Eye, Ear, Bone, Brain, Sparkles, ArrowRight, ShieldCheck, Info, HeartPulse, BookOpen } from 'lucide-react';
+import { Search, MapPin, Stethoscope, Heart, Baby, Smile, Eye, Ear, Bone, Brain, Sparkles, ArrowRight, Info, HeartPulse, BookOpen } from 'lucide-react';
 
 const POPULAR_SPECIALTIES = [
   { name: 'Hausarzt', icon: Stethoscope, slug: 'hausarzt' },
@@ -32,7 +32,6 @@ const BIG_CITIES = [
   { name: 'Nürnberg', slug: 'nuernberg' },
 ];
 
-// Häufig gesuchte Symptome – Direct-Link zu den Ratgeber-Pillar-Pages /symptome/[slug]
 const POPULAR_SYMPTOMS = [
   { label: 'Rückenschmerzen', slug: 'rueckenschmerzen' },
   { label: 'Kopfschmerzen', slug: 'kopfschmerzen' },
@@ -82,27 +81,25 @@ export default function HomePage() {
   };
 
   return (
-    <div>
-      {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -top-40 left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-gradient-to-b from-sky-100 via-teal-50 to-transparent blur-3xl" />
-        </div>
-        <div className="mx-auto max-w-5xl px-4 pt-16 pb-10 text-center sm:px-6 sm:pt-24">
-          <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white/70 px-3 py-1 text-xs font-medium text-sky-700">
-            <ShieldCheck className="h-3.5 w-3.5" /> Für Patienten gemacht
+    <>
+      {/* HERO — solid Primary Blue mit integrierter Suche */}
+      <section className="nv-surface-primary relative overflow-hidden">
+        <div className="nv-container py-16 sm:py-20 lg:py-24">
+          <div className="mx-auto max-w-3xl text-center">
+            <h1 className="text-[38px] font-bold leading-[1.05] tracking-tight text-white sm:text-[48px] lg:text-[56px]">
+              Ärzte in Ihrer Nähe finden
+            </h1>
+            <p className="mx-auto mt-5 max-w-2xl text-[17px] leading-relaxed sm:text-[18px]" style={{ color: 'var(--color-primary-light)' }}>
+              Adresse, Telefon, Öffnungszeiten und Bewertungen — deutschlandweit,
+              übersichtlich und aktuell auf einer Seite.
+            </p>
           </div>
-          <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl md:text-6xl">
-            Ihr nächster Arzt. <span className="bg-gradient-to-r from-sky-600 to-teal-500 bg-clip-text text-transparent">Ohne Umwege.</span>
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600 sm:text-lg">
-            Adresse, Telefon, Öffnungszeiten und Bewertungen – alles auf einer Seite. Übersichtlich und aktuell.
-          </p>
 
-          {/* Suchbox */}
+          {/* Suchbox — auf dem Hero */}
           <form
             onSubmit={submit}
-            className="card-soft mt-8 mx-auto max-w-3xl p-3 sm:p-4"
+            className="mx-auto mt-8 max-w-3xl rounded-2xl p-3 sm:p-4"
+            style={{ background: '#ffffff', boxShadow: '0 12px 40px rgba(0,0,0,0.16)' }}
             aria-label="Arztsuche"
             toolname="searchDoctors"
             tooldescription="Sucht Ärzt:innen und Praxen in Deutschland nach Fachrichtung, Stadt oder Postleitzahl. Beispiele: 'Hausarzt' in 'Berlin', 'Zahnarzt' in '80331'. Öffnet die Suchergebnisseite auf Navoria mit passenden Praxen inkl. Adresse, Bewertung und Kontaktdaten."
@@ -111,21 +108,21 @@ export default function HomePage() {
             <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
               <div className="relative">
                 <label htmlFor="home-search-q" className="sr-only">Suchbegriff (z. B. Hausarzt, Kardiologe)</label>
-                <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: 'var(--color-text-muted)' }} />
                 <input
                   id="home-search-q"
                   name="q"
                   type="search"
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
-                  placeholder="Was suchen Sie? z.B. Hausarzt, Kardiologe"
-                  className="input pl-9"
+                  placeholder="Fachrichtung, Praxis oder Name"
+                  className="nv-input pl-9"
                   toolparamdescription="Fachrichtung oder freier Suchbegriff, z. B. 'Hausarzt', 'Zahnarzt', 'Kardiologe', 'Physiotherapeut'."
                 />
               </div>
               <div className="relative">
                 <label htmlFor="home-search-ort" className="sr-only">Ort oder Postleitzahl</label>
-                <MapPin aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <MapPin aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: 'var(--color-text-muted)' }} />
                 <input
                   id="home-search-ort"
                   name="ort"
@@ -134,191 +131,247 @@ export default function HomePage() {
                   value={ort}
                   onChange={(e) => setOrt(e.target.value)}
                   placeholder="Ort oder PLZ"
-                  className="input pl-9"
+                  className="nv-input pl-9"
                   toolparamdescription="Deutscher Ortsname oder 5-stellige Postleitzahl, z. B. 'Berlin' oder '10115'."
                 />
               </div>
-              <button type="submit" className="btn-primary whitespace-nowrap">
-                Ärzte finden <ArrowRight aria-hidden="true" className="ml-1.5 h-4 w-4" />
+              <button type="submit" className="nv-btn nv-btn-lg nv-btn-primary">
+                Ärzte finden <ArrowRight aria-hidden="true" className="h-4 w-4" />
               </button>
             </div>
           </form>
 
-          <div className="mt-3 flex items-center justify-center gap-2 text-xs text-slate-500">
-            <Info aria-hidden="true" className="h-3.5 w-3.5" /> Keine medizinische Diagnose. Bei Notfall 112.
-          </div>
+          <p className="mx-auto mt-4 flex max-w-2xl items-center justify-center gap-2 text-xs" style={{ color: 'rgba(221,240,252,0.85)' }}>
+            <Info aria-hidden="true" className="h-3.5 w-3.5" /> Keine medizinische Diagnose. Bei akutem Notfall 112.
+          </p>
         </div>
       </section>
 
-      {/* Symptom Assistent */}
-      <section className="mx-auto max-w-5xl px-4 sm:px-6">
-        <div className="card-soft bg-gradient-to-br from-white to-sky-50/40 p-6 sm:p-8">
-          <div className="flex items-center gap-2 text-sm font-semibold text-sky-700">
-            <Sparkles aria-hidden="true" className="h-4 w-4" /> Symptom-Assistent
-          </div>
-          <h2 className="mt-1 text-2xl font-semibold text-slate-900">Sagen Sie uns, was fehlt. Wir sagen Ihnen, wer hilft.</h2>
-          <p className="mt-1 text-sm text-slate-600">Kein Fachbegriff nötig – einfach Beschwerden eintippen, wir finden die passende Fachrichtung.</p>
-          <form
-            role="search"
-            onSubmit={(e) => e.preventDefault()}
-            className="mt-4 flex flex-col gap-3 sm:flex-row"
-            aria-label="Symptom-Assistent"
-            toolname="findSpecialtyForSymptom"
-            tooldescription="Empfiehlt die passende Fachrichtung (z. B. Orthopäde, Hausarzt) für ein Symptom oder eine Beschwerde. Reine Empfehlung, keine medizinische Diagnose."
-          >
-            <label htmlFor="symptom-input" className="sr-only">Symptom oder Beschwerde beschreiben</label>
-            <input
-              id="symptom-input"
-              name="symptom"
-              type="search"
-              value={symptomInput}
-              onChange={(e) => setSymptomInput(e.target.value)}
-              placeholder="z.B. Rückenschmerzen, Herzrasen, Hautausschlag"
-              className="input"
-              aria-describedby="symptom-help"
-              toolparamdescription="Freitext-Beschwerde, z. B. 'Rückenschmerzen', 'Kopfschmerzen', 'Herzrasen', 'Hautausschlag'."
-            />
-          </form>
-          <p id="symptom-help" className="sr-only">Geben Sie ein Symptom ein – wir schlagen passende Fachrichtungen vor.</p>
-          {suggestLoading && <p className="mt-3 text-xs text-slate-500">Suche Fachrichtungen …</p>}
-          {symptomSuggestions !== null && !suggestLoading && (
-            <div className="mt-4">
-              {symptomSuggestions.length === 0 ? (
-                <p className="text-sm text-slate-500">Keine spezifische Zuordnung gefunden. Ein Hausarzt ist meist ein guter erster Ansprechpartner.</p>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-sm text-slate-600">Vorschläge:</span>
-                  {symptomSuggestions.map((s) => {
-                    // Symptom-Vorschlag → Pillar-Seite wenn Slug bekannt, sonst Fallback in Suche
-                    const specSlug = {
-                      'Hausarzt': 'hausarzt', 'Zahnarzt': 'zahnarzt', 'Kardiologe': 'kardiologe',
-                      'Orthopäde': 'orthopaede', 'Hautarzt': 'hautarzt', 'Frauenarzt': 'frauenarzt',
-                      'Kinderarzt': 'kinderarzt', 'Augenarzt': 'augenarzt', 'HNO-Arzt': 'hno-arzt',
-                      'Urologe': 'urologe', 'Neurologe': 'neurologe', 'Psychiater': 'psychiater',
-                      'Psychotherapeut': 'psychotherapeut', 'Radiologe': 'radiologe', 'Internist': 'internist',
-                      'Chirurg': 'chirurg', 'Physiotherapeut': 'physiotherapeut',
-                    }[s];
-                    const href = specSlug ? `/aerzte/fachrichtung/${specSlug}` : `/suche?q=${encodeURIComponent(s)}`;
-                    return (
-                      <a key={s} href={href} className="chip border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100">
-                        {s} <ArrowRight className="ml-1 h-3 w-3" />
-                      </a>
-                    );
-                  })}
-                </div>
-              )}
-              <p className="mt-4 text-[11px] text-slate-500">Navoria ersetzt keine ärztliche Diagnose. Bei akuten oder lebensbedrohlichen Beschwerden rufen Sie 112.</p>
+      {/* Symptom-Assistent — White Surface Card */}
+      <section className="nv-surface-white">
+        <div className="nv-container nv-section-tight">
+          <div className="nv-card-elevated mx-auto max-w-4xl">
+            <div className="flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--color-primary)' }}>
+              <Sparkles aria-hidden="true" className="h-4 w-4" /> Symptom-Assistent
             </div>
-          )}
-        </div>
-      </section>
-
-      {/* Häufige Symptome – Ratgeber-Pillar-Pages */}
-      <section className="mx-auto max-w-6xl px-4 pt-12 pb-4 sm:px-6">
-        <div className="mb-6 flex items-end justify-between">
-          <div>
-            <h2 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
-              <HeartPulse className="h-5 w-5 text-sky-600" />
-              Häufige Beschwerden
+            <h2 className="mt-2 text-2xl font-bold sm:text-3xl" style={{ color: 'var(--color-navy)' }}>
+              Sagen Sie uns, was fehlt. Wir sagen Ihnen, wer hilft.
             </h2>
-            <p className="text-sm text-slate-500">Welcher Arzt hilft bei welchem Symptom? Redaktionell geprüfte Ratgeber.</p>
-          </div>
-          <a href="/symptome" className="hidden text-sm font-medium text-sky-700 hover:text-sky-800 sm:inline-flex sm:items-center sm:gap-1">
-            Alle Symptome <ArrowRight className="h-3.5 w-3.5" />
-          </a>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {POPULAR_SYMPTOMS.map((s) => (
-            <a
-              key={s.slug}
-              href={`/symptome/${s.slug}`}
-              className="chip border-sky-100 bg-sky-50 text-sky-700 hover:border-sky-300 hover:bg-sky-100"
+            <p className="mt-2 text-[15px] nv-text-muted">
+              Kein Fachbegriff nötig — einfach Beschwerden eintippen. Wir schlagen die passende Fachrichtung vor.
+            </p>
+            <form
+              role="search"
+              onSubmit={(e) => e.preventDefault()}
+              className="mt-5"
+              aria-label="Symptom-Assistent"
+              toolname="findSpecialtyForSymptom"
+              tooldescription="Empfiehlt die passende Fachrichtung (z. B. Orthopäde, Hausarzt) für ein Symptom oder eine Beschwerde. Reine Empfehlung, keine medizinische Diagnose."
             >
-              {s.label}
-              <ArrowRight className="ml-1 h-3 w-3" />
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* Beliebte Fachrichtungen */}
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="mb-6 flex items-end justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold text-slate-900">Beliebte Fachrichtungen</h2>
-            <p className="text-sm text-slate-500">Häufig gesuchte Facharzt-Kategorien.</p>
+              <label htmlFor="symptom-input" className="sr-only">Symptom oder Beschwerde beschreiben</label>
+              <input
+                id="symptom-input"
+                name="symptom"
+                type="search"
+                value={symptomInput}
+                onChange={(e) => setSymptomInput(e.target.value)}
+                placeholder="z. B. Rückenschmerzen, Herzrasen, Hautausschlag"
+                className="nv-input"
+                aria-describedby="symptom-help"
+                toolparamdescription="Freitext-Beschwerde, z. B. 'Rückenschmerzen', 'Kopfschmerzen', 'Herzrasen', 'Hautausschlag'."
+              />
+            </form>
+            <p id="symptom-help" className="sr-only">Geben Sie ein Symptom ein – wir schlagen passende Fachrichtungen vor.</p>
+            {suggestLoading && <p className="mt-3 text-xs nv-text-muted">Suche Fachrichtungen …</p>}
+            {symptomSuggestions !== null && !suggestLoading && (
+              <div className="mt-4">
+                {symptomSuggestions.length === 0 ? (
+                  <p className="text-sm nv-text-muted">
+                    Keine spezifische Zuordnung gefunden. Ein Hausarzt ist meist ein guter erster Ansprechpartner.
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-sm nv-text-muted">Vorschläge:</span>
+                    {symptomSuggestions.map((s) => {
+                      const specSlug = {
+                        'Hausarzt': 'hausarzt', 'Zahnarzt': 'zahnarzt', 'Kardiologe': 'kardiologe',
+                        'Orthopäde': 'orthopaede', 'Hautarzt': 'hautarzt', 'Frauenarzt': 'frauenarzt',
+                        'Kinderarzt': 'kinderarzt', 'Augenarzt': 'augenarzt', 'HNO-Arzt': 'hno-arzt',
+                        'Urologe': 'urologe', 'Neurologe': 'neurologe', 'Psychiater': 'psychiater',
+                        'Psychotherapeut': 'psychotherapeut', 'Radiologe': 'radiologe', 'Internist': 'internist',
+                        'Chirurg': 'chirurg', 'Physiotherapeut': 'physiotherapeut',
+                      }[s];
+                      const href = specSlug ? `/aerzte/fachrichtung/${specSlug}` : `/suche?q=${encodeURIComponent(s)}`;
+                      return (
+                        <a key={s} href={href} className="nv-chip hover:opacity-90">
+                          {s} <ArrowRight className="ml-1 h-3 w-3" />
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
+                <p className="mt-4 text-[11px] nv-text-muted">
+                  Navoria ersetzt keine ärztliche Diagnose. Bei akuten oder lebensbedrohlichen Beschwerden rufen Sie 112.
+                </p>
+              </div>
+            )}
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
-          {POPULAR_SPECIALTIES.map((s) => {
-            const Icon = s.icon;
-            return (
-              <a key={s.name} href={`/aerzte/fachrichtung/${s.slug}`} className="card-soft group flex items-center gap-3 p-4 transition hover:-translate-y-0.5 hover:shadow-md">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-600 transition group-hover:bg-sky-100">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <span className="text-sm font-medium text-slate-800">{s.name}</span>
-              </a>
-            );
-          })}
-        </div>
       </section>
 
-      {/* Große Städte */}
-      <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
-        <div className="mb-6 flex items-end justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold text-slate-900">Ärzte in großen Städten</h2>
-            <p className="text-sm text-slate-500">Direktzugang zu den wichtigsten deutschen Standorten.</p>
-          </div>
-          <a href="/aerzte/bundesland" className="hidden text-sm font-medium text-sky-700 hover:text-sky-800 sm:inline-flex sm:items-center sm:gap-1">
-            Nach Bundesland <ArrowRight className="h-3.5 w-3.5" />
-          </a>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {BIG_CITIES.map((c) => (
-            <a key={c.slug} href={`/aerzte/${c.slug}`} className="chip hover:border-sky-200 hover:bg-sky-50 hover:text-sky-700">
-              <MapPin className="mr-1 h-3 w-3" /> {c.name}
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* USPs */}
-      <section className="mx-auto max-w-6xl px-4 pb-12 sm:px-6">
-        <div className="grid gap-4 md:grid-cols-3">
-          {[
-            { title: 'Alles auf einer Seite', desc: 'Adresse, Telefon, Website, Öffnungszeiten, Bewertungen und Karte – kompakt und übersichtlich pro Praxis.' },
-            { title: 'Datenstand transparent', desc: 'Jedes Profil zeigt, wann wir es zuletzt geprüft haben. Kein Rätselraten über veraltete Telefonnummern.' },
-            { title: 'Symptom-Assistent', desc: 'Sie wissen nicht, welche Fachrichtung passt? Beschreiben Sie kurz Ihre Beschwerden – wir schlagen passende Ärzte vor.' },
-          ].map((f) => (
-            <div key={f.title} className="card-soft p-6">
-              <h3 className="text-base font-semibold text-slate-900">{f.title}</h3>
-              <p className="mt-1 text-sm text-slate-600">{f.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Ratgeber-CTA */}
-      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-        <div className="card-soft flex flex-col items-start justify-between gap-4 bg-gradient-to-br from-sky-50 to-white p-6 sm:flex-row sm:items-center sm:p-8">
-          <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
-              <BookOpen className="h-5 w-5" />
-            </div>
+      {/* Häufige Beschwerden — Ratgeber-Pillar-Chips */}
+      <section className="nv-surface-white">
+        <div className="nv-container nv-section-tight">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h3 className="text-base font-semibold text-slate-900">Patienten-Ratgeber</h3>
-              <p className="mt-1 text-sm text-slate-600">
-                Facharzt-Termin schneller bekommen, Zweitmeinung einholen, was zahlt die Kasse – kurz und konkret erklärt.
+              <h2 className="flex items-center gap-2 text-2xl font-bold sm:text-3xl" style={{ color: 'var(--color-navy)' }}>
+                <HeartPulse className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />
+                Häufige Beschwerden
+              </h2>
+              <p className="mt-2 text-[15px] nv-text-muted">
+                Welcher Arzt hilft bei welchem Symptom? Redaktionell geprüfte Ratgeber.
               </p>
             </div>
+            <a href="/symptome" className="inline-flex items-center gap-1 text-sm font-semibold" style={{ color: 'var(--color-primary)' }}>
+              Alle Symptome <ArrowRight className="h-3.5 w-3.5" />
+            </a>
           </div>
-          <a href="/ratgeber" className="btn-primary whitespace-nowrap">
-            Ratgeber ansehen <ArrowRight className="ml-1.5 h-4 w-4" />
-          </a>
+          <div className="flex flex-wrap gap-2">
+            {POPULAR_SYMPTOMS.map((s) => (
+              <a key={s.slug} href={`/symptome/${s.slug}`} className="nv-chip hover:opacity-90">
+                {s.label}
+                <ArrowRight className="ml-1 h-3 w-3" />
+              </a>
+            ))}
+          </div>
         </div>
       </section>
-    </div>
+
+      {/* Beliebte Fachrichtungen — Karten-Grid */}
+      <section className="nv-page-bg">
+        <div className="nv-container nv-section">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold sm:text-3xl" style={{ color: 'var(--color-navy)' }}>
+              Beliebte Fachrichtungen
+            </h2>
+            <p className="mt-2 text-[15px] nv-text-muted">Häufig gesuchte Facharzt-Kategorien.</p>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+            {POPULAR_SPECIALTIES.map((s) => {
+              const Icon = s.icon;
+              return (
+                <a
+                  key={s.name}
+                  href={`/aerzte/fachrichtung/${s.slug}`}
+                  className="nv-card group flex items-center gap-3 transition hover:-translate-y-0.5"
+                  style={{ padding: '1rem' }}
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <span className="text-sm font-semibold" style={{ color: 'var(--color-navy)' }}>{s.name}</span>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Große Städte — Primary Blue Konversions-Sektion */}
+      <section className="nv-surface-primary">
+        <div className="nv-container nv-section">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+            <div className="max-w-2xl">
+              <p className="text-sm font-semibold" style={{ color: 'var(--color-primary-light)' }}>Direktzugang</p>
+              <h2 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                Ärzte in großen Städten
+              </h2>
+              <p className="mt-3 text-[16px]" style={{ color: 'var(--color-primary-light)' }}>
+                Zu den wichtigsten deutschen Standorten und Fachrichtungen.
+              </p>
+            </div>
+            <a
+              href="/aerzte/bundesland"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-white hover:underline"
+            >
+              Nach Bundesland <ArrowRight className="h-3.5 w-3.5" />
+            </a>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {BIG_CITIES.map((c) => (
+              <a
+                key={c.slug}
+                href={`/aerzte/${c.slug}`}
+                className="group flex items-center justify-between rounded-xl px-4 py-3.5 transition"
+                style={{ background: 'rgba(255,255,255,0.08)', color: '#fff' }}
+              >
+                <div className="flex items-center gap-3">
+                  <MapPin className="h-4 w-4" style={{ color: 'var(--color-primary-light)' }} />
+                  <span className="text-[15px] font-semibold">{c.name}</span>
+                </div>
+                <ArrowRight className="h-4 w-4 opacity-70 transition group-hover:opacity-100" />
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* USPs — 3-Spalten Karten */}
+      <section className="nv-surface-white">
+        <div className="nv-container nv-section">
+          <div className="mb-10 max-w-2xl">
+            <h2 className="text-2xl font-bold sm:text-3xl" style={{ color: 'var(--color-navy)' }}>
+              Warum Navoria
+            </h2>
+            <p className="mt-3 text-[15px] nv-text-muted">
+              Übersichtlich, transparent und werbefrei recherchierte Praxis-Profile.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-3">
+            {[
+              {
+                title: 'Alles auf einer Seite',
+                desc: 'Adresse, Telefon, Website, Öffnungszeiten, Bewertungen und Karte — kompakt und übersichtlich pro Praxis.',
+              },
+              {
+                title: 'Datenstand transparent',
+                desc: 'Jedes Profil zeigt, wann wir es zuletzt geprüft haben. Kein Rätselraten über veraltete Telefonnummern.',
+              },
+              {
+                title: 'Symptom-Assistent',
+                desc: 'Sie wissen nicht, welche Fachrichtung passt? Beschreiben Sie kurz Ihre Beschwerden — wir schlagen passende Ärzte vor.',
+              },
+            ].map((f) => (
+              <div key={f.title} className="nv-card">
+                <h3 className="text-lg font-bold" style={{ color: 'var(--color-navy)' }}>{f.title}</h3>
+                <p className="mt-2 text-[15px] nv-text-muted">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Ratgeber-CTA — Soft Panel */}
+      <section className="nv-surface-white">
+        <div className="nv-container pb-20">
+          <div className="nv-panel-soft flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center" style={{ padding: '1.5rem 1.75rem' }}>
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl" style={{ background: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
+                <BookOpen className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold" style={{ color: 'var(--color-navy)' }}>Patienten-Ratgeber</h3>
+                <p className="mt-1 text-[15px] nv-text-muted">
+                  Facharzt-Termin schneller bekommen, Zweitmeinung einholen, was zahlt die Kasse — kurz und konkret erklärt.
+                </p>
+              </div>
+            </div>
+            <a href="/ratgeber" className="nv-btn nv-btn-primary whitespace-nowrap">
+              Ratgeber ansehen <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
