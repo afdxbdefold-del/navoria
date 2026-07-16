@@ -169,7 +169,7 @@ function Footer() {
             <FooterLink href="/aerzte/berlin">Berlin</FooterLink>
             <FooterLink href="/aerzte/hamburg">Hamburg</FooterLink>
             <FooterLink href="/aerzte/muenchen">München</FooterLink>
-            <FooterLink href="/aerzte/koeln">Köln</FooterLink>
+            <FooterLink href="/aerzte/bundesland">Alle Bundesländer</FooterLink>
           </FooterCol>
 
           <FooterCol title="Über Navoria">

@@ -18,7 +18,7 @@ const POPULAR_SPECIALTIES = [
   { name: 'Neurologe', icon: Brain, slug: 'neurologe' },
 ];
 
-const BIG_CITIES = [
+const BIG_CITIES_DEFAULT = [
   { name: 'Berlin', slug: 'berlin' },
   { name: 'Hamburg', slug: 'hamburg' },
   { name: 'München', slug: 'muenchen' },
@@ -48,7 +48,8 @@ const POPULAR_SYMPTOMS = [
   { label: 'Herzstolpern', slug: 'herzstolpern' },
 ];
 
-export default function HomePage({ latestArticles = [] }) {
+export default function HomePage({ latestArticles = [], bigCities = null }) {
+  const cities = bigCities && bigCities.length > 0 ? bigCities : BIG_CITIES_DEFAULT;
   const router = useRouter();
   const [q, setQ] = useState('');
   const [ort, setOrt] = useState('');
@@ -331,7 +332,7 @@ export default function HomePage({ latestArticles = [] }) {
             </a>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {BIG_CITIES.map((c) => (
+            {cities.map((c) => (
               <a
                 key={c.slug}
                 href={`/aerzte/${c.slug}`}

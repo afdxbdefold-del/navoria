@@ -1,6 +1,7 @@
 import HomeClient from './HomeClient.jsx';
 import { getBaseUrl } from '@/lib/baseUrl';
 import { MAGAZINE_ARTICLES } from '@/lib/magazineArticles';
+import { getCollection } from '@/lib/mongodb';
 
 export const revalidate = 300;
 
@@ -42,6 +43,26 @@ export default async function HomePage() {
       heroImageAlt: a.heroImageAlt || null,
     }));
 
+  // Städte-Kacheln: nur solche mit tatsächlichen Praxis-Einträgen anzeigen (vermeidet 404-Links).
+  // Rangfolge nach absteigender Praxen-Anzahl (bis zu 12 Kacheln).
+  let bigCities = [];
+  try {
+    const doctorsCol = await getCollection('doctor_places');
+    const citiesAgg = await doctorsCol.aggregate([
+      { $match: { is_active: true, city_slug: { $exists: true, $ne: null } } },
+      { $group: { _id: '$city_slug', name: { $first: '$city' }, count: { $sum: 1 } } },
+      { $match: { count: { $gte: 5 } } },
+      { $sort: { count: -1 } },
+      { $limit: 12 },
+    ]).toArray();
+    bigCities = citiesAgg
+      .filter((c) => c._id && c.name)
+      .map((c) => ({ slug: c._id, name: c.name, count: c.count }));
+  } catch (err) {
+    console.warn('[home] bigCities aggregation failed:', err?.message);
+    bigCities = [];
+  }
+
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
@@ -59,7 +80,7 @@ export default async function HomePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
-      <HomeClient latestArticles={latestArticles} />
+      <HomeClient latestArticles={latestArticles} bigCities={bigCities} />
     </>
   );
 }
