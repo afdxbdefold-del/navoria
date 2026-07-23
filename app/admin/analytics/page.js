@@ -91,6 +91,7 @@ export default function AdminAnalytics() {
           <button onClick={load} className="btn-secondary text-xs">
             <RefreshCw aria-hidden="true" className="mr-1.5 h-3.5 w-3.5" /> Aktualisieren
           </button>
+          <Link href="/admin/bots" className="btn-secondary text-xs">Bot-Detail →</Link>
         </div>
       </header>
 

@@ -713,6 +713,103 @@ async function handleGet(request, pathParts) {
     });
   }
 
+  // GET /api/admin/bots?range=today|7d|30d
+  // Detaillierte Bot-Aufschlüsselung: pro Bot Anzahl, First/Last Seen, Top-URLs, Stundenverlauf
+  if (pathParts[0] === 'admin' && pathParts[1] === 'bots' && !pathParts[2]) {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const col = await getCollection('page_views');
+    const range = (url.searchParams.get('range') || 'today').toLowerCase();
+
+    const now = new Date();
+    const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0));
+    let from;
+    if (range === '7d') from = new Date(todayStart.getTime() - 6 * 24 * 60 * 60 * 1000);
+    else if (range === '30d') from = new Date(todayStart.getTime() - 29 * 24 * 60 * 60 * 1000);
+    else from = todayStart;
+    const to = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+
+    const baseMatch = { timestamp: { $gte: from, $lt: to }, is_bot: true };
+
+    // Gesamt-Zahlen
+    const [totalRow] = await col.aggregate([
+      { $match: baseMatch },
+      { $group: { _id: null, total: { $sum: 1 }, uniquePaths: { $addToSet: '$path' } } },
+      { $project: { total: 1, unique_paths: { $size: '$uniquePaths' }, _id: 0 } },
+    ]).toArray();
+
+    // Aufschlüsselung pro Bot
+    const bots = await col.aggregate([
+      { $match: baseMatch },
+      { $group: {
+        _id: { $ifNull: ['$bot_name', 'other'] },
+        hits: { $sum: 1 },
+        first_seen: { $min: '$timestamp' },
+        last_seen: { $max: '$timestamp' },
+        unique_paths: { $addToSet: '$path' },
+      } },
+      { $project: {
+        bot: '$_id',
+        hits: 1,
+        first_seen: 1,
+        last_seen: 1,
+        paths_count: { $size: '$unique_paths' },
+        _id: 0,
+      } },
+      { $sort: { hits: -1 } },
+    ]).toArray();
+
+    // Für jeden Bot: Top-Pfade + Stundenverlauf (letzte 24h) parallel laden
+    const enriched = await Promise.all(bots.map(async (b) => {
+      const botName = b.bot;
+      const botMatch = { ...baseMatch, bot_name: botName === 'other' ? { $in: [null, 'other'] } : botName };
+
+      const [topPaths, hourly] = await Promise.all([
+        col.aggregate([
+          { $match: botMatch },
+          { $group: { _id: '$path', hits: { $sum: 1 } } },
+          { $project: { path: '$_id', hits: 1, _id: 0 } },
+          { $sort: { hits: -1 } },
+          { $limit: 10 },
+        ]).toArray(),
+        col.aggregate([
+          { $match: { ...botMatch, timestamp: { $gte: new Date(now.getTime() - 24 * 60 * 60 * 1000) } } },
+          { $group: {
+            _id: { $dateToString: { format: '%Y-%m-%d %H:00', date: '$timestamp', timezone: 'UTC' } },
+            hits: { $sum: 1 },
+          } },
+          { $project: { bucket: '$_id', hits: 1, _id: 0 } },
+          { $sort: { bucket: 1 } },
+        ]).toArray(),
+      ]);
+
+      return { ...b, top_paths: topPaths, hourly };
+    }));
+
+    // Aggregierter Stundenverlauf ALLER Bots (für Top-Chart)
+    const hourlyAll = await col.aggregate([
+      { $match: { ...baseMatch, timestamp: { $gte: new Date(now.getTime() - 24 * 60 * 60 * 1000) } } },
+      { $group: {
+        _id: { $dateToString: { format: '%Y-%m-%d %H:00', date: '$timestamp', timezone: 'UTC' } },
+        hits: { $sum: 1 },
+      } },
+      { $project: { bucket: '$_id', hits: 1, _id: 0 } },
+      { $sort: { bucket: 1 } },
+    ]).toArray();
+
+    return json({
+      range,
+      window: { from: from.toISOString(), to: to.toISOString() },
+      totals: {
+        hits: totalRow?.total || 0,
+        unique_paths: totalRow?.unique_paths || 0,
+        distinct_bots: enriched.length,
+      },
+      bots: enriched,
+      hourly_all: hourlyAll,
+      generated_at: new Date().toISOString(),
+    });
+  }
+
   // GET /api/admin/analytics/summary?range=today|yesterday|7d|30d
   if (pathParts[0] === 'admin' && pathParts[1] === 'analytics' && pathParts[2] === 'summary') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
