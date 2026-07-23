@@ -362,30 +362,10 @@ export default async function ProfilePage({ params }) {
             </span>
           </div>
 
-          {/* Zentrierter Avatar-Kreis */}
-          <div className="mx-auto mt-4 flex max-w-4xl flex-col items-center text-center">
-            <div
-              className="flex h-24 w-24 items-center justify-center rounded-full sm:h-28 sm:w-28"
-              style={{ background: '#ffffff', boxShadow: '0 8px 24px rgba(0,0,0,0.18)' }}
-              aria-hidden="true"
-            >
-              <span
-                className="text-2xl font-bold uppercase tracking-wide sm:text-3xl"
-                style={{ color: 'var(--color-navy)' }}
-              >
-                {(displayName || '?')
-                  .replace(/^(dr\.?|prof\.?|med\.?)\s+/i, '')
-                  .split(/\s+/)
-                  .filter(Boolean)
-                  .slice(0, 2)
-                  .map((w) => w[0])
-                  .join('')
-                  .slice(0, 2)}
-              </span>
-            </div>
-
+          {/* Praxis-Info zentriert (Avatar-Kreis entfernt) */}
+          <div className="mx-auto mt-6 flex max-w-4xl flex-col items-center text-center">
             {/* Praxis-Name */}
-            <h1 className="mt-5 max-w-3xl text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-[34px]">
+            <h1 className="max-w-3xl text-2xl font-bold tracking-tight text-white sm:text-3xl md:text-[34px]">
               {(() => {
                 // title_prefix wird grau vorangestellt, sichtbaren Namen ggf. bereinigen.
                 const prefix = nameParts.title_prefix;
@@ -452,8 +432,8 @@ export default async function ProfilePage({ params }) {
 
         {/* Telefon-CTA — weißer Button mit blauem Text auf blauem Hero-Hintergrund */}
         {phone ? (
-          <div className="relative -mx-4 sm:-mx-6" style={{ zIndex: 10 }}>
-            <div className="mx-auto max-w-4xl px-4 sm:px-6" style={{ marginTop: '-32px' }}>
+          <div className="relative" style={{ zIndex: 10,width:'340px',margin:'0 auto' }}>
+            <div className="" style={{ marginTop: '-32px' }}>
               <a
                 href={`tel:${phone}`}
                 className="flex w-full items-center justify-center gap-3 rounded-2xl px-6 text-base font-bold uppercase tracking-wide transition sm:text-lg"
@@ -472,32 +452,6 @@ export default async function ProfilePage({ params }) {
             </div>
           </div>
         ) : null}
-
-        {/* Sekundär-Aktionen (Route / Website) */}
-        {(routeUrl || d.website_url) && (
-          <div className="mx-auto mt-4 flex max-w-4xl flex-wrap items-center justify-center gap-2 px-4 sm:px-6">
-            {routeUrl && (
-              <a
-                href={routeUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="nv-btn nv-btn-secondary"
-              >
-                <MapPin className="h-4 w-4" /> Route planen
-              </a>
-            )}
-            {d.website_url && (
-              <a
-                href={d.website_url}
-                target="_blank"
-                rel="nofollow noopener noreferrer"
-                className="nv-btn nv-btn-secondary"
-              >
-                <Globe className="h-4 w-4" /> Website öffnen
-              </a>
-            )}
-          </div>
-        )}
 
         {/* E-Mail-Kontakt-Panel — nur wenn Adresse hinterlegt ist */}
         {(() => {
