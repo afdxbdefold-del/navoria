@@ -15,17 +15,34 @@ const KNOWN_BOTS = {
   bingbot: { label: 'Bingbot', category: 'Suchmaschine', color: '#008373' },
   applebot: { label: 'Applebot', category: 'Suchmaschine', color: '#000000' },
   amazonbot: { label: 'Amazonbot', category: 'Suchmaschine', color: '#FF9900' },
+  yandexbot: { label: 'YandexBot', category: 'Suchmaschine', color: '#FF0000' },
+  duckduckbot: { label: 'DuckDuckBot', category: 'Suchmaschine', color: '#DE5833' },
+  baiduspider: { label: 'Baiduspider', category: 'Suchmaschine', color: '#2932E1' },
+  seznambot: { label: 'SeznamBot', category: 'Suchmaschine', color: '#CC0000' },
+  petalbot: { label: 'PetalBot (Huawei)', category: 'Suchmaschine', color: '#EA0029' },
   gptbot: { label: 'GPTBot (OpenAI)', category: 'AI-Crawler', color: '#10A37F' },
+  'chatgpt-user': { label: 'ChatGPT-User', category: 'AI-Crawler', color: '#10A37F' },
+  'oai-searchbot': { label: 'OAI-SearchBot', category: 'AI-Crawler', color: '#10A37F' },
   claudebot: { label: 'ClaudeBot (Anthropic)', category: 'AI-Crawler', color: '#D97757' },
+  'claude-web': { label: 'Claude-Web', category: 'AI-Crawler', color: '#D97757' },
   perplexitybot: { label: 'PerplexityBot', category: 'AI-Crawler', color: '#20808D' },
   ccbot: { label: 'CCBot (Common Crawl)', category: 'AI-Crawler', color: '#6B7280' },
+  bytespider: { label: 'Bytespider (TikTok)', category: 'AI-Crawler', color: '#000000' },
+  'meta-externalagent': { label: 'Meta (Facebook / Threads)', category: 'AI-Crawler', color: '#1877F2' },
   semrushbot: { label: 'SemrushBot', category: 'SEO-Tool', color: '#FF642D' },
   ahrefsbot: { label: 'AhrefsBot', category: 'SEO-Tool', color: '#0060B9' },
-  facebookexternalhit: { label: 'Facebook Bot', category: 'Social', color: '#1877F2' },
-  twitterbot: { label: 'Twitterbot', category: 'Social', color: '#1DA1F2' },
+  mj12bot: { label: 'MJ12bot (Majestic)', category: 'SEO-Tool', color: '#00A1D8' },
+  dotbot: { label: 'DotBot (Moz)', category: 'SEO-Tool', color: '#00CAFF' },
+  screamingfrog: { label: 'Screaming Frog', category: 'SEO-Tool', color: '#00B14F' },
+  sitebulb: { label: 'Sitebulb', category: 'SEO-Tool', color: '#F79521' },
+  twitterbot: { label: 'Twitterbot / X', category: 'Social', color: '#1DA1F2' },
   linkedinbot: { label: 'LinkedIn Bot', category: 'Social', color: '#0A66C2' },
   whatsapp: { label: 'WhatsApp', category: 'Social', color: '#25D366' },
-  other: { label: 'Sonstige (nicht identifiziert)', category: 'Sonstige', color: '#94A3B8' },
+  telegrambot: { label: 'Telegram Bot', category: 'Social', color: '#26A5E4' },
+  'uptime-robot': { label: 'Uptime-Monitor', category: 'Monitoring', color: '#00C853' },
+  'vercel-bot': { label: 'Vercel Screenshot/OG', category: 'Monitoring', color: '#000000' },
+  'archive-org': { label: 'archive.org (Wayback)', category: 'Archiv', color: '#000000' },
+  other: { label: 'Sonstige (generischer Bot)', category: 'Sonstige', color: '#94A3B8' },
 };
 
 function botMeta(name) {
@@ -225,8 +242,10 @@ function BotsDashboard({ token }) {
       </div>
 
       <p className="mt-6 text-xs text-slate-400">
-        Datenquelle: <code className="rounded bg-slate-100 px-1 py-0.5">page_views</code>-Collection · Bot-Erkennung via User-Agent-Regex ·
-        Bots ohne JavaScript-Rendering werden nicht erfasst (fehlt Server-Side-Log).
+        Datenquelle: <code className="rounded bg-slate-100 px-1 py-0.5">server_hits</code>-Collection · Server-Side Request-Logging in{' '}
+        <code className="rounded bg-slate-100 px-1 py-0.5">app/layout.js</code> ·
+        Bot-Erkennung via User-Agent-Regex · Erfasst auch Non-JS-Bots (Yandex, Bytespider, MJ12Bot etc.) ·
+        Retention: 90 Tage (TTL).
       </p>
     </div>
   );

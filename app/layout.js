@@ -9,6 +9,7 @@ import PageTracker from '@/components/PageTracker';
 import WebMCPRegistrar from '@/components/WebMCPRegistrar';
 import { NavShellTop, NavShellBottom } from '@/components/NavShell';
 import { getBaseUrl, getBaseUrlSync } from '@/lib/baseUrl';
+import { logServerHit } from '@/lib/serverTracker';
 
 // Statischer Fallback für Metadata (die läuft zum Build-Zeitpunkt).
 // Die JSON-LD-Schemas werden im Layout selbst mit der Runtime-URL berechnet.
@@ -117,6 +118,17 @@ export default async function RootLayout({ children }) {
   // damit sie für Google als eigenständige Praxis-Websites wirken.
   const hdr = await headers();
   const isHomepageMode = hdr.get('x-navoria-mode') === 'homepage';
+
+  // Server-Side Request-Logging (fire-and-forget, blockiert Rendering nicht).
+  // Erfasst ALLE eingehenden Seiten-Requests inkl. Non-JS-Bots (Yandex, MJ12Bot, Bytespider etc.),
+  // die vom Client-Tracker (/api/track) nicht gesehen werden.
+  const path = hdr.get('x-navoria-path') || '/';
+  const ua = hdr.get('user-agent') || '';
+  const ip = hdr.get('x-forwarded-for')?.split(',')[0]?.trim() || hdr.get('x-real-ip') || null;
+  const referer = hdr.get('referer') || null;
+  const host = hdr.get('x-forwarded-host') || hdr.get('host') || null;
+  logServerHit({ path, userAgent: ua, ip, referer, host, mode: isHomepageMode ? 'homepage' : 'directory' })
+    .catch(() => {});
 
   // Base-URL zur Laufzeit ermitteln (mit Host-Header-Detection → auch wenn Env-Var
   // fälschlicherweise auf Preview-URL zeigt, wird auf navoria.de gemappt wenn der

@@ -714,10 +714,11 @@ async function handleGet(request, pathParts) {
   }
 
   // GET /api/admin/bots?range=today|7d|30d
-  // Detaillierte Bot-Aufschlüsselung: pro Bot Anzahl, First/Last Seen, Top-URLs, Stundenverlauf
+  // Detaillierte Bot-Aufschlüsselung aus SERVER-SIDE Log (server_hits Collection).
+  // Erfasst auch Non-JS-Bots (Yandex, MJ12Bot, Bytespider etc.), die im Client-Tracker fehlen.
   if (pathParts[0] === 'admin' && pathParts[1] === 'bots' && !pathParts[2]) {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
-    const col = await getCollection('page_views');
+    const col = await getCollection('server_hits');
     const range = (url.searchParams.get('range') || 'today').toLowerCase();
 
     const now = new Date();

@@ -47,6 +47,7 @@ export function middleware(request) {
     // dass wir auf einer Homepage-Modus-Seite sind → keine globalen Navoria-Schemas emittieren.
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-navoria-mode', 'homepage');
+    requestHeaders.set('x-navoria-path', pathname);
     const response = NextResponse.next({ request: { headers: requestHeaders } });
     // Response-Header (an Browser + Crawler):
     // noindex/nofollow/noarchive/noimageindex – nur crawlbar für GMB-Verifizierung, nicht indexierbar.
@@ -57,6 +58,7 @@ export function middleware(request) {
   // Alle anderen Routen: Standard-Modus (mit globalen Navoria-Schemas)
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-navoria-mode', 'directory');
+  requestHeaders.set('x-navoria-path', pathname);
   return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
