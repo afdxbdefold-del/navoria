@@ -33,6 +33,24 @@ const RESERVED = new Set([
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
+  // 410 GONE für offensichtlich kaputte Praxis-URLs mit null/undefined/leerem Slug.
+  // Diese entstehen oft aus alten OG-Cache-Einträgen von Facebook/Threads oder alten Sitemaps.
+  // Statt 404 senden wir 410, damit Suchmaschinen/Meta die URLs schnell aus ihrem Index entfernen.
+  const brokenPraxisRe = /^\/praxis\/[^/]+\/(null|undefined|nan|none|)\/?$/i;
+  if (brokenPraxisRe.test(pathname)) {
+    return new NextResponse(
+      '<!doctype html><html><head><meta name="robots" content="noindex,nofollow"><title>410 Gone</title></head><body><h1>410 Gone</h1><p>Diese URL existiert nicht mehr.</p></body></html>',
+      {
+        status: 410,
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'X-Robots-Tag': 'noindex, nofollow',
+          'Cache-Control': 'public, max-age=86400',
+        },
+      }
+    );
+  }
+
   // Match: Root-Level Praxis-Homepage /[slug] (nur wenn kein reservierter Slug)
   // Beispiel: /jaroslaw-raczynski, /herr-dr-med-r-fecadu-shencoru
   const rootSlugMatch = pathname.match(/^\/([a-z0-9][a-z0-9-]{2,79})\/?$/);
