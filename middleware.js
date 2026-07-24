@@ -77,7 +77,14 @@ export function middleware(request) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-navoria-mode', 'directory');
   requestHeaders.set('x-navoria-path', pathname);
-  return NextResponse.next({ request: { headers: requestHeaders } });
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+
+  // Consent-Signal für KI-Training: kein Meta-AI, keine Bild-KI-Trainings.
+  // Wichtig: `noai` und `noimageai` sind sog. Consent-Signals — nicht alle Crawler
+  // respektieren sie, aber Meta, Google-Extended, Bytespider u. a. reagieren darauf.
+  // Klassische Suchmaschinen-Indexierung bleibt via HTML-Meta-Tags gesteuert.
+  response.headers.set('X-Robots-Tag', 'noai, noimageai');
+  return response;
 }
 
 export const config = {

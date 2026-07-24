@@ -59,7 +59,9 @@ User-agent: cohere-ai
 Allow: /
 
 User-agent: Meta-ExternalAgent
-Allow: /
+Disallow: /
+# ↑ Meta-AI-Training-Crawler blockiert (Llama/Meta-KI-Training).
+# facebookexternalhit (Link-Previews) bleibt via User-agent: * erlaubt.
 
 User-agent: Applebot-Extended
 Allow: /
