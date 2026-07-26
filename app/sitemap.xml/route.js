@@ -35,6 +35,7 @@ export async function GET() {
   const sitemaps = [];
   sitemaps.push(sitemap(base, '/sitemap-pages.xml', now));
   sitemaps.push(sitemap(base, '/sitemap-cities.xml', now));
+  sitemaps.push(sitemap(base, '/sitemap-homepages.xml', now));
   for (let i = 1; i <= citySpecChunks; i += 1) {
     sitemaps.push(sitemap(base, `/sitemap-city-specs/${i}`, now));
   }

@@ -8,10 +8,12 @@
 // Statische Routen von Next.js haben Vorrang, daher entstehen keine Konflikte mit /admin, /aerzte etc.
 
 import { getCollection } from '@/lib/mongodb';
-import { notFound, permanentRedirect } from 'next/navigation';
+import { notFound, permanentRedirect, redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import { isReservedRootSlug } from '@/lib/reservedSlugs';
 import PracticeHomepage from '@/components/PracticeHomepage';
 import { getBaseUrl } from '@/lib/baseUrl';
+import { getPraxisHomepageUrl, extractPraxisSubdomain, isPreviewHost, MAIN_DOMAIN } from '@/lib/subdomains';
 
 async function loadByHomepageSlug(slug) {
   if (!slug) return null;
@@ -36,9 +38,18 @@ export async function generateMetadata({ params }) {
   const cityText = d.city || '';
   const specialty = d.specialty_guess || 'Arztpraxis';
   const displayName = d.name;
-  const canonical = `/${d.homepage_slug}`;
-  const base = await getBaseUrl();
-  const absoluteCanonical = `${base}${canonical}`;
+
+  // Canonical zeigt IMMER auf die Subdomain-URL, sobald Homepage-Modus aktiv ist.
+  // Auch wenn der Nutzer die Praxis via navoria.de/[slug] aufruft, konsolidiert
+  // Google so die Signale auf https://<slug>.navoria.de/.
+  // Fallback (Preview/Dev): getBaseUrl → aktueller Host.
+  const hdr = await headers();
+  const clientHost = (hdr.get('x-forwarded-host') || hdr.get('host') || '').split(',')[0].trim().toLowerCase().split(':')[0];
+  const isPreview = isPreviewHost(clientHost);
+
+  const absoluteCanonical = isPreview
+    ? `${await getBaseUrl()}/${d.homepage_slug}`
+    : getPraxisHomepageUrl(d.homepage_slug);
 
   const title = `${displayName} – ${specialty} in ${cityText}`;
   const desc = `Praxis ${displayName} in ${cityText}. ${d.formatted_address ? `Adresse: ${d.formatted_address}. ` : ''}${d.phone_national ? `Termine: ${d.phone_national}.` : ''}`;
@@ -90,8 +101,22 @@ export default async function PraxisHomepagePage({ params }) {
   // Wenn Homepage-Modus AUS ist, leiten wir auf den Directory-Eintrag um.
   // Damit bleibt die alte URL nutzbar (z.B. wenn sie schon verteilt / gedruckt wurde)
   // und Google konsolidiert den Link-Juice via 301 auf den Directory-Eintrag.
+  // Das gilt auch für Subdomain-Aufrufe (<slug>.navoria.de) — nach Ablauf
+  // des Homepage-Modus leitet die Subdomain auf das Verzeichnis-Profil.
   if (d.homepage_mode !== true) {
     permanentRedirect(`/praxis/${d.city_slug}/${d.slug}`);
+  }
+
+  // Falls Homepage-Modus AKTIV und Aufruf via Root-Domain (navoria.de/[slug]) statt
+  // Subdomain: 301-Redirect auf die kanonische <slug>.navoria.de/-URL.
+  // Preview-/Dev-Hosts sind ausgenommen — dort läuft das alte Root-Slug-Verhalten weiter.
+  const hdr = await headers();
+  const clientHost = (hdr.get('x-forwarded-host') || hdr.get('host') || '').split(',')[0].trim().toLowerCase().split(':')[0];
+  const requestedFromSubdomain = extractPraxisSubdomain(clientHost);
+
+  if (!isPreviewHost(clientHost) && !requestedFromSubdomain) {
+    // Root-Domain-Aufruf → Redirect zur Subdomain
+    redirect(getPraxisHomepageUrl(d.homepage_slug), 'replace');
   }
 
   return (

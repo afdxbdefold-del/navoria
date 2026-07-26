@@ -12,6 +12,7 @@
 // via 301-Redirect um – der Header schadet dann nicht.
 
 import { NextResponse } from 'next/server';
+import { extractPraxisSubdomain, isRootDomain, isPreviewHost, MAIN_DOMAIN } from '@/lib/subdomains';
 
 // Reservierte Root-Slugs, die statische Routen sind (kein Homepage-Modus)
 const RESERVED = new Set([
@@ -32,6 +33,8 @@ const RESERVED = new Set([
 
 export function middleware(request) {
   const { pathname } = request.nextUrl;
+  const hostHeader = request.headers.get('x-forwarded-host') || request.headers.get('host') || '';
+  const clientHost = String(hostHeader).split(',')[0].trim().toLowerCase().split(':')[0];
 
   // 410 GONE für offensichtlich kaputte Praxis-URLs mit null/undefined/leerem Slug.
   // Diese entstehen oft aus alten OG-Cache-Einträgen von Facebook/Threads oder alten Sitemaps.
@@ -51,6 +54,34 @@ export function middleware(request) {
     );
   }
 
+  // ===== Wildcard-Subdomain-Routing =====
+  // Wenn Request auf <slug>.navoria.de eingeht: interner Rewrite auf /[slug]/page.js.
+  // Die Page prüft dann homepage_mode und rendert entweder PracticeHomepage oder
+  // redirected auf /praxis/[stadt]/[slug] (Verzeichnis).
+  // Deaktiviert für Preview-/Emergent-Hosts — dort läuft weiter das alte /[praxisSlug]-Verhalten.
+  const subdomain = extractPraxisSubdomain(clientHost);
+  if (subdomain) {
+    // Non-Root-Paths auf einer Praxis-Subdomain → 301 auf Root-Domain
+    // (bewahrt SEO, falls versehentlich <slug>.navoria.de/aerzte etc. verlinkt wurde).
+    if (pathname !== '/' && pathname !== '') {
+      const target = `https://${MAIN_DOMAIN}${pathname}${request.nextUrl.search || ''}`;
+      return NextResponse.redirect(target, 301);
+    }
+
+    // Root-Path auf Praxis-Subdomain → intern rewrite auf /[praxisSlug]
+    const rewriteUrl = request.nextUrl.clone();
+    rewriteUrl.pathname = `/${subdomain}`;
+
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-navoria-mode', 'homepage');
+    requestHeaders.set('x-navoria-subdomain', subdomain);
+    requestHeaders.set('x-navoria-path', `/${subdomain}`);
+
+    const response = NextResponse.rewrite(rewriteUrl, { request: { headers: requestHeaders } });
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, noimageindex');
+    return response;
+  }
+
   // Match: Root-Level Praxis-Homepage /[slug] (nur wenn kein reservierter Slug)
   // Beispiel: /jaroslaw-raczynski, /herr-dr-med-r-fecadu-shencoru
   const rootSlugMatch = pathname.match(/^\/([a-z0-9][a-z0-9-]{2,79})\/?$/);
@@ -61,14 +92,14 @@ export function middleware(request) {
   // Der noindex kommt dann via HTML-Meta-Tag aus der Page-Route.
 
   if (isRootPraxisHomepage) {
-    // Request-Header setzen, damit die Root-Layout via next/headers erkennen kann,
-    // dass wir auf einer Homepage-Modus-Seite sind → keine globalen Navoria-Schemas emittieren.
+    // Wenn wir auf der Root-Domain (navoria.de) sind, könnte die Praxis-Homepage
+    // via Subdomain besser platziert sein — die Page-Route entscheidet und leitet
+    // ggf. um. Wir setzen nur die Mode-Header, damit Layout weiß, dass es Homepage-Modus ist.
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-navoria-mode', 'homepage');
     requestHeaders.set('x-navoria-path', pathname);
+    requestHeaders.set('x-navoria-client-host', clientHost);
     const response = NextResponse.next({ request: { headers: requestHeaders } });
-    // Response-Header (an Browser + Crawler):
-    // noindex/nofollow/noarchive/noimageindex – nur crawlbar für GMB-Verifizierung, nicht indexierbar.
     response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, noimageindex');
     return response;
   }
