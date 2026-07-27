@@ -16,7 +16,7 @@ cd "$BACKUP_DIR"
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting MongoDB dump"
 
 # Dump aus Docker-Container in lokales Volume
-docker compose -f /opt/navoria/deploy/docker-compose.yml exec -T mongo \
+docker exec -i navoria-mongo \
   mongodump --db=navoria_db --archive --gzip > "$BACKUP_DIR/navoria-$DATE.gz"
 
 # Größe prüfen

@@ -45,4 +45,4 @@ COPY --from=builder --chown=nextjs:nodejs /app/middleware.js ./middleware.js
 USER nextjs
 EXPOSE 3000
 
-CMD ['node', 'node_modules/.bin/next', 'start', '-H', '0.0.0.0', '-p', '3000']
+CMD ["node", "node_modules/.bin/next", "start", "-H", "0.0.0.0", "-p", "3000"]

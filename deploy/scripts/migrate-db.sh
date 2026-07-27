@@ -38,7 +38,17 @@ case "$ACTION" in
     # MongoDB muss laufen
     docker compose -f deploy/docker-compose.yml up -d mongo
     sleep 5
-    docker compose -f deploy/docker-compose.yml exec -T mongo mongorestore --archive --gzip --drop < "$DUMP_FILE"
+    # Warten bis Mongo healthy ist
+    for i in {1..20}; do
+      if docker compose -f deploy/docker-compose.yml ps mongo | grep -q '(healthy)'; then break; fi
+      echo "  ... warte auf Mongo healthy ($i/20)"
+      sleep 3
+    done
+    # Dump in Container kopieren (robuster als stdin-Redirect)
+    docker cp "$DUMP_FILE" navoria-mongo:/tmp/navoria-dump.gz
+    docker compose -f deploy/docker-compose.yml exec -T mongo \
+      mongorestore --archive=/tmp/navoria-dump.gz --gzip --drop
+    docker compose -f deploy/docker-compose.yml exec -T mongo rm -f /tmp/navoria-dump.gz
     echo '✅ Restore complete'
     echo ''
     echo 'Optional: Dump-Datei löschen (enthält Klartext-Daten)'

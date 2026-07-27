@@ -1,5 +1,5 @@
 # Navoria Production Stack — Hetzner CX22
-# Nginx läuft HOST-nativ (nicht in Compose), damit SSL-Renewal einfach ist.
+# Caddy läuft HOST-nativ (nicht in Compose) und proxied auf 127.0.0.1:3000.
 
 services:
   app:
@@ -18,7 +18,7 @@ services:
       - NODE_ENV=production
       - MONGO_URL=mongodb://mongo:27017
     ports:
-      - '127.0.0.1:3000:3000'  # nur lokal, Nginx proxied
+      - '127.0.0.1:3000:3000'  # nur lokal, Caddy proxied
     networks:
       - navoria-net
     healthcheck:
