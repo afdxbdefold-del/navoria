@@ -1,8 +1,10 @@
 import Link from 'next/link';
+import { AlertTriangle, Phone, Heart, Info } from 'lucide-react';
+import ContactEmailGate from './ContactEmailGate';
 
 export const metadata = {
   title: 'Impressum',
-  description: 'Impressum und Anbieterkennzeichnung nach § 5 DDG für Navoria.',
+  description: 'Impressum und Anbieterkennzeichnung nach § 5 DDG für Navoria. Wichtiger Hinweis: Navoria ist ein Arztverzeichnis, keine Arztpraxis.',
   alternates: { canonical: '/impressum' },
   robots: { index: true, follow: false },
 };
@@ -17,7 +19,62 @@ export default function ImpressumPage() {
       <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Impressum</h1>
       <p className="mt-2 text-sm text-slate-500">Angaben gemäß § 5 DDG</p>
 
-      <section className="mt-8 space-y-6 text-slate-700">
+      {/* Kritischer Hinweis: Navoria ist NICHT die Arztpraxis */}
+      <div
+        role="alert"
+        className="mt-6 rounded-xl border-2 p-5"
+        style={{ borderColor: '#DC2626', background: '#FEF2F2' }}
+      >
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="mt-0.5 h-6 w-6 shrink-0" style={{ color: '#DC2626' }} aria-hidden="true" />
+          <div>
+            <h2 className="text-base font-bold" style={{ color: '#991B1B' }}>
+              Wichtig: Navoria ist ein Arztverzeichnis — keine Arztpraxis
+            </h2>
+            <p className="mt-2 text-[14px] leading-relaxed" style={{ color: '#7F1D1D' }}>
+              Wir sind <strong>nicht die behandelnde Praxis</strong>, keine Ärzte und kein
+              medizinisches Personal. Wir haben <strong>keinen Zugriff</strong> auf Praxis-Kalender,
+              Rezepte, Befunde oder Krankenakten. Wir können <strong>keine Termine vereinbaren,
+              keine Rezepte ausstellen und keine medizinischen Fragen beantworten</strong>.
+            </p>
+            <div className="mt-4 rounded-lg bg-white/60 p-4">
+              <p className="text-[14px] font-semibold" style={{ color: '#991B1B' }}>
+                Bitte senden Sie uns keine Gesundheitsdaten
+              </p>
+              <p className="mt-1.5 text-[13px] leading-relaxed" style={{ color: '#7F1D1D' }}>
+                Symptome, Diagnosen, Medikamente, Befunde, Röntgen-, Blut- oder Laborwerte gehören
+                <strong> ausschließlich in ärztliche Hände</strong>. Solche Informationen sind
+                besondere Daten nach Art. 9 DSGVO und dürfen wir nicht entgegennehmen.
+              </p>
+            </div>
+            <div className="mt-4 space-y-2 text-[14px]" style={{ color: '#7F1D1D' }}>
+              <p className="flex items-start gap-2">
+                <Phone className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>
+                  <strong>Termine / Fragen zu Ihrer Behandlung:</strong> Bitte wenden Sie sich
+                  direkt an Ihre Praxis. Die Kontaktdaten finden Sie im jeweiligen Praxis-Profil.
+                </span>
+              </p>
+              <p className="flex items-start gap-2">
+                <Heart className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>
+                  <strong>Ärztlicher Bereitschaftsdienst (außerhalb der Sprechzeiten):</strong>{' '}
+                  <a href="tel:116117" className="font-semibold underline">116 117</a>
+                </span>
+              </p>
+              <p className="flex items-start gap-2">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>
+                  <strong>Lebensbedrohlicher Notfall:</strong>{' '}
+                  <a href="tel:112" className="font-semibold underline">112</a>
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section className="mt-10 space-y-6 text-slate-700">
         <div>
           <h2 className="text-base font-semibold text-slate-900">Anbieter</h2>
           <address className="not-italic mt-2 leading-relaxed">
@@ -30,7 +87,14 @@ export default function ImpressumPage() {
 
         <div>
           <h2 className="text-base font-semibold text-slate-900">Kontakt</h2>
-          <p className="mt-2">E-Mail: <a href="mailto:mail@navoria.de" className="text-sky-700 hover:underline">mail@navoria.de</a></p>
+          <p className="mt-2 text-[14px] text-slate-600">
+            Nachrichten mit medizinischem oder Gesundheitsbezug können wir aus rechtlichen Gründen
+            nicht bearbeiten und werden ungelesen gelöscht. Für Rückfragen zum Verzeichnis (z.&nbsp;B.
+            Korrekturen zu Praxisdaten, Löschanträge, Datenschutz, Presse) nutzen Sie bitte:
+          </p>
+          <div className="mt-3">
+            <ContactEmailGate />
+          </div>
         </div>
 
         <div>

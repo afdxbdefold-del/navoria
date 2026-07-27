@@ -486,3 +486,100 @@ agent_communication:
             Note: Only 1 candidate matched filter criteria (no website + active + has google_place_id + 
             not checked in last 90 days), so couldn't test larger batch scenario. However, the fix is 
             verified to work correctly with the reduced batch size and time budget.
+
+  - task: "Bot-Detail-Admin-Endpoint (GET /api/admin/bots)"
+    implemented: true
+    working: "NA"
+    file: "/app/app/api/[[...path]]/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: |
+            Neuer Admin-Endpoint für Bot-Traffic-Analyse. Liest aus der neuen `server_hits`-Collection
+            (gefüllt via lib/serverTracker.js aus app/layout.js).
+
+            Route: GET /api/admin/bots?range=today|7d|30d
+            Auth: Bearer Token via /api/admin/login (admin@navoria.de / one4all1)
+
+            Antwort:
+            {
+              range, window: {from, to},
+              totals: {hits, unique_paths, distinct_bots},
+              bots: [{bot, hits, first_seen, last_seen, paths_count, top_paths:[{path,hits}], hourly:[]}],
+              hourly_all: [...], generated_at
+            }
+
+            Zu testen:
+            1. Auth-Guard: OHNE Bearer-Token → HTTP 401 mit {"error": "Nicht autorisiert"}
+            2. Mit gültigem Token, range=today → HTTP 200, gültiges Schema
+            3. Mit range=7d und range=30d → HTTP 200, unterschiedliche Zeitfenster
+            4. Ungültiger range (z.B. "invalid") → Fallback auf 'today' (nicht 500)
+            5. Response-Schema: totals.hits ist number, bots ist array, jede Zeile hat bot/hits/top_paths/hourly
+
+  - task: "Server-Side Request Logging (lib/serverTracker.js + app/layout.js)"
+    implemented: true
+    working: "NA"
+    file: "/app/lib/serverTracker.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: |
+            Neues Server-Side Request-Logging. app/layout.js ruft logServerHit() fire-and-forget auf,
+            das jeden Page-Render in die `server_hits`-MongoDB-Collection schreibt.
+
+            Test-Setup:
+            - Bot-User-Agents senden (Googlebot, PerplexityBot, YandexBot, Bytespider, SemrushBot)
+              an z.B. GET / oder GET /aerzte
+            - Nach kurzer Verzögerung (fire-and-forget) sollte in server_hits Collection eine Row
+              mit korrektem bot_name und is_bot:true stehen.
+            - Auch normale Browser-UAs sollten mit is_bot:false geloggt werden.
+            - Skip-Paths: /api, /admin, /_next, static asset paths — dürfen NICHT geloggt werden.
+
+            Zu prüfen:
+            1. Nach GET / mit User-Agent "Googlebot/2.1" existiert Row in server_hits mit bot_name="googlebot"
+            2. Nach GET / mit User-Agent "Mozilla/5.0 (X11; Linux)" existiert Row mit is_bot=false
+            3. GET /api/track wird NICHT geloggt (SKIP_PATH_REGEX)
+            4. GET /admin/bots wird NICHT geloggt
+            5. Kein Doppel-Eintrag pro Request
+            6. Fire-and-forget: Response-Zeit für / bleibt unter 500ms (Log darf nicht blockieren)
+
+  - task: "Wildcard-Subdomain-Routing (middleware.js + lib/subdomains.js)"
+    implemented: true
+    working: "NA"
+    file: "/app/middleware.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: |
+            Neue Wildcard-Subdomain-Logik für Praxis-Homepages:
+            - <slug>.navoria.de/ → intern rewrite auf /[praxisSlug] → 200
+            - <slug>.navoria.de/aerzte → 301 auf navoria.de/aerzte
+            - navoria.de/<slug> bei aktivem homepage_mode → 307 auf <slug>.navoria.de/
+            - Preview-Host (arzt-suche.preview.emergentagent.com) → Fallback auf altes Verhalten
+            - Reserved subdomains (www, admin, api, mail, ...) → kein Rewrite
+
+            Test-Setup (curl mit Host-Header):
+            1. curl -sI -H "Host: jaroslaw-raczynski.navoria.de" http://localhost:3000/
+               → Erwartet: HTTP 200 (rewritet zu /[slug])
+            2. curl -sI -H "Host: jaroslaw-raczynski.navoria.de" http://localhost:3000/aerzte
+               → Erwartet: HTTP 301, Location: https://navoria.de/aerzte
+            3. curl -sI -H "Host: navoria.de" -H "X-Forwarded-Host: navoria.de" http://localhost:3000/jaroslaw-raczynski
+               → Erwartet: HTTP 307, Location: https://jaroslaw-raczynski.navoria.de/
+            4. curl -sI -H "Host: admin.navoria.de" http://localhost:3000/
+               → Erwartet: KEIN Rewrite, HTTP 200 (Startseite gerendert)
+            5. curl -sI -H "Host: arzt-suche.preview.emergentagent.com" http://localhost:3000/jaroslaw-raczynski
+               → Erwartet: HTTP 200 (Preview-Fallback aktiv)
+            6. GET /sitemap-homepages.xml → HTTP 200, enthält https://jaroslaw-raczynski.navoria.de/
+            7. GET /sitemap.xml → HTTP 200, referenziert sitemap-homepages.xml
+            8. Kaputte URL /praxis/berlin/null → HTTP 410 (Gone)
+
+            Verwende die Praxis mit homepage_slug="jaroslaw-raczynski" aus der DB als Test-Daten.
