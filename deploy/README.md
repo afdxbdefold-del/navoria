@@ -1,26 +1,30 @@
-# Navoria Deployment auf Hetzner (Docker Compose + Nginx + Wildcard-SSL via IONOS DNS)
+# Navoria Deployment auf Hetzner (Docker Compose + Caddy)
 
 **Ziel-Setup:**
 - Hetzner CX22 (2 vCPU, 4 GB RAM, 40 GB SSD, Ubuntu 24.04)
 - Docker Compose für Next.js-App + MongoDB
-- Nginx als Reverse-Proxy auf dem Host (nicht im Container – vereinfacht SSL-Renewal)
-- Let's Encrypt Wildcard-Cert für `navoria.de` + `*.navoria.de` via DNS-01 mit IONOS-API-Plugin
+- **Caddy als Reverse-Proxy** — automatisches TLS on-demand für ALLE Praxis-Subdomains
 - Tägliches MongoDB-Backup (Cronjob)
+
+## Warum Caddy statt Nginx?
+
+- ✅ **Kein Wildcard-Cert nötig** — Caddy holt für JEDE aufgerufene Subdomain ihr eigenes Cert
+- ✅ **Keine DNS-API-Keys nötig** — HTTP-01-Challenge auf Port 80
+- ✅ **Kein SSL-Renewal-Setup** — Caddy erneuert alle Certs automatisch im Hintergrund
+- ✅ **10 Zeilen Config** statt 80 Zeilen Nginx
+- ✅ HTTP/3 (QUIC) out of the box
 
 ## 📋 Voraussetzungen
 
-Bevor du beginnst, brauchst du:
-
-1. **Hetzner CX22 Server** — Ubuntu 24.04 LTS, öffentliche IPv4 (z. B. `128.140.x.y`)
+1. **Hetzner CX22 Server** — Ubuntu 24.04 LTS, öffentliche IPv4
 2. **SSH-Zugang** als root oder sudo-User
-3. **IONOS API Keys**:
-   - IONOS-Web-Panel → **DNS API Keys** anlegen unter https://developer.hosting.ionos.de/keys
-   - Du bekommst: `ionos_prefix` und `ionos_secret`
-4. **DNS-Records bei IONOS**:
-   - A-Record: `navoria.de` → Server-IP
-   - A-Record: `*.navoria.de` → Server-IP (Wildcard!)
-   - (TTL 300 Sekunden für schnelle Änderungen)
-5. **mongodump aus der aktuellen Preview-Umgebung** (Anleitung unter Schritt 5)
+3. **DNS-Records bei IONOS** (oder wo dein DNS läuft):
+   - `A navoria.de` → Server-IP
+   - `A *.navoria.de` → Server-IP (Wildcard-DNS!)
+   - `A www.navoria.de` → Server-IP (falls www.navoria.de genutzt wird)
+   - TTL: 300 Sekunden empfohlen
+
+**Wichtig:** DNS muss stimmen BEVOR du Caddy startest — sonst kann Caddy keine ACME-Challenge lösen.
 
 ---
 
@@ -37,16 +41,11 @@ cd /opt
 git clone <deine-repo-url> navoria
 cd navoria
 
-# Server-Init-Script ausführen (installiert Docker, Nginx, Certbot, konfiguriert Firewall)
+# Server-Init-Script ausführen (Docker, Caddy, Firewall, Fail2Ban)
 bash deploy/scripts/server-init.sh
 ```
 
-Das Script macht folgendes:
-- Installiert Docker Engine + Docker Compose Plugin
-- Installiert Nginx (host-nativ, nicht in Docker)
-- Installiert Certbot + `certbot-dns-ionos` Plugin (via pip)
-- UFW-Firewall konfigurieren (nur SSH/80/443 offen)
-- Erstellt Systemd-Service für Auto-Start
+Installiert Docker Engine + Compose, Caddy, UFW-Firewall (nur SSH/80/443 offen), Fail2Ban, unattended-upgrades.
 
 ### Schritt 2: Environment-Variablen setzen
 
@@ -56,57 +55,32 @@ nano deploy/.env
 ```
 
 Trage ein:
-- `MONGO_URL=mongodb://mongo:27017` (Docker-internes Netz)
+- `MONGO_URL=mongodb://mongo:27017`
 - `DB_NAME=navoria_db`
 - `ADMIN_PASSWORD=<sicheres-passwort>`
 - `NEXT_PUBLIC_BASE_URL=https://navoria.de`
 - `OUTSCRAPER_API_KEY=...`
 - `GOOGLE_PLACES_API_KEY=...`
-- Alle weiteren Keys aus der aktuellen `/app/.env`
+- (weitere Keys aus deiner aktuellen `/app/.env`)
 
-### Schritt 3: SSL-Zertifikat erstellen (Wildcard)
-
-```bash
-# IONOS-Credentials für certbot hinterlegen
-mkdir -p /etc/letsencrypt/ionos
-cat > /etc/letsencrypt/ionos/credentials.ini <<EOF
-dns_ionos_prefix = DEIN_PREFIX_HIER
-dns_ionos_secret = DEIN_SECRET_HIER
-dns_ionos_endpoint = https://api.hosting.ionos.com
-EOF
-chmod 600 /etc/letsencrypt/ionos/credentials.ini
-
-# Zertifikat anfordern (Wildcard + Root-Domain)
-certbot certonly \
-  --authenticator dns-ionos \
-  --dns-ionos-credentials /etc/letsencrypt/ionos/credentials.ini \
-  --dns-ionos-propagation-seconds 120 \
-  --email dein@email.de \
-  --agree-tos \
-  --no-eff-email \
-  -d navoria.de \
-  -d '*.navoria.de'
-```
-
-Der Zertifikat-Pfad ist danach: `/etc/letsencrypt/live/navoria.de/{fullchain,privkey}.pem`
-
-### Schritt 4: Nginx konfigurieren
+### Schritt 3: Caddyfile aktivieren
 
 ```bash
-# Nginx-Config kopieren
-cp deploy/nginx/navoria.conf /etc/nginx/sites-available/navoria
-ln -sf /etc/nginx/sites-available/navoria /etc/nginx/sites-enabled/navoria
-rm -f /etc/nginx/sites-enabled/default
+cp deploy/Caddyfile /etc/caddy/Caddyfile
 
-# Config testen und reloaden
-nginx -t && systemctl reload nginx
+# E-Mail-Adresse anpassen (für Let's Encrypt Renewal-Warnings)
+nano /etc/caddy/Caddyfile
+# Zeile 'email admin@navoria.de' auf deine Adresse setzen
+
+# Caddy neu laden (validiert automatisch die Config)
+systemctl restart caddy
+systemctl status caddy    # sollte 'active (running)' zeigen
 ```
 
-### Schritt 5: Datenbank-Migration (Preview → Prod)
+### Schritt 4: Datenbank-Migration (Preview → Prod)
 
 **Auf dem aktuellen Preview-Server (Emergent):**
 ```bash
-# Dump erstellen
 mongodump --uri="mongodb://localhost:27017" --db=navoria_db --archive=navoria-dump.gz --gzip
 ```
 
@@ -118,69 +92,47 @@ scp navoria-dump.gz root@<hetzner-ip>:/opt/navoria/
 **Auf dem Hetzner-Server:**
 ```bash
 cd /opt/navoria
-
-# App-Stack starten (nur MongoDB Container braucht man für Restore)
-docker compose up -d mongo
-
-# Restore in den MongoDB-Container
-docker compose exec -T mongo mongorestore --archive --gzip --drop < navoria-dump.gz
+docker compose -f deploy/docker-compose.yml up -d mongo   # MongoDB starten
+docker compose -f deploy/docker-compose.yml exec -T mongo mongorestore --archive --gzip --drop < navoria-dump.gz
 rm navoria-dump.gz   # aus Sicherheitsgründen löschen
 ```
 
-### Schritt 6: App bauen und starten
+### Schritt 5: App bauen und starten
 
 ```bash
 cd /opt/navoria
-docker compose build
-docker compose up -d
-
-# Logs prüfen
-docker compose logs -f app
+docker compose -f deploy/docker-compose.yml build
+docker compose -f deploy/docker-compose.yml up -d
+docker compose -f deploy/docker-compose.yml logs -f app
 ```
 
-Die App läuft nun intern auf `localhost:3000`. Nginx reverse-proxied `navoria.de` und `*.navoria.de` dorthin.
+App läuft auf `localhost:3000`. Caddy reverse-proxied bereits `navoria.de` + `*.navoria.de` dorthin.
 
-### Schritt 7: Verifizieren
+### Schritt 6: Verifizieren
 
 ```bash
-# Root-Domain
+# Root-Domain (erster Cert-Aquise 3-5 Sek)
 curl -sI https://navoria.de/ | head -5
 
-# Wildcard-Subdomain
+# Wildcard-Subdomain (erster Aufruf holt eigenes Cert)
 curl -sI https://jaroslaw-raczynski.navoria.de/ | head -5
 
 # Health-Check
-docker compose ps
+curl -s https://navoria.de/api/health | jq
 ```
 
-Beide sollten `HTTP/2 200` liefern.
+Alle drei sollten `HTTP/2 200` mit gültigem SSL-Cert liefern.
 
-### Schritt 8: Automatische Backups aktivieren
+### Schritt 7: Automatische Backups aktivieren
 
 ```bash
-# Cronjob installieren (täglich 3:15 Uhr Backup)
+# Cronjob installieren (täglich 3:15 Uhr)
 crontab -e
 # Diese Zeile hinzufügen:
 15 3 * * * /opt/navoria/deploy/scripts/backup-mongodb.sh >> /var/log/navoria-backup.log 2>&1
 ```
 
-Die Backups landen in `/opt/navoria/backups/` — 14 Tage Retention.
-
-### Schritt 9: SSL-Auto-Renewal aktivieren
-
-Certbot installiert automatisch einen Systemd-Timer, der 2×/Tag prüft. Das reicht.
-Prüfe mit: `systemctl list-timers | grep certbot`
-
-Bei Renewal wird Nginx nicht automatisch neu geladen — deshalb ein deploy-hook:
-
-```bash
-mkdir -p /etc/letsencrypt/renewal-hooks/deploy
-cat > /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh <<'EOF'
-#!/bin/bash
-systemctl reload nginx
-EOF
-chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
-```
+Backups landen in `/opt/navoria/backups/` — 14 Tage Retention.
 
 ---
 
@@ -192,11 +144,35 @@ cd /opt/navoria
 bash deploy/scripts/deploy.sh
 ```
 
-Das Script macht:
-1. `git pull`
-2. `docker compose build app`
-3. `docker compose up -d app` (rolling restart)
-4. Bereinigt alte Images
+Das Script: git pull → docker compose build → rolling restart → cleanup.
+
+**Wichtig:** Caddy muss dabei NICHT neu gestartet werden — es proxy'd weiterhin transparent.
+
+---
+
+## 🔒 On-Demand-TLS: So funktioniert es
+
+Beim ersten Aufruf einer neuen Subdomain (z. B. `neu-praxis.navoria.de`):
+
+1. User → HTTPS-Request an `neu-praxis.navoria.de`
+2. Caddy: "Ich habe kein Cert für diese Domain — fragen wir Navoria: `GET /api/tls-check?domain=neu-praxis.navoria.de`"
+3. Unser Endpoint (`app/api/tls-check/route.js`) prüft:
+   - Endet auf `.navoria.de`? ✅
+   - Reservierter Slug (www, admin, api...)? ❌
+   - Slug-Format ok (a-z, 0-9, 3-80 Zeichen)? ✅
+   - → HTTP 200 zurück
+4. Caddy: "OK, ich hole via HTTP-01 ein Let's-Encrypt-Cert" (dauert ~3-5 Sek)
+5. Nutzer bekommt Response mit gültigem SSL (kann etwas langsamer sein beim allerersten Mal)
+6. Ab jetzt gecacht in `/var/lib/caddy/.local/share/caddy/certificates/`
+7. Nach 60 Tagen: Auto-Renewal im Hintergrund
+
+**Rate-Limit-Schutz:**
+- Caddy holt Certs im Burst von max 10 pro 5 Min
+- Reservierte Subdomains bekommen KEIN Cert (verhindert Missbrauch)
+- Zu kurze oder ungültige Slugs → 403 vom `tls-check`
+
+**Wenn du strengere Absicherung willst** (nur Certs für tatsächlich in DB existierende Praxen):
+Öffne `/app/app/api/tls-check/route.js` und aktiviere den DB-Lookup-Block (steht kommentiert drin, Zeilen 62-70).
 
 ---
 
@@ -204,43 +180,42 @@ Das Script macht:
 
 **App startet nicht:**
 ```bash
-docker compose logs app --tail 100
+docker compose -f deploy/docker-compose.yml logs app --tail 100
 ```
 
 **MongoDB nicht erreichbar:**
 ```bash
-docker compose exec mongo mongosh --eval "db.serverStatus().ok"
+docker compose -f deploy/docker-compose.yml exec mongo mongosh --eval "db.serverStatus().ok"
 ```
 
-**Nginx-Config-Fehler:**
+**Caddy-Fehler:**
 ```bash
-nginx -t
-tail -f /var/log/nginx/error.log
+systemctl status caddy
+journalctl -u caddy -n 100
+tail -f /var/log/caddy/navoria.log
 ```
 
-**SSL-Cert läuft ab:**
+**Cert wird nicht ausgestellt:**
+- DNS prüfen: `dig +short neu-praxis.navoria.de` (sollte Server-IP zeigen)
+- Test tls-check: `curl -s "http://localhost:3000/api/tls-check?domain=neu-praxis.navoria.de"` sollte 200 zurückgeben
+- Caddy-Logs: `journalctl -u caddy -f`
+- Rate-Limit erreicht? `ls -la /var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/`
+
+**Wildcard-DNS funktioniert nicht:**
 ```bash
-certbot renew --dry-run
+dig +short random123.navoria.de
+# Muss die Server-IP zeigen. Wenn leer → DNS nicht korrekt.
 ```
-
-**Wildcard funktioniert nicht:**
-- DNS prüfen: `dig +short *.navoria.de` — sollte die Server-IP zeigen
-- Nginx-Config prüfen: `server_name navoria.de *.navoria.de;`
 
 ---
 
 ## 📊 Ressourcen-Monitoring
 
-Auf dem Server:
 ```bash
-# Docker-Stats
-docker stats --no-stream
-
-# System-Load
-htop
-
-# Disk-Usage
-df -h /opt /var/lib/docker
+docker stats --no-stream                              # Docker container
+htop                                                  # System load
+df -h /opt /var/lib/docker /var/lib/caddy             # Disk usage
+ls /var/lib/caddy/.local/share/caddy/certificates/    # aktive SSL-Certs
 ```
 
-Bei CX22 (4 GB RAM) sollte Navoria ~800 MB nutzen (App: 500 MB, MongoDB: 200 MB, Nginx: 50 MB, Rest System).
+Bei CX22 (4 GB RAM) sollte Navoria ~800 MB nutzen (App: 500 MB, MongoDB: 200 MB, Caddy: 30 MB).

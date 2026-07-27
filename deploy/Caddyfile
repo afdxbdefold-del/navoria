@@ -1,0 +1,93 @@
+# Navoria Caddyfile — Reverse Proxy + Automatisches TLS on-demand
+#
+# Vorteile ggenüber Nginx+Certbot:
+#  - Kein Wildcard-Cert nötig (Caddy holt jedes Cert on-demand via HTTP-01)
+#  - Keine DNS-API-Keys nötig
+#  - Auto-Renewal transparent
+#  - Ein einziges Config-File
+
+{
+    # E-Mail für Let's Encrypt (Renewal-Warnings) — anpassen!
+    email admin@navoria.de
+
+    # On-Demand TLS: Caddy holt Certs erst wenn Subdomains tatsächlich aufgerufen werden.
+    # Ohne 'ask'-Check würde Caddy für JEDE Domain versuchen ein Cert zu holen (Rate-Limit-Risiko).
+    # Deshalb prüfen wir gegen unseren /api/tls-check Endpoint, ob der Host zu uns gehört.
+    on_demand_tls {
+        ask http://127.0.0.1:3000/api/tls-check
+        interval 5m
+        burst 10
+    }
+
+    # HTTP/3 aktivieren
+    servers {
+        protocols h1 h2 h3
+    }
+}
+
+# ============================================================
+# Root-Domain + www — explizite Domains, HTTP-01 Challenge
+# ============================================================
+navoria.de, www.navoria.de {
+    reverse_proxy 127.0.0.1:3000 {
+        header_up X-Forwarded-Host {host}
+        header_up X-Real-IP {remote_host}
+    }
+
+    encode zstd gzip
+
+    # Security-Header
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Frame-Options "SAMEORIGIN"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # -Server-Header entfernen
+        -Server
+    }
+
+    # Statische Next.js-Assets — lang cachen
+    @static {
+        path /_next/static/*
+    }
+    header @static Cache-Control "public, max-age=31536000, immutable"
+
+    # Access-Log
+    log {
+        output file /var/log/caddy/navoria.log {
+            roll_size 100mb
+            roll_keep 5
+        }
+        format json
+    }
+}
+
+# ============================================================
+# Wildcard: Alle *.navoria.de Praxis-Subdomains
+# On-Demand-TLS: Cert wird beim ersten Aufruf via HTTP-01 geholt
+# ============================================================
+https://*.navoria.de {
+    tls {
+        on_demand
+    }
+
+    reverse_proxy 127.0.0.1:3000 {
+        header_up X-Forwarded-Host {host}
+        header_up X-Real-IP {remote_host}
+    }
+
+    encode zstd gzip
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        -Server
+    }
+
+    log {
+        output file /var/log/caddy/navoria-subdomains.log {
+            roll_size 100mb
+            roll_keep 5
+        }
+        format json
+    }
+}
