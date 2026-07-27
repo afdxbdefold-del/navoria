@@ -1,0 +1,64 @@
+# Navoria Production Stack — Hetzner CX22
+# Nginx läuft HOST-nativ (nicht in Compose), damit SSL-Renewal einfach ist.
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.app
+    image: navoria-app:latest
+    container_name: navoria-app
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - MONGO_URL=mongodb://mongo:27017
+    ports:
+      - '127.0.0.1:3000:3000'  # nur lokal, Nginx proxied
+    networks:
+      - navoria-net
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O- http://localhost:3000/api/health || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '20m'
+        max-file: '5'
+
+  mongo:
+    image: mongo:7-jammy
+    container_name: navoria-mongo
+    restart: unless-stopped
+    command: ['mongod', '--bind_ip_all', '--wiredTigerCacheSizeGB', '1']
+    volumes:
+      - mongo-data:/data/db
+      - mongo-config:/data/configdb
+    networks:
+      - navoria-net
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', "db.adminCommand('ping').ok"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '20m'
+        max-file: '3'
+
+volumes:
+  mongo-data:
+  mongo-config:
+
+networks:
+  navoria-net:
+    driver: bridge
