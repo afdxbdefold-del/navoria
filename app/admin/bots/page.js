@@ -87,6 +87,15 @@ function BotsDashboard({ token }) {
       const r = await fetch(`/api/admin/bots?range=${range}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      // Auth-Ablauf: Token entfernen, User zur Login-Seite schicken.
+      if (r.status === 401) {
+        try { localStorage.removeItem('navoria_admin_token'); } catch { /* ignore */ }
+        if (typeof window !== 'undefined') {
+          window.location.href = '/admin?redirect=/admin/bots';
+        }
+        setLoading(false);
+        return;
+      }
       if (!r.ok) throw new Error(`${r.status}`);
       const j = await r.json();
       setData(j);

@@ -39,6 +39,16 @@ export default function AdminAnalytics() {
         fetch('/api/admin/analytics/live', { headers: { Authorization: `Bearer ${token}` } }),
         fetch('/api/admin/analytics/summary', { headers: { Authorization: `Bearer ${token}` } }),
       ]);
+      // Auth-Ablauf: Token entfernen, User zur Login-Seite schicken.
+      if (r1.status === 401 || r2.status === 401) {
+        try { localStorage.removeItem('navoria_admin_token'); } catch { /* ignore */ }
+        setToken(null);
+        setErr('Ihre Admin-Sitzung ist abgelaufen. Bitte erneut anmelden.');
+        if (typeof window !== 'undefined') {
+          setTimeout(() => { window.location.href = '/admin?redirect=/admin/analytics'; }, 1500);
+        }
+        return;
+      }
       if (!r1.ok || !r2.ok) throw new Error(`Status: ${r1.status}/${r2.status}`);
       setLive(await r1.json());
       setSummary(await r2.json());
