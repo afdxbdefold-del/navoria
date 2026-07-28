@@ -1,7 +1,8 @@
-# Navoria Deployment auf Hetzner CX22 — Schritt-für-Schritt
+# Navoria Deployment auf Ubuntu-VPS — Schritt-für-Schritt
 
 **Ziel-Setup:**
-- Hetzner CX22 (2 vCPU, 4 GB RAM, 40 GB SSD, Ubuntu 24.04)
+- Ubuntu 22.04 oder 24.04 LTS VPS (z. B. speed-net.ch, Hetzner, o. ä.), mindestens 2 vCPU / 4 GB RAM / 40 GB SSD
+- Öffentliche IPv4, Ports 22 / 80 / 443 offen
 - Docker Compose: Next.js-App + MongoDB
 - Caddy (HOST-nativ) als Reverse-Proxy mit automatischem TLS on-demand
 - Tägliches MongoDB-Backup via Cronjob
@@ -13,16 +14,17 @@
 
 | Phase | Was passiert | Status alt / neu |
 |-------|--------------|------------------|
-| **A — Aufbau (Schritte 1-7)** | Hetzner-Server bauen, App + DB live, aber nur intern via `curl -H "Host: navoria.de"` testbar | Preview läuft weiter live |
-| **B — DNS-Cutover (Schritt 8)** | Bei IONOS A-Records auf Hetzner-IP umlegen, Wildcard anlegen | Traffic wandert innerhalb 5-60 Min |
+| **A — Aufbau (Schritte 1-7)** | VPS bauen, App + DB live, aber nur intern via `curl -H "Host: navoria.de"` testbar | Preview läuft weiter live |
+| **B — DNS-Cutover (Schritt 8)** | Bei IONOS A-Records auf VPS-IP umlegen, Wildcard anlegen | Traffic wandert innerhalb 5-60 Min |
 | **C — Nachziehen (Schritt 9-10)** | Caddy startet & holt automatisch SSL-Certs, Backups aktivieren, Preview abschalten | Neue Prod stabil |
 
 ---
 
 ## 📋 Voraussetzungen (vom User bereits vorhanden)
 
-- ✅ Hetzner CX22 Server läuft, Ubuntu 24.04 LTS, öffentliche IPv4
+- ✅ Ubuntu-VPS läuft (22.04 oder 24.04 LTS), öffentliche IPv4
 - ✅ SSH-Zugang als `root` (oder sudo-User)
+- ✅ Ports 22, 80, 443 sind beim Provider **freigeschaltet** (nicht durch externe Firewall geblockt)
 - ✅ Zugang zur IONOS DNS-Konsole (wird erst in Phase B gebraucht)
 - ✅ Aktuelle `.env` aus Preview kennen (Werte werden in Schritt 3 gebraucht)
 
@@ -36,7 +38,7 @@
 Wenn du in Emergent den Button „Save to Github" verwendet hast, hast du ein Repo (z. B. `github.com/<user>/navoria`).
 
 ```bash
-# Auf dem Hetzner-Server als root
+# Auf dem VPS als root
 apt-get update && apt-get install -y git
 mkdir -p /opt && cd /opt
 git clone https://github.com/<dein-user>/navoria.git navoria
@@ -50,13 +52,13 @@ Vom lokalen Rechner aus, in dem Ordner in dem du das Emergent-Preview ausgecheck
 # Lokal, im Repo-Root
 rsync -avz --exclude 'node_modules' --exclude '.next' --exclude '.git' \
   --exclude '.emergent' --exclude 'memory' \
-  ./ root@<HETZNER-IP>:/opt/navoria/
+  ./ root@<VPS-IP>:/opt/navoria/
 ```
 
 ## Schritt 2: Server initialisieren (Docker, Caddy, Firewall)
 
 ```bash
-# Auf dem Hetzner-Server, als root
+# Auf dem VPS, als root
 cd /opt/navoria
 bash deploy/scripts/server-init.sh
 ```
@@ -141,17 +143,17 @@ mongodump --uri="$MONGO_URL" --db=navoria_db --archive=/app/navoria-dump.gz --gz
 
 Anschließend lädst du dir die Datei über den Emergent-Datei-Download aus `/app/navoria-dump.gz` herunter.
 
-**5b) Dump auf Hetzner übertragen (lokal)**
+**5b) Dump auf VPS übertragen (lokal)**
 
 ```bash
 # Auf deinem lokalen Rechner
-scp navoria-dump.gz root@<HETZNER-IP>:/opt/navoria/
+scp navoria-dump.gz root@<VPS-IP>:/opt/navoria/
 ```
 
-**5c) Restore auf Hetzner**
+**5c) Restore auf VPS**
 
 ```bash
-# Auf dem Hetzner-Server
+# Auf dem VPS
 cd /opt/navoria
 bash deploy/scripts/migrate-db.sh restore /opt/navoria/navoria-dump.gz
 ```
@@ -249,15 +251,15 @@ Bei IONOS DNS-Konsole, folgende drei Records setzen/anpassen:
 
 | Host | Typ | Wert | TTL |
 |------|-----|------|-----|
-| `@` (navoria.de) | A | `<HETZNER-IP>` | 300 |
-| `www` | A | `<HETZNER-IP>` | 300 |
-| `*` (Wildcard) | A | `<HETZNER-IP>` | 300 |
+| `@` (navoria.de) | A | `<VPS-IP>` | 300 |
+| `www` | A | `<VPS-IP>` | 300 |
+| `*` (Wildcard) | A | `<VPS-IP>` | 300 |
 
 Der Wildcard-Record `*.navoria.de` ist neu und wichtig für Praxis-Subdomains.
 
 **8c) DNS-Propagation prüfen:**
 ```bash
-# Kann 5-60 Min dauern. Wiederhole bis alle 3 die Hetzner-IP zeigen:
+# Kann 5-60 Min dauern. Wiederhole bis alle 3 die VPS-IP zeigen:
 dig +short navoria.de
 dig +short www.navoria.de
 dig +short irgendwas.navoria.de   # Wildcard-Test
@@ -267,7 +269,7 @@ dig +short navoria.de @8.8.8.8
 dig +short navoria.de @1.1.1.1
 ```
 
-**Erst weiter wenn alle drei die Hetzner-IP zeigen.**
+**Erst weiter wenn alle drei die VPS-IP zeigen.**
 
 ---
 
@@ -276,7 +278,7 @@ dig +short navoria.de @1.1.1.1
 ## Schritt 9: Caddy starten (holt automatisch SSL)
 
 ```bash
-# Auf dem Hetzner-Server
+# Auf dem VPS
 systemctl enable caddy
 systemctl start caddy
 sleep 5
@@ -336,7 +338,7 @@ ls -lh /opt/navoria/backups/
 
 ## Schritt 11: Emergent-Preview abschalten
 
-Nach **mindestens 24 h stabilem Betrieb** auf Hetzner:
+Nach **mindestens 24 h stabilem Betrieb** auf dem VPS:
 - Emergent-Preview → Deployment stoppen oder in einen Read-Only-Modus versetzen
 - Alten MongoDB-Snapshot als Fallback lokal aufbewahren
 
@@ -400,7 +402,7 @@ curl -s "http://127.0.0.1:3000/api/tls-check?domain=deine-testsubdomain.navoria.
 
 # DNS-Check
 dig +short deine-testsubdomain.navoria.de
-# → muss Hetzner-IP zeigen
+# → muss VPS-IP zeigen
 
 # Let's Encrypt Rate-Limit erreicht?
 ls /var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-directory/
@@ -439,7 +441,7 @@ ls /var/lib/caddy/.local/share/caddy/certificates/acme-v02.api.letsencrypt.org-d
 tail -f /var/log/caddy/navoria.log                    # Access-Log
 ```
 
-Bei CX22 (4 GB RAM) sollte Navoria ~800 MB nutzen (App: ~500 MB, MongoDB: ~200 MB, Caddy: ~30 MB).
+Bei einem 4 GB-RAM-Server sollte Navoria ~800 MB nutzen (App: ~500 MB, MongoDB: ~200 MB, Caddy: ~30 MB).
 
 ---
 
@@ -456,7 +458,7 @@ Phase A (kein Traffic-Impact):
   7. Caddyfile validieren           → caddy validate (KEIN start!)
 
 Phase B (DNS-Cutover):
-  8. IONOS: A-Records + Wildcard  → auf Hetzner-IP, TTL 300
+  8. IONOS: A-Records + Wildcard  → auf VPS-IP, TTL 300
 
 Phase C (finalisieren):
   9. systemctl start caddy          → Certs on-demand
@@ -464,4 +466,4 @@ Phase C (finalisieren):
   11. Preview abschalten            → nach 24 h stabil
 ```
 
-**Sicherer, verwerfbarer Zustand:** Bis Phase B (Schritt 8) ist alles rückgängig machbar durch nichts tun. Erst der DNS-Switch macht Hetzner „live".
+**Sicherer, verwerfbarer Zustand:** Bis Phase B (Schritt 8) ist alles rückgängig machbar durch nichts tun. Erst der DNS-Switch macht den VPS „live".

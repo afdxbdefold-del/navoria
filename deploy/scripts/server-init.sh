@@ -1,7 +1,7 @@
 #!/bin/bash
 # Navoria Server-Init-Script für Ubuntu 24.04 LTS — mit CADDY (kein Nginx)
 #
-# Anwendung: Auf frischem Hetzner CX22 als root ausführen.
+# Anwendung: Auf frischem Ubuntu-VPS als root ausführen.
 #   scp -r deploy/ root@<ip>:/opt/navoria/
 #   ssh root@<ip>
 #   cd /opt/navoria && bash deploy/scripts/server-init.sh

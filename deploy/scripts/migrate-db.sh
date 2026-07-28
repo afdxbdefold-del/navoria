@@ -1,12 +1,12 @@
 #!/bin/bash
-# Navoria Datenmigration — Von Preview (Emergent) auf Hetzner
+# Navoria Datenmigration — Von Preview (Emergent) auf den VPS
 #
 # Anwendung:
 #   Auf Preview-Server:
 #     bash migrate-db.sh dump  # erzeugt navoria-dump.gz
 #   Anschließend per scp übertragen:
-#     scp navoria-dump.gz root@<hetzner-ip>:/opt/navoria/
-#   Auf Hetzner-Server:
+#     scp navoria-dump.gz root@<vps-ip>:/opt/navoria/
+#   Auf VPS:
 #     bash migrate-db.sh restore /opt/navoria/navoria-dump.gz
 
 set -euo pipefail
@@ -25,8 +25,8 @@ case "$ACTION" in
     echo "✅ Dump created: $DUMP_FILE ($SIZE)"
     echo ''
     echo 'Nächster Schritt (auf lokalem Rechner):'
-    echo "  scp $DUMP_FILE root@<hetzner-ip>:/opt/navoria/"
-    echo "  ssh root@<hetzner-ip> 'cd /opt/navoria && bash deploy/scripts/migrate-db.sh restore /opt/navoria/$DUMP_FILE'"
+    echo "  scp $DUMP_FILE root@<vps-ip>:/opt/navoria/"
+    echo "  ssh root@<vps-ip> 'cd /opt/navoria && bash deploy/scripts/migrate-db.sh restore /opt/navoria/$DUMP_FILE'"
     ;;
   restore)
     if [ ! -f "$DUMP_FILE" ]; then

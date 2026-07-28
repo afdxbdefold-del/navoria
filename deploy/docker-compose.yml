@@ -1,4 +1,4 @@
-# Navoria Production Stack — Hetzner CX22
+# Navoria Production Stack — Ubuntu VPS
 # Caddy läuft HOST-nativ (nicht in Compose) und proxied auf 127.0.0.1:3000.
 
 services:

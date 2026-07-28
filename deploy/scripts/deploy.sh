@@ -1,5 +1,5 @@
 #!/bin/bash
-# Navoria Deploy-Script (auf Hetzner-Server)
+# Navoria Deploy-Script (auf VPS)
 # Zieht neuesten Code, baut Image, rolling-restart
 
 set -euo pipefail
