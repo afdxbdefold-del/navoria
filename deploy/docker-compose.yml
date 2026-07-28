@@ -37,7 +37,7 @@ services:
     image: mongo:7-jammy
     container_name: navoria-mongo
     restart: unless-stopped
-    command: ['mongod', '--bind_ip_all', '--wiredTigerCacheSizeGB', '1']
+    command: ['mongod', '--bind_ip_all', '--wiredTigerCacheSizeGB', '0.5']
     volumes:
       - mongo-data:/data/db
       - mongo-config:/data/configdb

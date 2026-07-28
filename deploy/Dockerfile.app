@@ -15,7 +15,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Build-time env: nur PUBLIC-Werte, Secrets kommen zur Laufzeit
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS='--max-old-space-size=2048'
+ENV NODE_OPTIONS='--max-old-space-size=1536'
 RUN yarn build
 
 # ---------- Stage 3: Runtime (minimal) ----------

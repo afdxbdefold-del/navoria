@@ -63,6 +63,18 @@ systemctl enable --now fail2ban
 echo '→ Enable unattended security upgrades'
 dpkg-reconfigure -f noninteractive unattended-upgrades
 
+# ---------- Swap für kleine VPS (2 GB RAM) ----------
+if ! swapon --show | grep -q '/swapfile'; then
+  echo '→ Enable 2 GB swap (nötig für Next.js-Build auf 2 GB-RAM-VPS)'
+  fallocate -l 2G /swapfile
+  chmod 600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
+  grep -q '/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+  sysctl vm.swappiness=10
+  grep -q 'vm.swappiness' /etc/sysctl.conf || echo 'vm.swappiness=10' >> /etc/sysctl.conf
+fi
+
 # ---------- Backup-Verzeichnis ----------
 mkdir -p /opt/navoria/backups /var/log/caddy
 chmod 700 /opt/navoria/backups
