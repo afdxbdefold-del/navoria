@@ -176,7 +176,6 @@ function Footer() {
             <FooterLink href="/ueber-uns">Über uns</FooterLink>
             <FooterLink href="/redaktionelle-standards">Redaktionelle Standards</FooterLink>
             <FooterLink href="/korrekturen">Korrekturen melden</FooterLink>
-            <FooterLink href="mailto:mail@navoria.de">Kontakt</FooterLink>
           </FooterCol>
         </div>
 
