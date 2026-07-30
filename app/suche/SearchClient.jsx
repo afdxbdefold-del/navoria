@@ -104,31 +104,30 @@ function SearchContent() {
         </div>
       </form>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[280px_1fr]">
-        <aside className="card-soft h-fit p-5" aria-label="Filter und Sortierung">
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-900"><Filter className="h-4 w-4" aria-hidden="true" /> Filter</div>
-          <div className="mt-5 space-y-5">
-            <div>
-              <label htmlFor="filter-sort" className="label">Sortierung</label>
-              <select id="filter-sort" value={sort} onChange={(e) => setSort(e.target.value)} className="input mt-1.5">
-                <option value="relevance">Relevanz</option>
-                <option value="completeness">Profil-Vollständigkeit</option>
-              </select>
-            </div>
-            <fieldset className="space-y-2">
-              <legend className="label mb-1">Nur Praxen anzeigen mit</legend>
-              <label className="flex items-center gap-2 text-sm text-slate-700">
-                <input type="checkbox" checked={withWebsite} onChange={(e) => setWithWebsite(e.target.checked)} className="h-4 w-4 rounded border-slate-300 text-sky-600" /> Mit Website
-              </label>
-              <label className="flex items-center gap-2 text-sm text-slate-700">
-                <input type="checkbox" checked={withPhone} onChange={(e) => setWithPhone(e.target.checked)} className="h-4 w-4 rounded border-slate-300 text-sky-600" /> Mit Telefonnummer
-              </label>
-              <label className="flex items-center gap-2 text-sm text-slate-700">
-                <input type="checkbox" checked={hasHours} onChange={(e) => setHasHours(e.target.checked)} className="h-4 w-4 rounded border-slate-300 text-sky-600" /> Mit Öffnungszeiten
-              </label>
-            </fieldset>
-          </div>
-        </aside>
+      <div className="mt-6">
+        {/* Kompakte horizontale Filter-Bar (optimiert für 640px Content-Breite) */}
+        <div className="card-soft mb-4 flex flex-wrap items-center gap-2 p-3" aria-label="Filter und Sortierung">
+          <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-700"><Filter className="h-3.5 w-3.5" aria-hidden="true" /> Filter</span>
+          <select
+            id="filter-sort"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            className="rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-700"
+            aria-label="Sortierung"
+          >
+            <option value="relevance">Sortierung: Relevanz</option>
+            <option value="completeness">Sortierung: Vollständigkeit</option>
+          </select>
+          <label className={`inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-1 text-xs transition ${withWebsite ? 'border-sky-600 bg-sky-50 text-sky-700' : 'border-slate-300 bg-white text-slate-600 hover:border-slate-400'}`}>
+            <input type="checkbox" checked={withWebsite} onChange={(e) => setWithWebsite(e.target.checked)} className="sr-only" /> Website
+          </label>
+          <label className={`inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-1 text-xs transition ${withPhone ? 'border-sky-600 bg-sky-50 text-sky-700' : 'border-slate-300 bg-white text-slate-600 hover:border-slate-400'}`}>
+            <input type="checkbox" checked={withPhone} onChange={(e) => setWithPhone(e.target.checked)} className="sr-only" /> Telefon
+          </label>
+          <label className={`inline-flex cursor-pointer items-center gap-1.5 rounded-md border px-2 py-1 text-xs transition ${hasHours ? 'border-sky-600 bg-sky-50 text-sky-700' : 'border-slate-300 bg-white text-slate-600 hover:border-slate-400'}`}>
+            <input type="checkbox" checked={hasHours} onChange={(e) => setHasHours(e.target.checked)} className="sr-only" /> Öffnungszeiten
+          </label>
+        </div>
 
         <div>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -177,11 +176,11 @@ function SearchContent() {
 function ResultCard({ d }) {
   const cityPath = d.city_slug || 'stadt';
   return (
-    <article className="card-soft p-4 sm:p-5 transition hover:shadow-md">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+    <article className="card-soft p-4 transition hover:shadow-md">
+      <div className="flex flex-col gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-base sm:text-lg font-semibold text-slate-900 break-words">
+            <h3 className="text-base font-semibold text-slate-900 break-words">
               <a href={`/praxis/${cityPath}/${d.slug}`} className="hover:text-sky-700">{d.name}</a>
             </h3>
             {d.specialty_guess && <span className="chip border-sky-100 bg-sky-50 text-sky-700">{d.specialty_guess}</span>}
@@ -191,7 +190,7 @@ function ResultCard({ d }) {
             )}
           </div>
           <p className="mt-1 text-sm text-slate-600 break-words">{d.formatted_address || [d.street, d.postal_code, d.city].filter(Boolean).join(', ')}</p>
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
             {(d.phone_national || d.phone_international) && (
               <a href={`tel:${d.phone_international || d.phone_national}`} className="flex items-center gap-1 text-slate-600 hover:text-sky-700 break-all"><Phone className="h-4 w-4 shrink-0" /> {d.phone_national || d.phone_international}</a>
             )}
@@ -200,10 +199,10 @@ function ResultCard({ d }) {
             )}
           </div>
         </div>
-        <div className="flex shrink-0 flex-row gap-2 sm:flex-col sm:items-end">
-          <a href={`/praxis/${cityPath}/${d.slug}`} className="btn-secondary flex-1 sm:flex-none">Profil <ArrowRight className="ml-1 h-4 w-4" /></a>
+        <div className="flex flex-row gap-2 border-t border-slate-100 pt-3">
+          <a href={`/praxis/${cityPath}/${d.slug}`} className="btn-secondary flex-1 justify-center">Profil <ArrowRight className="ml-1 h-4 w-4" /></a>
           {d.google_maps_url && (
-            <a href={d.google_maps_url} target="_blank" rel="noreferrer" className="btn-secondary flex-1 sm:flex-none"><ExternalLink className="mr-1 h-4 w-4" /> Route</a>
+            <a href={d.google_maps_url} target="_blank" rel="noreferrer" className="btn-secondary flex-1 justify-center"><ExternalLink className="mr-1 h-4 w-4" /> Route</a>
           )}
         </div>
       </div>

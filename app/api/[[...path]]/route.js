@@ -627,23 +627,46 @@ async function handleGet(request, pathParts) {
     });
   }
 
-  // GET /api/admin/export – vollständigen doctor_places Dump als JSON zum Download
+  // GET /api/admin/export – vollständigen doctor_places Dump als JSON zum Download.
+  // Streaming-Variante: läuft mit konstantem Speicher (~2-5 MB), egal wie viele Praxen.
   if (pathParts[0] === 'admin' && pathParts[1] === 'export') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
     const col = await getCollection('doctor_places');
-    const docs = await col.find({}, { projection: { _id: 0 } }).toArray();
-    const payload = {
-      exported_at: new Date().toISOString(),
-      source: 'navoria',
-      count: docs.length,
-      doctors: docs,
-    };
+    const count = await col.countDocuments();
     const filename = `navoria-export-${new Date().toISOString().slice(0, 10)}.json`;
-    return new NextResponse(JSON.stringify(payload, null, 2), {
+    const cursor = col.find({}, { projection: { _id: 0 } });
+    const encoder = new TextEncoder();
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          const header = `{"exported_at":"${new Date().toISOString()}","source":"navoria","count":${count},"doctors":[`;
+          controller.enqueue(encoder.encode(header));
+          let first = true;
+          for await (const doc of cursor) {
+            const chunk = (first ? '' : ',') + JSON.stringify(doc);
+            controller.enqueue(encoder.encode(chunk));
+            first = false;
+          }
+          controller.enqueue(encoder.encode(']}'));
+          controller.close();
+        } catch (e) {
+          try { controller.error(e); } catch (_) {}
+        } finally {
+          try { await cursor.close(); } catch (_) {}
+        }
+      },
+      cancel() {
+        try { cursor.close(); } catch (_) {}
+      },
+    });
+
+    return new NextResponse(stream, {
       status: 200,
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
         'Content-Disposition': `attachment; filename="${filename}"`,
+        'Cache-Control': 'no-store',
       },
     });
   }
