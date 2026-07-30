@@ -27,9 +27,9 @@ const OUT_VERCEL = path.join(SCRIPT_DIR, 'vercel.json');
 const OLD_HOST = 'https://rzte-online.vercel.app';
 const NAV_HOST = 'https://navoria.de';
 
-const SAFE_THRESHOLD = 0.90;
+const SAFE_THRESHOLD = 0.85;
 const SECOND_MARGIN = 0.08;
-const REVIEW_THRESHOLD = 0.55;
+const REVIEW_THRESHOLD = 0.50;
 
 // Fachrichtungs-Aliases (URL-Pfad → normalisiert)
 const SPECIALTY_MAP = {
@@ -185,7 +185,12 @@ function tokenSetRatio(tokensA, tokensB) {
   return Math.max(s1, s2, s3);
 }
 
-/** Kombinierter Name-Score: 60% token-set + 40% partial substring */
+/** Consonant-Skeleton: entfernt Vokale und macht "jrg" identisch zu "juerg". */
+function skeleton(s) {
+  return String(s).toLowerCase().replace(/[aeiouäöü]/g, '');
+}
+
+/** Kombinierter Name-Score: 60% token-set + 40% partial substring (mit Skeleton-Fallback) */
 function nameScore(parsedTokens, candidateName) {
   const candNorm = normalizeUmlauts(candidateName || '');
   const candTokens = candNorm.split(/[^a-z0-9]+/).map((t) => t.trim()).filter(Boolean)
@@ -193,17 +198,27 @@ function nameScore(parsedTokens, candidateName) {
   if (!parsedTokens.length || !candTokens.length) return 0;
 
   const tsr = tokenSetRatio(parsedTokens, candTokens);
-  // Partial: prüft wie viele der parsedTokens irgendwo im Candidate vorkommen
+  // Partial: prüft wie viele der parsedTokens irgendwo im Candidate vorkommen.
+  // Fallback via Consonant-Skeleton: "jrg" ↔ "juerg" (beide "jrg"), "sren" ↔ "soeren".
   const candJoined = candTokens.join(' ');
+  const candSkeletons = candTokens.map(skeleton);
   let matched = 0;
   for (const t of parsedTokens) {
-    // Exact contain oder mit ≤1 edit
-    if (candJoined.includes(t)) matched += 1;
-    else {
-      for (const ct of candTokens) {
-        if (lev(t, ct) <= Math.max(1, Math.floor(t.length * 0.15))) { matched += 1; break; }
+    if (candJoined.includes(t)) { matched += 1; continue; }
+    // Levenshtein-toleranter Match
+    let hit = false;
+    for (const ct of candTokens) {
+      if (lev(t, ct) <= Math.max(1, Math.floor(t.length * 0.15))) { hit = true; break; }
+    }
+    if (hit) { matched += 1; continue; }
+    // Skeleton-Match (fehlende Vokale rekonstruieren)
+    const tSkel = skeleton(t);
+    if (tSkel.length >= 2) {
+      for (const cs of candSkeletons) {
+        if (cs === tSkel || (cs.length >= 3 && tSkel.length >= 3 && lev(cs, tSkel) <= 1)) { hit = true; break; }
       }
     }
+    if (hit) matched += 1;
   }
   const partial = matched / parsedTokens.length;
   return 0.6 * tsr + 0.4 * partial;
@@ -213,9 +228,15 @@ function cityScore(parsedCity, candidateCitySlug, candidateCity) {
   const p = normalizeCity(parsedCity);
   const csA = normalizeCity(candidateCitySlug || '');
   const csB = normalizeUmlauts(candidateCity || '').replace(/[^a-z0-9]+/g, '-');
-  const s = Math.max(similarity(p, csA), similarity(p, csB));
-  // Genauer Match ist wichtig
-  return s;
+  // Exakter Match: 1.0
+  if (p === csA || p === csB) return 1.0;
+  // Prefix-Match ("offenbach" ⊂ "offenbach-am-main"): 1.0
+  if (csA.startsWith(p + '-') || csB.startsWith(p + '-')) return 1.0;
+  // Suffix-Match ("bad-mnstereifel" ⊂ "bad-muenstereifel"): 0.95
+  if (csA.endsWith('-' + p) || csB.endsWith('-' + p)) return 0.95;
+  // Substring: leicht schwächer
+  if (csA.includes(p) || csB.includes(p)) return 0.9;
+  return Math.max(similarity(p, csA), similarity(p, csB));
 }
 
 function specialtyScore(parsedSpec, candidateSpec) {
@@ -273,19 +294,39 @@ async function matchAll(paths, col) {
 
   const getCandidates = async (cityNormalized) => {
     if (cacheByCity.has(cityNormalized)) return cacheByCity.get(cityNormalized);
-    // Erst exakter Match, sonst suffix-tolerant
+    // 1) Exakte Slug-Varianten
     const variations = new Set([cityNormalized]);
-    // Kompensation: "duesseldorf" ↔ "dusseldorf" ↔ "duesseldorf"
     variations.add(cityNormalized.replace(/ue/g, 'u'));
     variations.add(cityNormalized.replace(/oe/g, 'o'));
     variations.add(cityNormalized.replace(/ae/g, 'a'));
-    variations.add(cityNormalized.replace(/ss/g, 'ss'));
 
     let candidates = [];
     for (const v of variations) {
       if (citySlugsInDb.has(v)) {
         const found = await col.find(
           { city_slug: v, is_active: { $ne: false } },
+          { projection: { name: 1, city: 1, city_slug: 1, slug: 1, specialty_guess: 1, formatted_address: 1, street: 1, postal_code: 1, id: 1, _id: 0 } },
+        ).limit(2000).toArray();
+        candidates = candidates.concat(found);
+      }
+    }
+    // 2) Prefix-Match: "frankfurt" ↔ "frankfurt-am-main"
+    if (candidates.length === 0) {
+      const prefixSlugs = Array.from(citySlugsInDb).filter((s) => s.startsWith(cityNormalized + '-'));
+      if (prefixSlugs.length) {
+        const found = await col.find(
+          { city_slug: { $in: prefixSlugs }, is_active: { $ne: false } },
+          { projection: { name: 1, city: 1, city_slug: 1, slug: 1, specialty_guess: 1, formatted_address: 1, street: 1, postal_code: 1, id: 1, _id: 0 } },
+        ).limit(2000).toArray();
+        candidates = candidates.concat(found);
+      }
+    }
+    // 3) Suffix-Match als weiterer Fallback: "-{city}" (z.B. "bad-{X}")
+    if (candidates.length === 0) {
+      const suffixSlugs = Array.from(citySlugsInDb).filter((s) => s.endsWith('-' + cityNormalized) || s === cityNormalized);
+      if (suffixSlugs.length) {
+        const found = await col.find(
+          { city_slug: { $in: suffixSlugs }, is_active: { $ne: false } },
           { projection: { name: 1, city: 1, city_slug: 1, slug: 1, specialty_guess: 1, formatted_address: 1, street: 1, postal_code: 1, id: 1, _id: 0 } },
         ).limit(2000).toArray();
         candidates = candidates.concat(found);
