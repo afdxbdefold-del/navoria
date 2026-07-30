@@ -185,7 +185,7 @@ export default async function RootLayout({ children }) {
             damit Homepage-Modus-Seiten für Google als eigenständige Praxis-Sites wirken
             (keine Navoria-Chrome im DOM, auch nicht versteckt). */}
         {!isHomepageMode && <NavShellTop />}
-        <main id="main-content" tabIndex={-1}>{children}</main>
+        <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-[970px]">{children}</main>
         {!isHomepageMode && <NavShellBottom />}
         {/* ConsentBanner deaktiviert – Ezoic Gatekeeper CMP übernimmt die Consent-Steuerung.
             Datei bleibt als Backup unter /components/ConsentBanner.jsx. */}
