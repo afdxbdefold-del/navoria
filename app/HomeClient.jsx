@@ -290,7 +290,7 @@ export default function HomePage({ latestArticles = [], bigCities = null }) {
             </h2>
             <p className="mt-2 text-[15px] nv-text-muted">Häufig gesuchte Facharzt-Kategorien.</p>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {POPULAR_SPECIALTIES.map((s) => {
               const Icon = s.icon;
               return (
@@ -300,7 +300,7 @@ export default function HomePage({ latestArticles = [], bigCities = null }) {
                   className="nv-card group flex items-center gap-3 transition hover:-translate-y-0.5"
                   style={{ padding: '1rem' }}
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
                     <Icon className="h-5 w-5" />
                   </div>
                   <span className="text-sm font-semibold" style={{ color: 'var(--color-navy)' }}>{s.name}</span>
@@ -331,7 +331,7 @@ export default function HomePage({ latestArticles = [], bigCities = null }) {
               Nach Bundesland <ArrowRight className="h-3.5 w-3.5" />
             </a>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
             {cities.map((c) => (
               <a
                 key={c.slug}
