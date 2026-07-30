@@ -98,3 +98,8 @@ node_modules/@next/swc-linux-arm64-musl/next-swc.linux-arm64-musl.node
 credentials.json
 *.key
 .credentials
+
+# Ausnahmen MÜSSEN nach `.env.*` und `*.env` stehen, sonst matchen die generischen Regeln zuletzt
+!deploy/.env.example
+!.env.example
+!.env.production.example
