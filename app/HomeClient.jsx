@@ -86,12 +86,12 @@ export default function HomePage({ latestArticles = [], bigCities = null }) {
     <>
       {/* HERO — solid Primary Blue mit integrierter Suche */}
       <section className="nv-surface-primary relative overflow-hidden">
-        <div className="nv-container pb-16 pt-8 sm:pb-20 sm:pt-10 lg:pb-24 lg:pt-12">
+        <div className="nv-container pb-12 pt-6 sm:pb-14 sm:pt-8 lg:pb-16 lg:pt-10">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-[38px] font-bold leading-[1.05] tracking-tight text-white sm:text-[48px] lg:text-[56px]">
+            <h1 className="text-[32px] font-bold leading-[1.05] tracking-tight text-white sm:text-[40px] lg:text-[44px]">
               Ärzte in Ihrer Nähe finden
             </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-[17px] leading-relaxed sm:text-[18px]" style={{ color: 'var(--color-primary-light)' }}>
+            <p className="mx-auto mt-5 max-w-2xl text-[16px] leading-relaxed sm:text-[17px]" style={{ color: 'var(--color-primary-light)' }}>
               Adresse, Telefon, Öffnungszeiten und Bewertungen — deutschlandweit,
               übersichtlich und aktuell auf einer Seite.
             </p>
@@ -107,7 +107,7 @@ export default function HomePage({ latestArticles = [], bigCities = null }) {
             tooldescription="Sucht Ärzt:innen und Praxen in Deutschland nach Fachrichtung, Stadt oder Postleitzahl. Beispiele: 'Hausarzt' in 'Berlin', 'Zahnarzt' in '80331'. Öffnet die Suchergebnisseite auf Navoria mit passenden Praxen inkl. Adresse, Bewertung und Kontaktdaten."
             toolautosubmit="true"
           >
-            <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+            <div className="grid gap-3 sm:grid-cols-2">
               <div className="relative">
                 <label htmlFor="home-search-q" className="sr-only">Suchbegriff (z. B. Hausarzt, Kardiologe)</label>
                 <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: 'var(--color-text-muted)' }} />
@@ -137,7 +137,7 @@ export default function HomePage({ latestArticles = [], bigCities = null }) {
                   toolparamdescription="Deutscher Ortsname oder 5-stellige Postleitzahl, z. B. 'Berlin' oder '10115'."
                 />
               </div>
-              <button type="submit" className="nv-btn nv-btn-lg nv-btn-primary">
+              <button type="submit" className="nv-btn nv-btn-lg nv-btn-primary w-full sm:col-span-2">
                 Ärzte finden <ArrowRight aria-hidden="true" className="h-4 w-4" />
               </button>
             </div>
@@ -172,8 +172,8 @@ export default function HomePage({ latestArticles = [], bigCities = null }) {
                 Alle Artikel <ArrowRight className="h-3.5 w-3.5" />
               </a>
             </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {latestArticles.slice(0, 3).map((a) => (
+            <div className="grid gap-6 sm:grid-cols-2">
+              {latestArticles.slice(0, 2).map((a) => (
                 <ArticleCard key={a.slug} article={a} />
               ))}
             </div>
