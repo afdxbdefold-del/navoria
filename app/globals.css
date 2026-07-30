@@ -248,6 +248,7 @@ body {
    Kappt alle typischen Page-Container-Klassen, ohne kleine Kartenlayouts
    (max-w-md, max-w-lg, max-w-xl, max-w-2xl) anzufassen.
 --------------------------------------------------------------------------- */
+main .max-w-2xl,
 main .max-w-3xl,
 main .max-w-4xl,
 main .max-w-5xl,
