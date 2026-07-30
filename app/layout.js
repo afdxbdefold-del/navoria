@@ -211,7 +211,7 @@ export default async function RootLayout({ children }) {
           </div>
         )}
         {!isHomepageMode ? (
-          <div className="mx-auto w-full max-w-[970px] px-4 lg:px-0">
+          <div className="mx-auto w-full max-w-[970px] bg-white px-4 lg:px-0">
             <div className="lg:flex lg:gap-[30px]">
               <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 lg:w-[640px]">{children}</main>
               <aside className="hidden w-[300px] shrink-0 pt-6 lg:block" aria-label="Sidebar">
