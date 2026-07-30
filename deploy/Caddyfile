@@ -15,8 +15,6 @@
     # Deshalb prüfen wir gegen unseren /api/tls-check Endpoint, ob der Host zu uns gehört.
     on_demand_tls {
         ask http://127.0.0.1:3000/api/tls-check
-        interval 5m
-        burst 10
     }
 
     # HTTP/3 aktivieren
