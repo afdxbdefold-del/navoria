@@ -11,7 +11,7 @@ import RatingBadge from '@/components/RatingBadge';
 import MapEmbed from '@/components/MapEmbed';
 import FaqAccordion from '@/components/praxis/FaqAccordion';
 import MobileStickyCta from '@/components/praxis/MobileStickyCta';
-import EzoicAd from '@/components/EzoicAd';
+import EzoicAd from '@/components/EzoicAd';  // noqa: aktuell ungenutzt (Sidebar-Ad läuft über Layout), Import behalten für spätere Inline-Slots
 import { parseDisplayName } from '@/lib/doctorFormatter';
 import { humanizePrimaryType } from '@/lib/specialtyLabels';
 import { hasExternalWebsite } from '@/lib/ownUrl';
@@ -778,10 +778,8 @@ export default async function ProfilePage({ params }) {
             </dl>
           </div>
 
-          {/* Ezoic MREC (300x250) – Sidebar-Slot.
-              Placeholder-ID 101 muss im Ezoic-Dashboard angelegt und einem
-              MREC-Format zugewiesen sein. */}
-          <EzoicAd id={101} className="mx-auto w-full max-w-[300px]" />
+          {/* Ezoic MREC (300x250) läuft jetzt global über die Layout-Sidebar (app/layout.js).
+              Hier bewusst kein zweiter Placeholder, um Doppel-Ads zu vermeiden. */}
 
           {/* Profil beanspruchen (für Praxisinhaber) */}
           <div className="rounded-xl border border-sky-200 bg-gradient-to-br from-sky-50 to-white p-5">

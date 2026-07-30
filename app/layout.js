@@ -8,6 +8,7 @@ import { Toaster } from 'sonner';
 import PageTracker from '@/components/PageTracker';
 import WebMCPRegistrar from '@/components/WebMCPRegistrar';
 import { NavShellTop, NavShellBottom } from '@/components/NavShell';
+import EzoicAd from '@/components/EzoicAd';
 import { getBaseUrl, getBaseUrlSync } from '@/lib/baseUrl';
 import { logServerHit } from '@/lib/serverTracker';
 
@@ -185,7 +186,18 @@ export default async function RootLayout({ children }) {
             damit Homepage-Modus-Seiten für Google als eigenständige Praxis-Sites wirken
             (keine Navoria-Chrome im DOM, auch nicht versteckt). */}
         {!isHomepageMode && <NavShellTop />}
-        <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-[970px]">{children}</main>
+        {!isHomepageMode ? (
+          <div className="mx-auto flex w-full max-w-[1300px] gap-6 px-4 lg:gap-8 lg:px-6">
+            <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 lg:max-w-[970px]">{children}</main>
+            <aside className="hidden w-[300px] shrink-0 pt-6 lg:block" aria-label="Sidebar">
+              <div className="sticky top-24 space-y-4">
+                <EzoicAd id={101} />
+              </div>
+            </aside>
+          </div>
+        ) : (
+          <main id="main-content" tabIndex={-1}>{children}</main>
+        )}
         {!isHomepageMode && <NavShellBottom />}
         {/* ConsentBanner deaktiviert – Ezoic Gatekeeper CMP übernimmt die Consent-Steuerung.
             Datei bleibt als Backup unter /components/ConsentBanner.jsx. */}
