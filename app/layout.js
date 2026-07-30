@@ -191,7 +191,7 @@ export default async function RootLayout({ children }) {
             <div className="lg:flex lg:gap-[30px]">
               <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 lg:w-[640px]">{children}</main>
               <aside className="hidden w-[300px] shrink-0 pt-6 lg:block" aria-label="Sidebar">
-                <div className="sticky top-24 space-y-4">
+                <div className="space-y-4">
                   <EzoicAd id={101} />
                 </div>
               </aside>
