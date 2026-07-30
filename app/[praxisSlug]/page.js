@@ -64,19 +64,16 @@ export async function generateMetadata({ params }) {
     creator: displayName,
     publisher: displayName,
     keywords: null, // Navoria-Keywords aus Root-Layout unterdrücken
-    // WICHTIG: Homepage-Modus-Seiten sind TEMPORÄR und dienen ausschließlich der
-    // Google-Business-Profile-Verifizierung. Google darf die URL crawlen (200 OK)
-    // und den Inhalt lesen (für Name/Adresse-Match), aber sie NICHT indexieren.
+    // Ehemals: Homepage-Modus-Seiten waren temporär und noindex.
+    // Neu: Praxis-Homepages sind produktive, indexierbare Seiten mit eigener Subdomain.
     robots: {
-      index: false,
-      follow: false,
-      nocache: true,
+      index: true,
+      follow: true,
       googleBot: {
-        index: false,
-        follow: false,
-        noimageindex: true,
+        index: true,
+        follow: true,
         'max-snippet': -1,
-        'max-image-preview': 'none',
+        'max-image-preview': 'large',
       },
     },
     openGraph: {
@@ -88,7 +85,6 @@ export async function generateMetadata({ params }) {
     twitter: { card: 'summary', title, description: desc },
     other: {
       'og:site_name': displayName,
-      'X-Robots-Tag': 'noindex, nofollow, noarchive, noimageindex',
     },
   };
 }
@@ -98,13 +94,22 @@ export default async function PraxisHomepagePage({ params }) {
   const d = await loadByHomepageSlug(praxisSlug);
   if (!d) notFound();
 
-  // Wenn Homepage-Modus AUS ist, leiten wir auf den Directory-Eintrag um.
+  // Wenn Homepage-Modus AUS ist, leiten wir permanent auf den Directory-Eintrag um.
   // Damit bleibt die alte URL nutzbar (z.B. wenn sie schon verteilt / gedruckt wurde)
-  // und Google konsolidiert den Link-Juice via 301 auf den Directory-Eintrag.
-  // Das gilt auch für Subdomain-Aufrufe (<slug>.navoria.de) — nach Ablauf
-  // des Homepage-Modus leitet die Subdomain auf das Verzeichnis-Profil.
+  // und Google konsolidiert den Link-Juice via 301 auf das reguläre Verzeichnis-Profil.
+  // Wir prüfen den aktuellen Host: bei Aufruf über die Praxis-Subdomain
+  // (<slug>.navoria.de) leiten wir absolut auf navoria.de/praxis/... um, damit
+  // die Subdomain sauber verlassen wird (statt sich selbst auf einen Nicht-Root-Pfad
+  // umzuleiten und dann noch einen zweiten Hop durch die Middleware zu machen).
   if (d.homepage_mode !== true) {
-    permanentRedirect(`/praxis/${d.city_slug}/${d.slug}`);
+    const hdr2 = await headers();
+    const clientHost2 = (hdr2.get('x-forwarded-host') || hdr2.get('host') || '').split(',')[0].trim().toLowerCase().split(':')[0];
+    const cameFromSubdomain = !!extractPraxisSubdomain(clientHost2);
+    const directoryPath = `/praxis/${d.city_slug}/${d.slug}`;
+    if (cameFromSubdomain && !isPreviewHost(clientHost2)) {
+      permanentRedirect(`https://${MAIN_DOMAIN}${directoryPath}`);
+    }
+    permanentRedirect(directoryPath);
   }
 
   // Falls Homepage-Modus AKTIV und Aufruf via Root-Domain (navoria.de/[slug]) statt

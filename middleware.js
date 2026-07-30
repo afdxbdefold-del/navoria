@@ -78,7 +78,7 @@ export function middleware(request) {
     requestHeaders.set('x-navoria-path', `/${subdomain}`);
 
     const response = NextResponse.rewrite(rewriteUrl, { request: { headers: requestHeaders } });
-    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, noimageindex');
+    // Praxis-Subdomains sind produktive, indexierbare Seiten – kein noindex mehr.
     return response;
   }
 
@@ -100,7 +100,7 @@ export function middleware(request) {
     requestHeaders.set('x-navoria-path', pathname);
     requestHeaders.set('x-navoria-client-host', clientHost);
     const response = NextResponse.next({ request: { headers: requestHeaders } });
-    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, noimageindex');
+    // Praxis-Homepages sind produktive Seiten – kein noindex.
     return response;
   }
 
