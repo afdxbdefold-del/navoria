@@ -60,7 +60,7 @@ export default function RedaktionellePage() {
       </ul>
 
       <h2 className={h2}>6. Zuständigkeit</h2>
-      <p className={p}>Redaktionell verantwortlich nach § 18 Abs. 2 MStV: <strong>Andreas Frey, AF Consulting, Am Nesseufer 1, 26789 Leer</strong>. Kontakt für Anfragen zur Redaktion: <a href="mailto:mail@navoria.de" className={a}>mail@navoria.de</a>.</p>
+      <p className={p}>Redaktionell verantwortlich nach § 18 Abs. 2 MStV: <strong>HYPERAI ADVERTISING LLC, 3500 South DuPont Hwy, Dover, DE 19901, USA</strong>. Kontakt für Anfragen zur Redaktion: <a href="mailto:mail@navoria.de" className={a}>mail@navoria.de</a>.</p>
 
       <h2 className={h2}>7. Beschwerden und Widersprüche</h2>
       <p className={p}>Betreiber einer Praxis, die ihren Eintrag geändert, entfernt oder unter eigener Kontrolle sehen möchten, kontaktieren <a href="mailto:mail@navoria.de" className={a}>mail@navoria.de</a>. Bearbeitung werktags, in der Regel innerhalb von zwei Arbeitstagen. Bis zur Klärung können einzelne Einträge temporär offline genommen werden.</p>

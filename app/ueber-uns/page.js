@@ -40,7 +40,7 @@ export default function UeberUnsPage() {
       </ul>
 
       <h2 className={h2}>Wer betreibt Navoria</h2>
-      <p className={p}>Navoria wird als Einzelprojekt der <strong>AF Consulting, Am Nesseufer 1, 26789 Leer</strong> betrieben. Verantwortlich ist Andreas Frey. Vollständige Kontakt- und Anschriftsangaben stehen im <Link href="/impressum" className={a}>Impressum</Link>.</p>
+      <p className={p}>Navoria wird betrieben von <strong>HYPERAI ADVERTISING LLC, 3500 South DuPont Hwy, Dover, DE 19901, USA</strong>. Vollständige Kontakt- und Anschriftsangaben stehen im <Link href="/impressum" className={a}>Impressum</Link>.</p>
       <p className={p}>Erreichbar per E-Mail: <a href="mailto:mail@navoria.de" className={a}>mail@navoria.de</a>. Auf Anfragen wird werktags in der Regel innerhalb von zwei Arbeitstagen reagiert.</p>
 
       <h2 className={h2}>Wie die Daten entstehen</h2>

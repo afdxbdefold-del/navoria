@@ -53,7 +53,7 @@ export default async function BarrierefreiheitPage() {
 
       <section>
         <p className={p}>
-          AF Consulting ist als Betreiberin von <strong>navoria.de</strong> bemüht, die Website im Einklang mit dem <em>Barrierefreiheitsstärkungsgesetz (BFSG)</em> und der <em>EU-Richtlinie 2019/882</em> barrierefrei zugänglich zu machen. Als Zielstandard gilt die <a className={a} href="https://www.w3.org/Translations/WCAG21-de/" target="_blank" rel="noopener noreferrer">Web Content Accessibility Guidelines (WCAG) 2.1 in Konformitätsstufe AA<ExternalLink aria-hidden="true" className="ml-0.5 inline h-3 w-3" /></a>.
+          HYPERAI ADVERTISING LLC ist als Betreiberin von <strong>navoria.de</strong> bemüht, die Website im Einklang mit dem <em>Barrierefreiheitsstärkungsgesetz (BFSG)</em> und der <em>EU-Richtlinie 2019/882</em> barrierefrei zugänglich zu machen. Als Zielstandard gilt die <a className={a} href="https://www.w3.org/Translations/WCAG21-de/" target="_blank" rel="noopener noreferrer">Web Content Accessibility Guidelines (WCAG) 2.1 in Konformitätsstufe AA<ExternalLink aria-hidden="true" className="ml-0.5 inline h-3 w-3" /></a>.
         </p>
       </section>
 

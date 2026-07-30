@@ -21,10 +21,10 @@ export default function DatenschutzPage() {
         <div>
           <h2 className="text-lg font-semibold text-slate-900">1. Verantwortlicher</h2>
           <address className="not-italic mt-2 leading-relaxed">
-            AF Consulting<br />
-            Andreas Frey<br />
-            Am Nesseufer 1<br />
-            26789 Leer<br />
+            HYPERAI ADVERTISING LLC<br />
+            3500 South DuPont Hwy<br />
+            Dover, DE 19901<br />
+            USA<br />
             E-Mail: <a href="mailto:mail@navoria.de" className="text-sky-700 hover:underline">mail@navoria.de</a>
           </address>
         </div>

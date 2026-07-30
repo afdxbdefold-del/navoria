@@ -99,7 +99,7 @@ export default function ImpressumPage() {
 
         <div>
           <h2 className="text-base font-semibold text-slate-900">Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
-          <p className="mt-2">Andreas Frey, Anschrift wie oben</p>
+          <p className="mt-2">HYPERAI ADVERTISING LLC, Anschrift wie oben</p>
         </div>
 
         <div>

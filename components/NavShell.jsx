@@ -154,7 +154,7 @@ function Footer() {
               Gesundheitsinformationen. Unabhängig, transparent, redaktionell geprüft.
             </p>
             <p className="mt-4 text-xs" style={{ color: 'rgba(221,240,252,0.6)' }}>
-              Betrieben von AF Consulting seit 2025.
+              Betrieben von HYPERAI ADVERTISING LLC seit 2025.
             </p>
           </div>
 
@@ -189,7 +189,7 @@ function Footer() {
           <a href="/barrierefreiheit" className="hover:text-white">Barrierefreiheit</a>
           <ConsentResetLink className="hover:text-white" />
           <span className="ml-auto text-xs" style={{ color: 'rgba(221,240,252,0.7)' }}>
-            © {new Date().getFullYear()} Navoria · AF Consulting
+            © {new Date().getFullYear()} Navoria · HYPERAI ADVERTISING LLC
           </span>
         </div>
 

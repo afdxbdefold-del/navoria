@@ -10,8 +10,7 @@ export async function GET() {
 > Navoria (${base}) ist ein öffentliches, redaktionell geprüftes Ärzteverzeichnis für Deutschland. Wir listen Praxen, Zahnärzte, Fachärzte, Kliniken und Apotheken mit Adresse, Telefon, Öffnungszeiten und öffentlichen Google-Bewertungen. Datenquelle: Google Places API und öffentliche Quellen. Wir sind kein Behandler und geben keine medizinischen Ratschläge.
 
 ## Über Navoria
-- Redaktionsstandort: Leer, Deutschland
-- Betreiber: AF Consulting
+- Betreiber: HYPERAI ADVERTISING LLC (Dover, Delaware, USA)
 - Sprache: Deutsch (de-DE)
 - Zielgruppe: Patient:innen in Deutschland auf Praxis-Suche
 - Datenschutz: DSGVO-konform, Consent-Mode-v2
