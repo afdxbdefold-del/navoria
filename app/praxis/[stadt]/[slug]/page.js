@@ -426,6 +426,11 @@ export default async function ProfilePage({ params }) {
                   <BadgeCheck className="h-3.5 w-3.5" /> Verifiziert
                 </span>
               )}
+              {d.verification_status === 'review_required' && !d.is_verified && (
+                <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold" style={{ background: 'rgba(255,255,255,0.14)', color: '#ffffff' }} title="Dieser Eintrag basiert auf einer Migration alter Verzeichnisdaten und wurde noch nicht von der Praxis bestätigt.">
+                  <Info className="h-3.5 w-3.5" /> Noch nicht bestätigt
+                </span>
+              )}
             </div>
           </div>
         </div>
