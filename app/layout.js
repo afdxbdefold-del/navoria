@@ -189,7 +189,7 @@ export default async function RootLayout({ children }) {
           </>
         )}
       </head>
-      <body className="min-h-screen bg-white text-slate-900 antialiased">
+      <body className="min-h-screen text-slate-900 antialiased">
         {/* Skip-Link: Nur bei Fokus sichtbar, für Screenreader- und Tastatur-Nutzer:innen */}
         <a
           href="#main-content"
