@@ -78,10 +78,10 @@ export default function ImpressumPage() {
         <div>
           <h2 className="text-base font-semibold text-slate-900">Anbieter</h2>
           <address className="not-italic mt-2 leading-relaxed">
-            Andreas Frey<br />
-            handelnd unter AF Consulting<br />
-            Am Nesseufer 1<br />
-            26789 Leer
+            HYPERAI ADVERTISING LLC<br />
+            3500 South DuPont Hwy<br />
+            Dover, DE 19901<br />
+            USA
           </address>
         </div>
 
