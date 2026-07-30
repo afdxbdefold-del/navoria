@@ -1,0 +1,2633 @@
+{
+  "/hausarzt/offenbach/frau-dr-med-gabriele-frey-offenbach": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Frau Dr. med. Gabriele Frey",
+      "street": "Bieberer Str. 148 ",
+      "plz": "63071",
+      "city": "Offenbach",
+      "phone": "069 858443"
+    },
+    "target": {
+      "navoria_id": "53881e8d-835a-46c7-bf00-62f69b8ce69d",
+      "name": "Frau Dr. med. Gabriele Frey",
+      "address": "Bieberer Str. 148, 63071 Offenbach am Main",
+      "canonical": "https://navoria.de/praxis/offenbach-am-main/frau-dr-med-gabriele-frey-_DD4Z4",
+      "phone": "069 858443"
+    }
+  },
+  "/hautarzt/berlin/hautarztpraxis-rahaf-ali": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Hautarztpraxis Rahaf Ali",
+      "street": "Frankfurter Allee 70",
+      "plz": "10247",
+      "city": "Berlin",
+      "phone": "030 20830050"
+    }
+  },
+  "/hausarzt/crailsheim/gemeinschaftspraxis-ulrich-rupp-florian-setzer": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Gemeinschaftspraxis Ulrich Rupp & Florian Setzer",
+      "street": "Haller Str. 124",
+      "plz": "74564",
+      "city": "Crailsheim",
+      "phone": "07951 7990"
+    }
+  },
+  "/orthopaede/wernigerode/dr-med-christian-gottwald-wernigerode": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Christian Gottwald",
+      "street": "Ilsenburger Str. 44 ",
+      "plz": "38855",
+      "city": "Wernigerode",
+      "phone": "03943 632048"
+    }
+  },
+  "/hautarzt/annaberg-buchholz/diana-demmler-fachrztin-fr-haut-und-geschlechtskrankheiten-annaberg-buchholz": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Diana Demmler - Fachärztin für Haut- und Geschlechtskrankheiten",
+      "street": "Geyersdorfer Str. 1 ",
+      "plz": "09456",
+      "city": "Annaberg-Buchholz",
+      "phone": "03733 6761461"
+    }
+  },
+  "/arzt/duesseldorf/dr-med-jrg-wienke-dsseldorf": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr. med. Jörg Wienke",
+      "street": "Ritastraße 2 ",
+      "plz": "40589",
+      "city": "Düsseldorf",
+      "phone": "0211 791200"
+    },
+    "target": {
+      "navoria_id": "4a0f6912-c6dd-4aaa-844d-52c1b447a071",
+      "name": "Dr. med. Jörg Wienke",
+      "address": "Ritastraße 2, 40589 Düsseldorf-Stadtbezirk 9",
+      "canonical": "https://navoria.de/praxis/duesseldorf/dr-med-joerg-wienke-Wb875s",
+      "phone": "0211 791200"
+    }
+  },
+  "/arzt/coburg/dr-jaweed-abo-shawish": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Jaweed Abo-Shawish",
+      "street": "Hindenburgstraße 11",
+      "plz": "96450",
+      "city": "Coburg",
+      "phone": "09561 92301"
+    }
+  },
+  "/hausarzt/koblenz/herr-dr-med-uwe-barnikel-koblenz": {
+    "status": "MATCHED",
+    "reason": "phone",
+    "legacy": {
+      "name": "Herr Dr. med. Uwe Barnikel",
+      "street": "Kemmertstraße 1 ",
+      "plz": "56072",
+      "city": "Koblenz",
+      "phone": "0261 96396389"
+    },
+    "target": {
+      "navoria_id": "423b5283-e794-47cd-a302-cd2814afe6b0",
+      "name": "Herr Dr. med. Uwe Barnikel",
+      "address": "Kemmertstraße 1, 56072 Metternich",
+      "canonical": "https://navoria.de/praxis/koblenz/herr-dr-med-uwe-barnikel-EZI9ko",
+      "phone": "0261 96396389"
+    }
+  },
+  "/augenarzt/montabaur/dr-med-christhoper-hagelauer-montabaur": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Christhoper Hagelauer",
+      "street": "Bahnhofstraße 35 ",
+      "plz": "56410",
+      "city": "Montabaur",
+      "phone": "02602 2411"
+    }
+  },
+  "/augenarzt/frankfurt/dr-med-c-hofmann-frankfurt": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr. med. C. Hofmann",
+      "street": "Pfingstweidstraße 5 ",
+      "plz": "60316",
+      "city": "Frankfurt",
+      "phone": "069 433362"
+    },
+    "target": {
+      "navoria_id": "03c275f3-a7c2-4e4e-bdae-190872c15f7e",
+      "name": "Dr. med. C. Hofmann",
+      "address": "Pfingstweidstraße 5, 60316 Frankfurt am Main-Bornheim/Ostend",
+      "canonical": "https://navoria.de/praxis/frankfurt-am-main/dr-med-c-hofmann-sHk8sU",
+      "phone": "069 433362"
+    }
+  },
+  "/hausarzt/cuxhaven/herr-dr-med-roland-hartwig-cuxhaven": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Roland Hartwig",
+      "street": "Nordfeldstraße 22 ",
+      "plz": "27476",
+      "city": "Cuxhaven",
+      "phone": "04721 393372"
+    }
+  },
+  "/orthopaede/selb/herr-dr-med-detlef-phlmann-selb": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Detlef Pöhlmann",
+      "street": "Wittelsbacherstraße 25 ",
+      "plz": "95100",
+      "city": "Selb",
+      "phone": "09287 79979"
+    }
+  },
+  "/hausarzt/dueren/herr-dr-med-axel-storch-dren": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Herr Dr. med. Axel Storch",
+      "street": "Marienstraße 13 ",
+      "plz": "52351",
+      "city": "Düren",
+      "phone": "02421 13985"
+    },
+    "target": {
+      "navoria_id": "0f77d5d5-8e81-4dab-9ce6-7f110b27296f",
+      "name": "Herr Dr. med. Axel Storch",
+      "address": "Marienstraße 13, 52351 Düren",
+      "canonical": "https://navoria.de/praxis/dueren/herr-dr-med-axel-storch-Iojlrk",
+      "phone": "02421 13985"
+    }
+  },
+  "/hausarzt/gummersbach/dr-med-christiane-sieber-gummersbach": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Christiane Sieber",
+      "street": "Moltkestraße 2 ",
+      "plz": "51643",
+      "city": "Gummersbach",
+      "phone": "02261 818578"
+    }
+  },
+  "/hautarzt/bad-segeberg/herr-dr-med-stefan-peker-6982": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Stefan Peker",
+      "street": "Kirchstraße 25",
+      "plz": "23795",
+      "city": "Bad Segeberg",
+      "phone": "04551 3919"
+    }
+  },
+  "/hausarzt/muenster/prof-dr-med-dr-hc-michael-zitzmann-mnster": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Prof Dr med Dr hc Michael Zitzmann",
+      "street": "Domagkstraße 17-11 ",
+      "plz": "48149",
+      "city": "Münster",
+      "phone": "0251 8356095"
+    }
+  },
+  "/hausarzt/mainburg/dr-luitpold-kistler-mainburg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Luitpold Kistler",
+      "street": "Promenadenweg 7 ",
+      "plz": "84048",
+      "city": "Mainburg",
+      "phone": "08751 9081"
+    }
+  },
+  "/orthopaede/luckenwalde/dr-med-bettina-kuehne": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Bettina Kühne",
+      "street": "Markt  4",
+      "plz": "14943",
+      "city": "Luckenwalde",
+      "phone": "033714024567"
+    }
+  },
+  "/hausarzt/neubrandenburg/gemeinschaftspraxis-dr-sren-dreler-dr-gunnar-zinapold-neubrandenburg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Gemeinschaftspraxis Dr. Sören Dreßler & Dr. Gunnar Zinapold",
+      "street": "Neutorstraße 21 ",
+      "plz": "17033",
+      "city": "Neubrandenburg",
+      "phone": "0395 7612020"
+    }
+  },
+  "/hausarzt/kassel/frau-charlotte-lehnert": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Frau Charlotte Lehnert",
+      "street": "Kirchweg  31",
+      "plz": "34121",
+      "city": "Kassel",
+      "phone": "056114555"
+    },
+    "target": {
+      "navoria_id": "39e3a365-aa51-4aae-bbd7-61c200b22586",
+      "name": "Frau Charlotte Lehnert",
+      "address": "Kirchweg 31, 34121 Kassel-Wehlheiden",
+      "canonical": "https://navoria.de/praxis/kassel/frau-charlotte-lehnert-F5pRDI",
+      "phone": "0561 14555"
+    }
+  },
+  "/hausarzt/ulm/dr-med-frank-riederle-ulm": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr. med. Frank Riederle",
+      "street": "Schlossergasse 1 ",
+      "plz": "89077",
+      "city": "Ulm",
+      "phone": "0731 387262"
+    },
+    "target": {
+      "navoria_id": "a5d81168-844d-4cd2-8fe6-c5f93cb7f5ff",
+      "name": "Dr. med. Frank Riederle",
+      "address": "Schlossergasse 1, 89077 Ulm",
+      "canonical": "https://navoria.de/praxis/ulm/dr-med-frank-riederle-OVfBD4",
+      "phone": "0731 387262"
+    }
+  },
+  "/frauenarzt/landau/frauenarztpraxis-natalya-klassen-landau": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frauenarztpraxis Natalya Klassen",
+      "street": "Theresienstraße 4 ",
+      "plz": "94405",
+      "city": "Landau",
+      "phone": "09951 690260"
+    }
+  },
+  "/hausarzt/castrop-rauxel/andrey-nefedev-julia-carolin-nefedev-castrop-rauxel": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Andrey Nefedev, Julia Carolin Nefedev",
+      "street": "Münsterpl. 9 ",
+      "plz": "44575",
+      "city": "Castrop-Rauxel",
+      "phone": "02305 27007"
+    }
+  },
+  "/hausarzt/weimar/dr-med-heiko-filz-weimar": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Heiko Filz",
+      "street": "Carl-August-Allee 14 ",
+      "plz": "99423",
+      "city": "Weimar",
+      "phone": "03643 901949"
+    }
+  },
+  "/hausarzt/leipzig/frau-dr-med-katja-khn-leipzig": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Katja Kühn",
+      "street": "Löhrstraße 4 ",
+      "plz": "04105",
+      "city": "Leipzig",
+      "phone": "0341 9136980"
+    }
+  },
+  "/hno-arzt/lorsch/hno-praxis-lorsch-dr-med-sabine-weiss-lorsch": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "HNO Praxis Lorsch - Dr. med. Sabine Weiss",
+      "street": "Heppenheimer Str. 18 ",
+      "plz": "64653",
+      "city": "Lorsch",
+      "phone": "06251 588892"
+    }
+  },
+  "/hausarzt/frankenthal/dr-med-duc-chung-bui-facharzt-fuer-allgemeinmedizin-notfallmedizin": {
+    "legacy": {
+      "error": "HTTP 404 bei https://xn--rzte-online-k8a.org/hausarzt/frankenthal/dr-med-duc-chung-bui-facharzt-fuer-allgemeinmedizin-notfallmedizin",
+      "legacy_url": "https://rzte-online.vercel.app/hausarzt/frankenthal/dr-med-duc-chung-bui-facharzt-fuer-allgemeinmedizin-notfallmedizin"
+    },
+    "status": "NO_LEGACY_DATA"
+  },
+  "/hausarzt/pattensen/frau-claudia-timm-pattensen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Claudia Timm",
+      "street": "Steinstraße 32 ",
+      "plz": "30982",
+      "city": "Pattensen",
+      "phone": "05101 852030"
+    }
+  },
+  "/arzt/korbach/herr-walter-brggemann-korbach": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Walter Brüggemann",
+      "street": "Dr.-Hartwig-Straße 19 ",
+      "plz": "34497",
+      "city": "Korbach",
+      "phone": "05631 3450"
+    }
+  },
+  "/hausarzt/offenbach/dr-med-r-kappus-offenbach": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr. med. R. Kappus",
+      "street": "Berliner Str. 75 ",
+      "plz": "63065",
+      "city": "Offenbach",
+      "phone": "069 884355"
+    },
+    "target": {
+      "navoria_id": "140f10eb-689b-4675-87f4-d2c0397d9828",
+      "name": "Dr. med. R. Kappus",
+      "address": "Berliner Str. 75, 63065 Offenbach am Main-Frankfurt-Ost",
+      "canonical": "https://navoria.de/praxis/offenbach-am-main/dr-med-r-kappus-0CTdkI",
+      "phone": "069 884355"
+    }
+  },
+  "/hausarzt/eisenach/gemeinschaftspraxis-dr-med-katja-heim-dr-med-univ-neusatz-aleksandar-griesser-aleksic-eisenach": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Gemeinschaftspraxis Dr. med Katja Heim & Dr. med. univ. Neusatz Aleksandar Griesser-Aleksic",
+      "street": "Nordpl. 22 ",
+      "plz": "99817",
+      "city": "Eisenach",
+      "phone": "03691 818112"
+    }
+  },
+  "/hausarzt/muenchen/praxis-dr-med-qassim-al-saadawi-mnchen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Praxis Dr. med. Qassim Al Saadawi",
+      "street": "Putzbrunner Str. 5 ",
+      "plz": "81737",
+      "city": "München",
+      "phone": "089 6370928"
+    }
+  },
+  "/hausarzt/homberg/drsmed-volker-dittschar-und-andr-otto-homberg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Drs.med Volker Dittschar und André Otto",
+      "street": "Am Hang 2 ",
+      "plz": "34576",
+      "city": "Homberg",
+      "phone": "05681 930650"
+    }
+  },
+  "/hausarzt/erkelenz/praxis-dr-beate-abuzahra-2652": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Praxis Dr. Beate Abuzahra",
+      "street": "Quadtstraße 24",
+      "plz": "41189",
+      "city": "Erkelenz",
+      "phone": "02166 5075"
+    }
+  },
+  "/augenarzt/neutraubling/drmed-bernhard-roesen-neutraubling": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr.med. Bernhard Roesen",
+      "street": "Aussiger Str. 11 ",
+      "plz": "93073",
+      "city": "Neutraubling",
+      "phone": "09401 911892"
+    },
+    "target": {
+      "navoria_id": "53766c8a-d123-4205-97aa-bb2b7b35cb90",
+      "name": "Dr.med. Bernhard Roesen",
+      "address": "Aussiger Str. 11, 93073 Neutraubling",
+      "canonical": "https://navoria.de/praxis/neutraubling/drmed-bernhard-roesen-tmMPvY",
+      "phone": "09401 911892"
+    }
+  },
+  "/hausarzt/hagen/dr-med-m-farsab-hagen": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr. Med. M. Farsab",
+      "street": "Friedrich-Ebert-Platz 2 ",
+      "plz": "58095",
+      "city": "Hagen",
+      "phone": "02331 13040"
+    },
+    "target": {
+      "navoria_id": "747560d4-0458-4037-809c-0f0ab48a1c28",
+      "name": "Dr. Med. M. Farsab",
+      "address": "Friedrich-Ebert-Platz 2, 58095 Hagen",
+      "canonical": "https://navoria.de/praxis/hagen/dr-med-m-farsab-Hz_8uU",
+      "phone": "02331 13040"
+    }
+  },
+  "/hausarzt/pinneberg/frau-dr-med-mechthild-tammen-pinneberg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Mechthild Tammen",
+      "street": "Am Rathaus 2 ",
+      "plz": "25421",
+      "city": "Pinneberg",
+      "phone": "04101 7741651"
+    }
+  },
+  "/frauenarzt/oberndorf/ildiko-husar-fachrztin-fr-frauenheilkunde-und-geburtshilfe-oberndorf": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Ildiko Husar Fachärztin für Frauenheilkunde und Geburtshilfe",
+      "street": "Kirchtorstraße 4 ",
+      "plz": "78727",
+      "city": "Oberndorf",
+      "phone": "07423 7667"
+    }
+  },
+  "/hausarzt/landau/praxis-dr-manfred-lehmann-landau": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Praxis Dr. Manfred Lehmann",
+      "street": "Marienpl. 6a ",
+      "plz": "94405",
+      "city": "Landau",
+      "phone": "09951 59139"
+    }
+  },
+  "/hausarzt/troisdorf/dr-heeg-troisdorf": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Heeg",
+      "street": "Pfarrer-Kenntemich-Platz 11 ",
+      "plz": "53840",
+      "city": "Troisdorf",
+      "phone": "02241 72248"
+    }
+  },
+  "/hausarzt/esslingen-am-neckar/herr-dr-imf-klausenburg-roland-henrich": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Herr Dr. (IMF Klausenburg) Roland Henrich",
+      "street": "Schenkenbergstraße 70",
+      "plz": "73733",
+      "city": "Esslingen am Neckar",
+      "phone": "0711 324025"
+    },
+    "target": {
+      "navoria_id": "43a44c99-ce3e-457e-911f-26f1d3bafa78",
+      "name": "Herr Dr. (IMF Klausenburg) Roland Henrich",
+      "address": "Schenkenbergstraße 70, 73733 Esslingen am Neckar-Mettingen",
+      "canonical": "https://navoria.de/praxis/esslingen-am-neckar/herr-dr-imf-klausenburg-roland-henrich-H1TAQc",
+      "phone": "0711 324025"
+    }
+  },
+  "/hausarzt/erfurt/praxis-fr-allgemeinmedizin-wolfgang-arand-erfurt": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Praxis für Allgemeinmedizin Wolfgang Arand",
+      "street": "Wilhelm-Busch-Straße 13 ",
+      "plz": "99099",
+      "city": "Erfurt",
+      "phone": "0361 3731835"
+    },
+    "target": {
+      "navoria_id": "8b54165c-3bf1-44f7-adab-b195e1e946bf",
+      "name": "Praxis für Allgemeinmedizin Wolfgang Arand",
+      "address": "Wilhelm-Busch-Straße 13, 99099 Erfurt-Daberstedt",
+      "canonical": "https://navoria.de/praxis/erfurt/praxis-fuer-allgemeinmedizin-wolfgang-arand-phytEU",
+      "phone": "0361 3731835"
+    }
+  },
+  "/hausarzt/ravensburg/dr-med-ingrid-schubert-ravensburg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Ingrid Schubert",
+      "street": "Eisenbahnstraße 44 ",
+      "plz": "88212",
+      "city": "Ravensburg",
+      "phone": "0751 23621"
+    }
+  },
+  "/hausarzt/crailsheim/herr-dr-gerhard-slavetinsky": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. Gerhard Slavetinsky",
+      "street": "Gartenstraße 21",
+      "plz": "74564",
+      "city": "Crailsheim",
+      "phone": "07951 7991"
+    }
+  },
+  "/hausarzt/hueckelhoven/hausarztpraxis-baal-hckelhoven": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Hausarztpraxis Baal",
+      "street": "Aachener Str. 32 ",
+      "plz": "41836",
+      "city": "Hückelhoven",
+      "phone": "02435 467"
+    }
+  },
+  "/hausarzt/holzgerlingen/dr-med-annemarie-trost-holzgerlingen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Annemarie Trost",
+      "street": "Stäuchle 5 ",
+      "plz": "71088",
+      "city": "Holzgerlingen",
+      "phone": "07031 609272"
+    }
+  },
+  "/hausarzt/delitzsch/dr-med-gerald-eckhardt-delitzsch": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Gerald Eckhardt",
+      "street": "Bitterfelder Str. 20 ",
+      "plz": "04509",
+      "city": "Delitzsch",
+      "phone": "034202 53541"
+    }
+  },
+  "/arzt/backnang/martina-aggensteiner-backnang": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Martina Aggensteiner",
+      "street": "Schillerstraße 36 ",
+      "plz": "71522",
+      "city": "Backnang",
+      "phone": "07191 60120"
+    }
+  },
+  "/hausarzt/ansbach/dr-med-ulrike-may-ansbach": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Ulrike May",
+      "street": "Nürnberger Str. 38A ",
+      "plz": "91522",
+      "city": "Ansbach",
+      "phone": "0981 17908"
+    }
+  },
+  "/orthopaede/frankenbergsachsen/herr-dr-med-dirk-harlos-frankenbergsachsen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Dirk Harlos",
+      "street": "Äußere Freiberger Str. 2 ",
+      "plz": "09669",
+      "city": "Frankenberg/Sachsen",
+      "phone": "037206 887650"
+    }
+  },
+  "/hausarzt/hofgeismar/gemeinschaftspraxis-trendelburg-hofgeismar": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Gemeinschaftspraxis Trendelburg",
+      "street": "Bürgermeister-Schirmer-Straße 4 ",
+      "plz": "34369",
+      "city": "Hofgeismar",
+      "phone": "05671 7799949"
+    }
+  },
+  "/hausarzt/euskirchen/dr-med-elsbeth-brammertz-euskirchen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Elsbeth Brammertz",
+      "street": "Kirchstraße 11 ",
+      "plz": "53879",
+      "city": "Euskirchen",
+      "phone": "02251 2164"
+    }
+  },
+  "/arzt/burgwedel/drmed-dorothee-kiwit-putzer-burgwedel": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Dorothee Kiwit-Putzer",
+      "street": "Von-Alten-Straße 21A ",
+      "plz": "30938",
+      "city": "Burgwedel",
+      "phone": "05139 8112"
+    }
+  },
+  "/arzt/sondershausen/dr-clemens-witzenhausen-sondershausen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Clemens Witzenhausen",
+      "street": "Wilhelm-Külz-Straße 18 ",
+      "plz": "99706",
+      "city": "Sondershausen",
+      "phone": "03632 783176"
+    }
+  },
+  "/arzt/flensburg/drcarolin-langhanke-dr-christina-brombacher-flensburg": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr.Carolin Langhanke & Dr. Christina Brombacher",
+      "street": "Apenrader Str. 10 ",
+      "plz": "24939",
+      "city": "Flensburg",
+      "phone": "0461 4041"
+    },
+    "target": {
+      "navoria_id": "337a8960-7a3d-4763-a6e1-ab21fa7dfbfe",
+      "name": "Dr.Carolin Langhanke & Dr. Christina Brombacher",
+      "address": "Apenrader Str. 10, 24939 Flensburg-Klues",
+      "canonical": "https://navoria.de/praxis/flensburg/drcarolin-langhanke-dr-christina-brombacher-1phW1o",
+      "phone": "0461 4041"
+    }
+  },
+  "/augenarzt/aschersleben/augenarztpraxis-bredehorn-mayr-aschersleben": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Augenarztpraxis Bredehorn-Mayr",
+      "street": "Johannispromenade 3 ",
+      "plz": "06449",
+      "city": "Aschersleben",
+      "phone": "03473 913691"
+    }
+  },
+  "/hausarzt/duisburg/herr-matthias-mahle-duisburg": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Herr Matthias Mahle",
+      "street": "Königstraße 38 ",
+      "plz": "47051",
+      "city": "Duisburg",
+      "phone": "0203 739970"
+    },
+    "target": {
+      "navoria_id": "51afcf13-9a98-4acf-bb1a-3b42f052c4ba",
+      "name": "Herr Matthias Mahle",
+      "address": "Königstraße 38, 47051 Duisburg",
+      "canonical": "https://navoria.de/praxis/duisburg/herr-matthias-mahle-Giz2S4",
+      "phone": "0203 739970"
+    }
+  },
+  "/hausarzt/herzogenrath/dr-med-oliver-fensky-herzogenrath": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Oliver Fensky",
+      "street": "Josefstraße 21 ",
+      "plz": "52134",
+      "city": "Herzogenrath",
+      "phone": "02406 4091"
+    }
+  },
+  "/hausarzt/jever/hausarztpraxis-am-schlo-jever": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Hausarztpraxis Am Schloß",
+      "street": "Schloßstraße 6 ",
+      "plz": "26441",
+      "city": "Jever",
+      "phone": "04461 9080720"
+    }
+  },
+  "/hausarzt/falkensee/hausarztpraxis-daniel-bernau-facharzt-fr-allgemeinmedizin-falkensee": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Hausarztpraxis - Daniel Bernau - Facharzt für Allgemeinmedizin",
+      "street": "Poststraße 46 ",
+      "plz": "14612",
+      "city": "Falkensee",
+      "phone": "03322 200450"
+    }
+  },
+  "/hausarzt/dorsten/herr-dr-med-georg-haase-dorsten": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Georg Haase",
+      "street": "Wulfener Markt 13 ",
+      "plz": "46286",
+      "city": "Dorsten",
+      "phone": "02369 22453"
+    }
+  },
+  "/orthopaede/olsberg/dr-med-bernd-j-kamitter-olsberg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Bernd J. Kamitter",
+      "street": "Ruhrstraße 25 ",
+      "plz": "59939",
+      "city": "Olsberg",
+      "phone": "02962 7350725"
+    }
+  },
+  "/hausarzt/rottenburg/herr-dr-med-matthias-ehrt-rottenburg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Matthias Ehrt",
+      "street": "Tübinger Str. 16 ",
+      "plz": "72108",
+      "city": "Rottenburg",
+      "phone": "07472 98520"
+    }
+  },
+  "/hausarzt/luenen/herr-dr-med-ulrich-hning-lnen": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Herr Dr. med. Ulrich Hüning",
+      "street": "Altstadtstraße 32 ",
+      "plz": "44534",
+      "city": "Lünen",
+      "phone": "02306 53333"
+    },
+    "target": {
+      "navoria_id": "1ee52268-2986-4901-a4e3-3a8408065999",
+      "name": "Herr Dr. med. Ulrich Hüning",
+      "address": "Altstadtstraße 32, 44534 Lünen",
+      "canonical": "https://navoria.de/praxis/luenen/herr-dr-med-ulrich-huening-9ImhnM",
+      "phone": "02306 53333"
+    }
+  },
+  "/hausarzt/schwerin/herr-dipl-med-karsten-reininghaus-schwerin": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dipl.-Med. Karsten Reininghaus",
+      "street": "August-Bebel-Straße 7 ",
+      "plz": "19055",
+      "city": "Schwerin",
+      "phone": "0385 565360"
+    }
+  },
+  "/hausarzt/ahlen/herr-dr-med-rolf-wermes-ahlen": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Herr Dr. med. Rolf Wermes",
+      "street": "Alter Hof 5 ",
+      "plz": "59227",
+      "city": "Ahlen",
+      "phone": "02382 81109"
+    },
+    "target": {
+      "navoria_id": "2ddc59a4-55ca-46ce-9ccd-be6276317338",
+      "name": "Herr Dr. med. Rolf Wermes",
+      "address": "Alter Hof 5, 59227 Ahlen",
+      "canonical": "https://navoria.de/praxis/ahlen/herr-dr-med-rolf-wermes-_0T6ak",
+      "phone": "02382 81109"
+    }
+  },
+  "/hausarzt/freiburg/dr-med-christoph-reuss-freiburg": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr. med. Christoph Reuss",
+      "street": "Urachstraße 1 ",
+      "plz": "79100",
+      "city": "Freiburg",
+      "phone": "0761 73521"
+    },
+    "target": {
+      "navoria_id": "c414a42d-942e-40b4-87c3-ca8a460549b4",
+      "name": "Dr. med. Christoph Reuss",
+      "address": "Urachstraße 1, 79100 Freiburg im Breisgau-Süd",
+      "canonical": "https://navoria.de/praxis/freiburg-im-breisgau/dr-med-christoph-reuss--zyR6s",
+      "phone": "0761 73521"
+    }
+  },
+  "/augenarzt/eggenfelden/dr-med-jan-wacker-eggenfelden": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Jan Wacker",
+      "street": "Spirknerallee 3 ",
+      "plz": "84307",
+      "city": "Eggenfelden",
+      "phone": "08721 1553"
+    }
+  },
+  "/hausarzt/dresden/frau-dr-med-antje-rahrisch-dresden": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Frau Dr. med. Antje Rahrisch",
+      "street": "Blochmannstraße 24 ",
+      "plz": "01069",
+      "city": "Dresden",
+      "phone": "0351 4902611"
+    },
+    "target": {
+      "navoria_id": "bd6fa181-7ef8-4f77-8f4e-cabd16e8e15a",
+      "name": "Frau Dr. med. Antje Rahrisch",
+      "address": "Blochmannstraße 24, 01069 Dresden-Altstadt",
+      "canonical": "https://navoria.de/praxis/dresden/frau-dr-med-antje-rahrisch-lkJiWU",
+      "phone": "0351 4902611"
+    }
+  },
+  "/hausarzt/gelnhausen/dr-med-rdiger-werner-fass-gelnhausen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Rüdiger Werner Fass",
+      "street": "Hailerer Str. 16 ",
+      "plz": "63571",
+      "city": "Gelnhausen",
+      "phone": "06051 476120"
+    }
+  },
+  "/arzt/freiberg/herr-dr-med-thomas-morgner-freiberg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Thomas Morgner",
+      "street": "Hornstraße 7 ",
+      "plz": "09599",
+      "city": "Freiberg",
+      "phone": "03731 164780"
+    }
+  },
+  "/hausarzt/burghausen/herr-dr-med-christian-schweinberger-burghausen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Christian Schweinberger",
+      "street": "Wackerstraße 40 ",
+      "plz": "84489",
+      "city": "Burghausen",
+      "phone": "08677 1883"
+    }
+  },
+  "/arzt/geilenkirchen/dr-kian-tajrobehkar-geilenkirchen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Kian Tajrobehkar",
+      "street": "Martin-Heyden-Straße 32 ",
+      "plz": "52511",
+      "city": "Geilenkirchen",
+      "phone": "02451 622235"
+    }
+  },
+  "/arzt/annaberg-buchholz/herr-dr-med-jrgen-schulze-annaberg-buchholz": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Jürgen Schulze",
+      "street": "Adam-Ries-Straße 57A ",
+      "plz": "09456",
+      "city": "Annaberg-Buchholz",
+      "phone": "03733 671334"
+    }
+  },
+  "/arzt/annaberg-buchholz/diplmed-mario-meinig-annaberg-buchholz": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dipl.Med. Mario Meinig",
+      "street": "Barbara-Uthmann-Ring 157 ",
+      "plz": "09456",
+      "city": "Annaberg-Buchholz",
+      "phone": "03733 672625"
+    }
+  },
+  "/hausarzt/geseke/frau-dr-med-ulrike-kleine-geseke": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Ulrike Kleine",
+      "street": "Marktstraße 2 ",
+      "plz": "59590",
+      "city": "Geseke",
+      "phone": "02942 6021"
+    }
+  },
+  "/orthopaede/frankenbergsachsen/drmed-ellen-barth-frankenbergsachsen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Ellen Barth",
+      "street": "Äußere Freiberger Str. 2 ",
+      "plz": "09669",
+      "city": "Frankenberg/Sachsen",
+      "phone": "037206 887650"
+    }
+  },
+  "/hausarzt/lehrte/dr-med-martin-schick-lehrte": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Martin Schick",
+      "street": "Zum Großen Freien 15A ",
+      "plz": "31275",
+      "city": "Lehrte",
+      "phone": "05132 886613"
+    }
+  },
+  "/hausarzt/bochum/herr-dr-med-clemens-seifert-bochum": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Herr Dr. med. Clemens Seifert",
+      "street": "Kemnader Str. 316 ",
+      "plz": "44797",
+      "city": "Bochum",
+      "phone": "0234 460832"
+    },
+    "target": {
+      "navoria_id": "4606f200-766e-47ea-b944-1481f80d8886",
+      "name": "Herr Dr. med. Clemens Seifert",
+      "address": "Kemnader Str. 316, 44797 Bochum Süd",
+      "canonical": "https://navoria.de/praxis/bochum/herr-dr-med-clemens-seifert-aR5Szo",
+      "phone": "0234 460832"
+    }
+  },
+  "/hausarzt/erlangen/drmed-christian-dbig-erlangen": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr.med. Christian Döbig",
+      "street": "Hilpertstraße 23 ",
+      "plz": "91052",
+      "city": "Erlangen",
+      "phone": "09131 32788"
+    },
+    "target": {
+      "navoria_id": "c9853b29-48f6-42df-88e9-5e1f16039fdb",
+      "name": "Dr.med. Christian Döbig",
+      "address": "Hilpertstraße 23, 91052 Erlangen",
+      "canonical": "https://navoria.de/praxis/erlangen/drmed-christian-doebig-a1NHSI",
+      "phone": "09131 32788"
+    }
+  },
+  "/hausarzt/berlin/dr-mehdi-rafii-berlin": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Mehdi Rafii",
+      "street": "Schildhornstraße 85 ",
+      "plz": "12163",
+      "city": "Berlin",
+      "phone": "030 7914346"
+    }
+  },
+  "/hausarzt/jena/praxis-dr-med-karsten-gneist-jena": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Praxis Dr. med. Karsten Gneist",
+      "street": "Wilhelm-Külz-Straße 7 ",
+      "plz": "07743",
+      "city": "Jena",
+      "phone": "03641 449252"
+    },
+    "target": {
+      "navoria_id": "15d625e5-0439-44d4-9452-439d0c0cc793",
+      "name": "Praxis Dr. med. Karsten Gneist",
+      "address": "Wilhelm-Külz-Straße 7, 07743 Jena",
+      "canonical": "https://navoria.de/praxis/jena/praxis-dr-med-karsten-gneist-2ErPAY",
+      "phone": "03641 449252"
+    }
+  },
+  "/arzt/schwalmstadt/drmed-frank-hellmann-schwalmstadt": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Frank Hellmann",
+      "street": "Schimmelpfengstraße 4 ",
+      "plz": "34613",
+      "city": "Schwalmstadt",
+      "phone": "06691 23031"
+    }
+  },
+  "/hausarzt/siegen/dr-med-martin-mansfeld-siegen": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr. med. Martin Mansfeld",
+      "street": "Häuslingstraße 22 ",
+      "plz": "57074",
+      "city": "Siegen",
+      "phone": "0271 332858"
+    },
+    "target": {
+      "navoria_id": "0e650d3a-ef64-4f83-aec0-c8aa3b02f388",
+      "name": "Dr. med. Martin Mansfeld",
+      "address": "Häuslingstraße 22, 57074 Siegen",
+      "canonical": "https://navoria.de/praxis/siegen/dr-med-martin-mansfeld-byTxlg",
+      "phone": "0271 332858"
+    }
+  },
+  "/kinderarzt/erbach/frau-dr-med-romy-schreck-erbach": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Romy Schreck",
+      "street": "Gerhart-Hauptmann-Straße 13 ",
+      "plz": "64711",
+      "city": "Erbach",
+      "phone": "06062 4555"
+    }
+  },
+  "/hausarzt/netphen/kinderarztpraxis-turian-westphal-ehemals-koch-netphen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Kinderarztpraxis Turian Westphal (ehemals Koch)",
+      "street": "Talstraße 16 ",
+      "plz": "57250",
+      "city": "Netphen",
+      "phone": "02738 1693"
+    }
+  },
+  "/arzt/holzgerlingen/dr-med-dagmar-hofsss-bock-holzgerlingen": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr. med. Dagmar Hofsäss-Bock",
+      "street": "Böblinger Str. 2 ",
+      "plz": "71088",
+      "city": "Holzgerlingen",
+      "phone": "07031 7249340"
+    },
+    "target": {
+      "navoria_id": "7daa9ef5-09b8-4fef-83ef-b374a3543dcf",
+      "name": "Dr. med. Dagmar Hofsäss-Bock",
+      "address": "Böblinger Str. 2, 71088 Holzgerlingen",
+      "canonical": "https://navoria.de/praxis/holzgerlingen/dr-med-dagmar-hofsaess-bock-i8xtEk",
+      "phone": "07031 7249340"
+    }
+  },
+  "/hausarzt/freiburg/dr-med-stefan-rahner-freiburg": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr. med. Stefan Rahner",
+      "street": "Lorettostraße 2 ",
+      "plz": "79100",
+      "city": "Freiburg",
+      "phone": "0761 71759"
+    },
+    "target": {
+      "navoria_id": "fabc00b3-1215-4c35-b469-b299a66d62ba",
+      "name": "Dr. med. Stefan Rahner",
+      "address": "Lorettostraße 2, 79100 Freiburg im Breisgau-Süd",
+      "canonical": "https://navoria.de/praxis/freiburg-im-breisgau/dr-med-stefan-rahner-5UBS1c",
+      "phone": "0761 71759"
+    }
+  },
+  "/arzt/schwedtoder/praxisgemeinschaft-fr-urologie-zenk-roszyk-schwedtoder": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Praxisgemeinschaft für Urologie Zenk & Roszyk",
+      "street": "Berliner Allee 5 ",
+      "plz": "16303",
+      "city": "Schwedt/Oder",
+      "phone": "03332 421602"
+    }
+  },
+  "/hausarzt/schwerin/dr-med-torsten-dahlmann-schwerin": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Torsten Dahlmann",
+      "street": "Röntgenstraße 11 ",
+      "plz": "19055",
+      "city": "Schwerin",
+      "phone": "0385 5557130"
+    }
+  },
+  "/hausarzt/witten/dr-berg-witten": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr. Berg",
+      "street": "Beethovenstraße 14 ",
+      "plz": "58452",
+      "city": "Witten",
+      "phone": "02302 52807"
+    },
+    "target": {
+      "navoria_id": "f8f4c7aa-3c7a-48b1-b6a3-5570e4fdd711",
+      "name": "Dr. Berg",
+      "address": "Beethovenstraße 14, 58452 Witten",
+      "canonical": "https://navoria.de/praxis/witten/dr-berg-8qwF7k",
+      "phone": "02302 52807"
+    }
+  },
+  "/augenarzt/fritzlar/drmed-jrg-bgeholz-fritzlar": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Jörg Bögeholz",
+      "street": "Kasseler Str. 6 ",
+      "plz": "34560",
+      "city": "Fritzlar",
+      "phone": "05622 915583"
+    }
+  },
+  "/hausarzt/oberndorf/herr-m-d-univ-damaskus-leon-darwisch-oberndorf": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr M. D. (Univ. Damaskus) Leon Darwisch",
+      "street": "Hauptstraße 4 ",
+      "plz": "78727",
+      "city": "Oberndorf",
+      "phone": "07423 2380"
+    }
+  },
+  "/hausarzt/reutlingen/herr-dr-med-till-reckert-reutlingen": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Herr Dr. med. Till Reckert",
+      "street": "Lederstraße 118 ",
+      "plz": "72764",
+      "city": "Reutlingen",
+      "phone": "07121 334438"
+    },
+    "target": {
+      "navoria_id": "983da3e7-719e-4d84-a4d3-0f310f8c3095",
+      "name": "Herr Dr. med. Till Reckert",
+      "address": "Lederstraße 118, 72764 Reutlingen",
+      "canonical": "https://navoria.de/praxis/reutlingen/herr-dr-med-till-reckert-SWBpFs",
+      "phone": "07121 334438"
+    }
+  },
+  "/hausarzt/freiberg/herr-dr-med-sigurd-bochmann-freiberg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Sigurd Bochmann",
+      "street": "Obergasse 24 ",
+      "plz": "09599",
+      "city": "Freiberg",
+      "phone": "03731 22277"
+    }
+  },
+  "/hausarzt/eichstaett/dr-med-margret-bauer-eichsttt": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Margret Bauer",
+      "street": "Luitpoldstraße 16 ",
+      "plz": "85072",
+      "city": "Eichstätt",
+      "phone": "08421 97440"
+    }
+  },
+  "/hausarzt/solingen/drmed-hans-peter-holbeck-solingen": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr.med. Hans-Peter Holbeck",
+      "street": "Gräfrather Markt 6 ",
+      "plz": "42653",
+      "city": "Solingen",
+      "phone": "0212 59753"
+    },
+    "target": {
+      "navoria_id": "578d5379-95ac-4faa-8421-181ef8ac71a3",
+      "name": "Dr.med. Hans-Peter Holbeck",
+      "address": "Gräfrather Markt 6, 42653 Solingen",
+      "canonical": "https://navoria.de/praxis/solingen/drmed-hans-peter-holbeck-mTPUdI",
+      "phone": "0212 59753"
+    }
+  },
+  "/arzt/erkner/thorsten-kruse-facharzt-fuer-innere-medizin-8836": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Thorsten Kruse Facharzt für Innere Medizin",
+      "street": "Schleusenstraße 50",
+      "plz": "15569",
+      "city": "Erkner",
+      "phone": "03362 75806"
+    }
+  },
+  "/orthopaede/ottweiler/drmed-axel-wolf-facharzt-fr-orthopdie-ottweiler": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Axel Wolf Facharzt für Orthopädie",
+      "street": "Schloßstraße 2 ",
+      "plz": "66564",
+      "city": "Ottweiler",
+      "phone": "06824 91610"
+    }
+  },
+  "/hausarzt/beelitz/frau-dipl-med-ramona-wendland-beelitz": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dipl.-Med. Ramona Wendland",
+      "street": "Trebbiner Str. 22 ",
+      "plz": "14547",
+      "city": "Beelitz",
+      "phone": "033204 630130"
+    }
+  },
+  "/arzt/lohr/herr-dr-med-dirk-trautvetter-lohr": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Dirk Trautvetter",
+      "street": "Uhrmachergasse 5 ",
+      "plz": "97816",
+      "city": "Lohr",
+      "phone": "09352 807831"
+    }
+  },
+  "/hausarzt/greifswald/drmed-mathias-meyer-facharzt-fr-allgemeinmedizin-greifswald": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Mathias Meyer Facharzt für Allgemeinmedizin",
+      "street": "Lange Reihe 89A ",
+      "plz": "17489",
+      "city": "Greifswald",
+      "phone": "03834 508500"
+    }
+  },
+  "/hausarzt/haseluenne/drmed-andreas-euler-haselnne": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Andreas Euler",
+      "street": "Hammer Str. 9 ",
+      "plz": "49740",
+      "city": "Haselünne",
+      "phone": "05961 5431"
+    }
+  },
+  "/hausarzt/mittweida/dr-steffen-schreiber-mittweida": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr Steffen Schreiber",
+      "street": "Lauenhainer Str. 59 ",
+      "plz": "09648",
+      "city": "Mittweida",
+      "phone": "03727 600130"
+    }
+  },
+  "/hausarzt/petersberg/herr-dr-med-michael-harre-petersberg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Michael Harre",
+      "street": "Brauhausstraße 5 ",
+      "plz": "36100",
+      "city": "Petersberg",
+      "phone": "0661 65055"
+    }
+  },
+  "/arzt/bautzen/dr-med-markus-hentschel-bautzen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Markus Hentschel",
+      "street": "Töpferstraße 17 ",
+      "plz": "02625",
+      "city": "Bautzen",
+      "phone": "03591 47089"
+    }
+  },
+  "/hausarzt/philippsburg/frau-dr-med-annette-weik-scheurer-philippsburg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Annette Weik-Scheurer",
+      "street": "Marktpl. 21 ",
+      "plz": "76661",
+      "city": "Philippsburg",
+      "phone": "07256 4785"
+    }
+  },
+  "/hausarzt/luedenscheid/herr-dr-med-volker-budde-ldenscheid": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Volker Budde",
+      "street": "Freiherr-vom-Stein-Straße 24 ",
+      "plz": "58511",
+      "city": "Lüdenscheid",
+      "phone": "02351 4325573"
+    }
+  },
+  "/hausarzt/buchen-odenwald/herr-helmut-koenig-5360": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Helmut König",
+      "street": "Brucknerstraße 13",
+      "plz": "74722",
+      "city": "Buchen (Odenwald)",
+      "phone": "06281 52420"
+    }
+  },
+  "/arzt/eschwege/herr-dr-med-roman-ergang-eschwege": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Roman Ergang",
+      "street": "Boyneburger Str. 7 ",
+      "plz": "37269",
+      "city": "Eschwege",
+      "phone": "05651 32357"
+    }
+  },
+  "/hausarzt/giessen/herr-dr-med-jrgen-fhrer-gieen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Jürgen Führer",
+      "street": "Liebigstraße 20 ",
+      "plz": "35392",
+      "city": "Gießen",
+      "phone": "0641 9790040"
+    }
+  },
+  "/hausarzt/ahaus/dr-barbara-tielkes-ahaus": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Barbara Tielkes",
+      "street": "Burgstraße 9 ",
+      "plz": "48683",
+      "city": "Ahaus",
+      "phone": "02561 987333"
+    }
+  },
+  "/hausarzt/sulzbach-rosenberg/claudius-rothbauer-sulzbach-rosenberg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Claudius Rothbauer",
+      "street": "Rosenberger Str. 31 ",
+      "plz": "92237",
+      "city": "Sulzbach-Rosenberg",
+      "phone": "09661 3011"
+    }
+  },
+  "/hausarzt/baunatal/michael-frlich-baunatal": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Michael Frölich",
+      "street": "Heinrich-Nordhoff-Straße 7 ",
+      "plz": "34225",
+      "city": "Baunatal",
+      "phone": "0561 495811"
+    },
+    "target": {
+      "navoria_id": "43b320d0-36ac-41ff-aae8-b4afe166865b",
+      "name": "Dr.med. Michaela Jahn",
+      "address": "Heinrich-Nordhoff-Straße 7, 34225 Baunatal-Altenbauna",
+      "canonical": "https://navoria.de/praxis/baunatal/drmed-michaela-jahn-mNzKj4",
+      "phone": "0561 492400"
+    }
+  },
+  "/hausarzt/eberswalde/dr-med-konstantin-zellmer-eberswalde": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Konstantin Zellmer",
+      "street": "Karl-Liebknecht-Straße 2 ",
+      "plz": "16225",
+      "city": "Eberswalde",
+      "phone": "03334 212983"
+    }
+  },
+  "/zahnarzt/landau/frau-prof-dr-med-dent-claudia-reicheneder-landau": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Prof. Dr. med. dent. Claudia Reicheneder",
+      "street": "Hauptstraße 91 ",
+      "plz": "94405",
+      "city": "Landau",
+      "phone": "09951 6049290"
+    }
+  },
+  "/arzt/loebau/herr-dipl-med-helmer-hache-lbau": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dipl.-Med. Helmer Hache",
+      "street": "Breitscheidstraße 24 ",
+      "plz": "02708",
+      "city": "Löbau",
+      "phone": "03585 862885"
+    }
+  },
+  "/augenarzt/frankenbergsachsen/dr-ute-hunger-frankenbergsachsen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Ute Hunger",
+      "street": "Gartenstraße 27 ",
+      "plz": "09669",
+      "city": "Frankenberg/Sachsen",
+      "phone": "037206 70338"
+    }
+  },
+  "/hausarzt/bargteheide/drmedsandra-nagel-bargteheide": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.Med.Sandra Nagel",
+      "street": "Rathausstraße 33A ",
+      "plz": "22941",
+      "city": "Bargteheide",
+      "phone": "04532 23951"
+    }
+  },
+  "/hausarzt/eschborn/doctor-ivona-djoric-eschborn": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Doctor Ivona Djoric",
+      "street": "Hauptstraße 30 ",
+      "plz": "65760",
+      "city": "Eschborn",
+      "phone": "06196 46663"
+    }
+  },
+  "/arzt/luedenscheid/herr-dr-med-dietrich-kmpfe-ldenscheid": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Dietrich Kämpfe",
+      "street": "Rathauspl. 3 ",
+      "plz": "58507",
+      "city": "Lüdenscheid",
+      "phone": "02351 6643540"
+    }
+  },
+  "/augenarzt/balve/dr-med-theodor-vorhoff-balve": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Theodor Vorhoff",
+      "street": "Am Drostenpl. 7 ",
+      "plz": "58802",
+      "city": "Balve",
+      "phone": "02375 91970"
+    }
+  },
+  "/hausarzt/itzehoe/hausarztpraxis-aust-itzehoe": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Hausarztpraxis Aust",
+      "street": "Lübscher Kamp 18 ",
+      "plz": "25524",
+      "city": "Itzehoe",
+      "phone": "04821 82185"
+    }
+  },
+  "/hausarzt/hennef/drmed-manfred-maylahn-praktischer-arzt-hennef": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Manfred Maylahn Praktischer Arzt",
+      "street": "Marktpl. 48 ",
+      "plz": "53773",
+      "city": "Hennef",
+      "phone": "02242 7579"
+    }
+  },
+  "/hausarzt/gera/drmed-susanna-remmler-gera": {
+    "status": "MATCHED",
+    "reason": "phone+name",
+    "legacy": {
+      "name": "Dr.med. Susanna Remmler",
+      "street": "Johannes-R.-Becher-Straße 1/1. Etage ",
+      "plz": "07546",
+      "city": "Gera",
+      "phone": "0365 85502200"
+    },
+    "target": {
+      "navoria_id": "8bc95265-4f6a-4650-b531-d789be946057",
+      "name": "Dr.med. Susanna Remmler",
+      "address": "Johannes-R.-Becher-Straße 1/1. Etage, 07546 Gera-Bieblach",
+      "canonical": "https://navoria.de/praxis/gera/drmed-susanna-remmler-L-GLcI",
+      "phone": "0365 85502200"
+    }
+  },
+  "/hausarzt/goerlitz/frau-dr-med-elisabeth-domsgen-grlitz": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Elisabeth Domsgen",
+      "street": "Grüner Graben 8 ",
+      "plz": "02826",
+      "city": "Görlitz",
+      "phone": "03581 83055"
+    }
+  },
+  "/hausarzt/fuerstenwaldespree/frau-dr-med-brnig-frstenwaldespree": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Brünig",
+      "street": "Jahnstraße 38A ",
+      "plz": "15517",
+      "city": "Fürstenwalde/Spree",
+      "phone": "03361 32010"
+    }
+  },
+  "/hausarzt/soest/dr-med-barbara-knollmann-soest": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Barbara Knollmann",
+      "street": "Marktstraße 2 ",
+      "plz": "59494",
+      "city": "Soest",
+      "phone": "02921 13210"
+    }
+  },
+  "/hausarzt/wismar/dr-romy-kujat-wismar": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Romy Kujat",
+      "street": "Turnerweg 4 ",
+      "plz": "23966",
+      "city": "Wismar",
+      "phone": "03841 282876"
+    }
+  },
+  "/hausarzt/ebersbach/frau-dr-med-danijela-arizanovic-ebersbach": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Danijela Arizanovic",
+      "street": "Hauptstraße 19 ",
+      "plz": "73061",
+      "city": "Ebersbach",
+      "phone": "07163 8288"
+    }
+  },
+  "/hausarzt/bad-waldsee/herr-dr-hc-ulf-michael-deckers": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. h.c. Ulf Michael Deckers",
+      "street": "Friedhofstraße 4",
+      "plz": "88339",
+      "city": "Bad Waldsee",
+      "phone": "07524 1417"
+    }
+  },
+  "/hausarzt/loeningen/medizinisches-versorgungszhasetal-lningen-lningen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Medizinisches Versorgungsz.Hasetal Löningen",
+      "street": "St.Annen Str. 9 ",
+      "plz": "49624",
+      "city": "Löningen",
+      "phone": "05431 156710"
+    }
+  },
+  "/arzt/erndtebrueck/praxis-said-moshref-erndtebrck": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Praxis Said Moshref",
+      "street": "Mühlenweg 4 ",
+      "plz": "57339",
+      "city": "Erndtebrück",
+      "phone": "02753 6046088"
+    }
+  },
+  "/hausarzt/frankfurt/dr-med-cpanijel-rath-fachrztin-f-allgemeinmedizin-frankfurt": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. C.Panijel-Rath Fachärztin f. Allgemeinmedizin",
+      "street": "Am Salzhaus 4 ",
+      "plz": "60311",
+      "city": "Frankfurt",
+      "phone": "069 284333"
+    }
+  },
+  "/hausarzt/freital/dipl-med-kerstin-steinbach-freital": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dipl. Med. Kerstin Steinbach",
+      "street": "Schachtstraße 3 ",
+      "plz": "01705",
+      "city": "Freital",
+      "phone": "0351 6411240"
+    }
+  },
+  "/hausarzt/gruenstadt/dr-med-carsten-blume-grnstadt": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Carsten Blume",
+      "street": "Verladepl. 2 ",
+      "plz": "67269",
+      "city": "Grünstadt",
+      "phone": "06359 931120"
+    }
+  },
+  "/kinderarzt/isny/dr-med-alexander-moch-isny": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Alexander Moch",
+      "street": "Lindauer Str. 42 ",
+      "plz": "88316",
+      "city": "Isny",
+      "phone": "07562 9815470"
+    }
+  },
+  "/hausarzt/clausthal-zellerfeld/frau-dr-med-friederike-bahr-clausthal-zellerfeld": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Friederike Bahr",
+      "street": "Adolph-Roemer-Straße 23 ",
+      "plz": "38678",
+      "city": "Clausthal-Zellerfeld",
+      "phone": "05323 2388"
+    }
+  },
+  "/hausarzt/goslar/herr-dr-med-andreas-eisenhardt-goslar": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Andreas Eisenhardt",
+      "street": "Hirschberger Str. 1 ",
+      "plz": "38642",
+      "city": "Goslar",
+      "phone": "05321 8740"
+    }
+  },
+  "/hausarzt/bueren/dr-pikrun-bren": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Pikrun",
+      "street": "Bahnhofstraße 22 ",
+      "plz": "33142",
+      "city": "Büren",
+      "phone": "02951 98120"
+    }
+  },
+  "/arzt/loebau/dipl-med-anke-siegert-lbau": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dipl. med. Anke Siegert",
+      "street": "Sachsenstraße 4 ",
+      "plz": "02708",
+      "city": "Löbau",
+      "phone": "03585 861855"
+    }
+  },
+  "/hausarzt/neuberg/drmed-peter-rdiger-tippe-facharzt-fr-allgemeinmedizin-neuberg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Peter Rüdiger Tippe Facharzt für Allgemeinmedizin",
+      "street": "Langendiebacher Str. 11 ",
+      "plz": "63543",
+      "city": "Neuberg",
+      "phone": "06183 928542"
+    }
+  },
+  "/hausarzt/wiesbaden/herr-olav-heringer-wiesbaden": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Olav Heringer",
+      "street": "Langenbeckpl. 2 ",
+      "plz": "65189",
+      "city": "Wiesbaden",
+      "phone": "0611 205090"
+    }
+  },
+  "/hausarzt/felsberg/frau-dr-med-karin-schte-felsberg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Karin Schüte",
+      "street": "Neue Str. 14 ",
+      "plz": "34587",
+      "city": "Felsberg",
+      "phone": "05662 4444"
+    }
+  },
+  "/hausarzt/gummersbach/hausarztpraxis-dr-medicina-d-toma-gummersbach": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Hausarztpraxis Dr. (Medicina) D. Toma",
+      "street": "Gummersbacher Str. 21 ",
+      "plz": "51645",
+      "city": "Gummersbach",
+      "phone": "02261 26928"
+    }
+  },
+  "/hausarzt/versmold/herr-alexander-sinica-versmold": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Alexander Sinica",
+      "street": "Wersestraße 15 ",
+      "plz": "33775",
+      "city": "Versmold",
+      "phone": "05423 48999"
+    }
+  },
+  "/hausarzt/mannheim/prof-dr-med-manfred-hensel-mannheim": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Prof. Dr. med. Manfred Hensel",
+      "street": "Q5 14-22 ",
+      "plz": "68161",
+      "city": "Mannheim",
+      "phone": "0621 1819490"
+    }
+  },
+  "/arzt/munster/dr-susanne-hrter-munster": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Susanne Härter",
+      "street": "Am Exerzierpl. 16-18 ",
+      "plz": "29633",
+      "city": "Munster",
+      "phone": "05192 2864098"
+    }
+  },
+  "/hausarzt/beckum/dr-med-hans-thomas-thompson": {
+    "legacy": {
+      "error": "HTTP 404 bei https://xn--rzte-online-k8a.org/hausarzt/beckum/dr-med-hans-thomas-thompson",
+      "legacy_url": "https://rzte-online.vercel.app/hausarzt/beckum/dr-med-hans-thomas-thompson"
+    },
+    "status": "NO_LEGACY_DATA"
+  },
+  "/hausarzt/loebau/praxis-gries-mudr-ohera-lbau": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Praxis Gries/ MUDr Ohera",
+      "street": "Breitscheidstraße 9 ",
+      "plz": "02708",
+      "city": "Löbau",
+      "phone": "03585 862259"
+    }
+  },
+  "/hausarzt/rostock/frau-dipl-med-susanne-decker-rostock": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Frau Dipl.-Med. Susanne Decker",
+      "street": "Wismarsche Str. 32 ",
+      "plz": "18057",
+      "city": "Rostock",
+      "phone": "0381 4997999"
+    },
+    "target": {
+      "navoria_id": "2cd6f9cc-bbb2-4fd9-a61c-21ab953841ce",
+      "name": "Praxis Dr.med. Susanne Markmann Fachärztin f. Frauenheilkunde und Geburtshilfe",
+      "address": "Wismarsche Str. 32, 18057 Rostock",
+      "canonical": "https://navoria.de/praxis/rostock/praxis-drmed-susanne-markmann-fachaerztin-f-frauenheilkunde-und-geburtshilfe-iTCmLI",
+      "phone": null
+    }
+  },
+  "/hausarzt/jessen/dr-med-stefan-kluge-dr-med-dirk-stanitz-jessen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Stefan Kluge & Dr. med. Dirk Stanitz",
+      "street": "Geschwister-Scholl-Straße 2A ",
+      "plz": "06917",
+      "city": "Jessen",
+      "phone": "03537 213621"
+    }
+  },
+  "/hausarzt/emmerich/herr-dariusz-markowski-emmerich": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dariusz Markowski",
+      "street": "Wollenweberstraße 18 ",
+      "plz": "46446",
+      "city": "Emmerich",
+      "phone": "02822 711908"
+    }
+  },
+  "/hausarzt/celle/frau-dr-med-gisela-winterhoff-celle": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Gisela Winterhoff",
+      "street": "Weißer Wall 3 ",
+      "plz": "29221",
+      "city": "Celle",
+      "phone": "05141 23334"
+    }
+  },
+  "/hausarzt/bad-wurzach/dr-bernd-lindenmaier-bad": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Bernd Lindenmaier",
+      "street": "Schloßstraße 5 ",
+      "plz": "88410",
+      "city": "Bad Wurzach",
+      "phone": "07564 1301"
+    }
+  },
+  "/augenarzt/schneeberg/herr-dr-med-thomas-windisch-schneeberg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Thomas Windisch",
+      "street": "Neustädtler Str. 4 ",
+      "plz": "08289",
+      "city": "Schneeberg",
+      "phone": "03772 22745"
+    }
+  },
+  "/hausarzt/borken-hessen/dr-med-sabine-hess-fachaerztin-f-allgemeinmedizin-2076": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Sabine Heß Fachärztin f. Allgemeinmedizin",
+      "street": "Bahnhofstraße 34",
+      "plz": "34582",
+      "city": "Borken (Hessen)",
+      "phone": "05682 7334848"
+    }
+  },
+  "/hausarzt/cloppenburg/arztpraxis-tatjana-tissen-und-katharina-inomjonov-cloppenburg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Arztpraxis Tatjana Tissen und Katharina Inomjonov",
+      "street": "Löninger Str. 13 ",
+      "plz": "49661",
+      "city": "Cloppenburg",
+      "phone": "04471 94820"
+    }
+  },
+  "/hausarzt/cottbus/herr-dr-med-andreas-pietzko-cottbus": {
+    "status": "MATCHED",
+    "reason": "name+plz",
+    "legacy": {
+      "name": "Herr Dr. med. Andreas Pietzko",
+      "street": "Süd 10 ",
+      "plz": "03044",
+      "city": "Cottbus",
+      "phone": "0355 7840741"
+    },
+    "target": {
+      "navoria_id": "e460b706-5ffe-426b-87ab-41c39dfdcb27",
+      "name": "Herr Dr. med. Andreas Pietzko",
+      "address": "Süd 10, Gerhart-Hauptmann-Straße 15, 03044 Cottbus-Ärztehaus Nord",
+      "canonical": "https://navoria.de/praxis/cottbus/herr-dr-med-andreas-pietzko-jSzg7c",
+      "phone": "0355 7840741"
+    }
+  },
+  "/hausarzt/betzdorf/drmed-rainer-banzhaf-facharzt-fr-allgemeinmedizin-betzdorf": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Rainer Banzhaf Facharzt für Allgemeinmedizin",
+      "street": "Viktoriastraße 11 ",
+      "plz": "57518",
+      "city": "Betzdorf",
+      "phone": "02741 22345"
+    }
+  },
+  "/hausarzt/frankenberg-eder/dr-ulrike-ursula-eckel": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Ulrike Ursula Eckel",
+      "street": "Bahnhofstraße 26",
+      "plz": "35066",
+      "city": "Frankenberg (Eder)",
+      "phone": "06451 25602"
+    }
+  },
+  "/arzt/esslingen-am-neckar/herr-dr-med-georg-mayer": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Herr Dr. med. Georg Mayer",
+      "street": "Ottilienplatz 15",
+      "plz": "73728",
+      "city": "Esslingen am Neckar",
+      "phone": "0711 355212"
+    },
+    "target": {
+      "navoria_id": "8218943d-a89e-4671-80d0-1ab7c8f2f546",
+      "name": "Herr Dr. med. Georg Mayer",
+      "address": "Ottilienpl. 15, 73728 Esslingen am Neckar",
+      "canonical": "https://navoria.de/praxis/esslingen-am-neckar/herr-dr-med-georg-mayer-AbyyC0",
+      "phone": "0711 355212"
+    }
+  },
+  "/hausarzt/grevenbroich/frau-monika-plug-gnther-grevenbroich": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Monika Plug-Günther",
+      "street": "Wilhelmitenstraße 10 ",
+      "plz": "41515",
+      "city": "Grevenbroich",
+      "phone": "02181 659511"
+    }
+  },
+  "/hausarzt/bautzen/dr-med-ekkehard-seeliger-facharzt-fuer-allgemeinmedizin": {
+    "legacy": {
+      "error": "HTTP 404 bei https://xn--rzte-online-k8a.org/hausarzt/bautzen/dr-med-ekkehard-seeliger-facharzt-fuer-allgemeinmedizin",
+      "legacy_url": "https://rzte-online.vercel.app/hausarzt/bautzen/dr-med-ekkehard-seeliger-facharzt-fuer-allgemeinmedizin"
+    },
+    "status": "NO_LEGACY_DATA"
+  },
+  "/hausarzt/giengen/praxis-dr-softic-giengen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Praxis Dr. Softic",
+      "street": "Ulmer Str. 55 ",
+      "plz": "89537",
+      "city": "Giengen",
+      "phone": "07322 919191"
+    }
+  },
+  "/hausarzt/bergisch-gladbach/dr-annette-knoll-9721": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr. Annette Knoll",
+      "street": "Hauptstraße 218-220",
+      "plz": "51465",
+      "city": "Bergisch Gladbach",
+      "phone": "02202 30711"
+    },
+    "target": {
+      "navoria_id": "cc30e3ee-58e1-4105-876d-00de70b6abba",
+      "name": "Dr. Annette Knoll",
+      "address": "Hauptstraße 218-220, 51465 Bergisch Gladbach",
+      "canonical": "https://navoria.de/praxis/bergisch-gladbach/dr-annette-knoll-ryMrJ4",
+      "phone": "02202 30711"
+    }
+  },
+  "/hausarzt/sendenhorst/dr-udo-hecke-sendenhorst": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Udo Hecke",
+      "street": "Weststraße 17 ",
+      "plz": "48324",
+      "city": "Sendenhorst",
+      "phone": "02526 565"
+    }
+  },
+  "/hausarzt/gruenberg/herr-dr-med-christian-becker-grnberg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Christian Becker",
+      "street": "Krool 9 ",
+      "plz": "35305",
+      "city": "Grünberg",
+      "phone": "06401 1278"
+    }
+  },
+  "/augenarzt/versmold/dr-nicola-buch-pleitner-versmold": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Nicola Buch-Pleitner",
+      "street": "Markusweg 1 ",
+      "plz": "33775",
+      "city": "Versmold",
+      "phone": "05423 6123"
+    }
+  },
+  "/hausarzt/melsungen/drmed-ulrike-jehle-sinning-melsungen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Ulrike Jehle-Sinning",
+      "street": "Bahnhofstraße 16 ",
+      "plz": "34212",
+      "city": "Melsungen",
+      "phone": "05661 6110"
+    }
+  },
+  "/arzt/tharandt/myriam-mller-tharandt": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Myriam Müller",
+      "street": "Roßmäßlerstraße 7 ",
+      "plz": "01737",
+      "city": "Tharandt",
+      "phone": "035203 186924"
+    },
+    "target": {
+      "navoria_id": "cfbb25c0-7423-426b-89b8-a16180d2d2e5",
+      "name": "Myriam Müller",
+      "address": "Roßmäßlerstraße 7, 01737 Tharandt",
+      "canonical": "https://navoria.de/praxis/tharandt/myriam-mueller-pT_7_g",
+      "phone": "035203 186924"
+    }
+  },
+  "/hausarzt/ludwigsburg/frau-dr-med-ute-jesse-ludwigsburg": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Frau Dr. med. Ute Jesse",
+      "street": "Martin-Luther-Straße 79/2 ",
+      "plz": "71636",
+      "city": "Ludwigsburg",
+      "phone": "07141 2982525"
+    },
+    "target": {
+      "navoria_id": "614d2f9a-73ae-4d56-bfee-9fc91590cd94",
+      "name": "Frau Dr. med. Ute Jesse",
+      "address": "Martin-Luther-Straße 79/2, 71636 Ludwigsburg",
+      "canonical": "https://navoria.de/praxis/ludwigsburg/frau-dr-med-ute-jesse-kd3wKI",
+      "phone": "07141 2982525"
+    }
+  },
+  "/hausarzt/bad-muenstereifel/dr-thomas-kleinfeld-7663": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Thomas Kleinfeld",
+      "street": "Von-Ayx-Straße 1",
+      "plz": "53902",
+      "city": "Bad Münstereifel",
+      "phone": "02253 6063"
+    }
+  },
+  "/hausarzt/rheda-wiedenbrueck/praxis-m-abou-zeidan-rheda-wiedenbrck": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Praxis M. Abou Zeidan",
+      "street": "Marienstraße 7 ",
+      "plz": "33378",
+      "city": "Rheda-Wiedenbrück",
+      "phone": "05242 902966"
+    }
+  },
+  "/hausarzt/zossen/herr-andreas-leese-zossen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Andreas Leese",
+      "street": "Berliner Allee 28 ",
+      "plz": "15806",
+      "city": "Zossen",
+      "phone": "033702 66376"
+    }
+  },
+  "/arzt/erkrath/frau-dr-med-maria-rita-langhorst-erkrath": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Maria-Rita Langhorst",
+      "street": "Ziegeleiweg 2 ",
+      "plz": "40699",
+      "city": "Erkrath",
+      "phone": "02104 803398"
+    }
+  },
+  "/arzt/apolda/dr-med-stefan-teweleit-fa-innere-medizin-apolda": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Stefan Teweleit, FA Innere Medizin",
+      "street": "Hermstedter Str. 6 ",
+      "plz": "99510",
+      "city": "Apolda",
+      "phone": "03644 554476"
+    }
+  },
+  "/hausarzt/bad/herr-dr-med-rainer-eisele-bad": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Rainer Eisele",
+      "street": "Elisabeth-Achler-Straße 3 ",
+      "plz": "88339",
+      "city": "Bad",
+      "phone": "07524 1800"
+    }
+  },
+  "/hausarzt/ehingen-donau/goetz-kitzig-2066": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Götz Kitzig",
+      "street": "Hauptstraße 68",
+      "plz": "89584",
+      "city": "Ehingen (Donau)",
+      "phone": "07391 53114"
+    }
+  },
+  "/hausarzt/gardelegen/diplmed-andreas-brendtner-gardelegen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dipl.med. Andreas Brendtner",
+      "street": "Am Burgwall 1 ",
+      "plz": "39638",
+      "city": "Gardelegen",
+      "phone": "03907 2524"
+    }
+  },
+  "/hausarzt/geisenheim/dr-karin-pogorzalek-schibalski-geisenheim": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr Karin Pogorzalek-Schibalski",
+      "street": "Hintergasse 2 ",
+      "plz": "65366",
+      "city": "Geisenheim",
+      "phone": "06722 5630"
+    }
+  },
+  "/hausarzt/muensingen/drmed-martin-brndle-mnsingen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Martin Brändle",
+      "street": "Hauptstraße 51 ",
+      "plz": "72525",
+      "city": "Münsingen",
+      "phone": "07381 69274"
+    }
+  },
+  "/hausarzt/paderborn/frau-dr-med-carla-gottschalg-paderborn": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Frau Dr. med. Carla Gottschalg",
+      "street": "Kaukenberg 25 ",
+      "plz": "33100",
+      "city": "Paderborn",
+      "phone": "05251 670333"
+    },
+    "target": {
+      "navoria_id": "80f58ac1-a19f-47f1-9f5b-02aee04803bc",
+      "name": "Frau Dr. med. Carla Gottschalg",
+      "address": "Kaukenberg 25, 33100 Paderborn",
+      "canonical": "https://navoria.de/praxis/paderborn/frau-dr-med-carla-gottschalg-cnimxs",
+      "phone": "05251 670333"
+    }
+  },
+  "/arzt/eberbach/dr-dietger-schwittayy-eberbach": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Dietger Schwittayy",
+      "street": "Bahnhofspl. 7/2 OG ",
+      "plz": "69412",
+      "city": "Eberbach",
+      "phone": "06271 2276"
+    }
+  },
+  "/hausarzt/landsberg/frau-dr-med-doreen-langer-landsberg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Doreen Langer",
+      "street": "Merseburger Str. 1b ",
+      "plz": "06188",
+      "city": "Landsberg",
+      "phone": "034602 20011"
+    }
+  },
+  "/hausarzt/wanzleben-boerde/herr-dr-med-ernst-schoof-wanzleben-brde": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Ernst Schoof",
+      "street": "Große Gartenstraße 12 ",
+      "plz": "39164",
+      "city": "Wanzleben-Börde",
+      "phone": "039209 42111"
+    }
+  },
+  "/hautarzt/baunatal/frau-dr-med-regina-hahn-baunatal": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Regina Hahn",
+      "street": "Stettiner Str. 5 ",
+      "plz": "34225",
+      "city": "Baunatal",
+      "phone": "0561 76640350"
+    }
+  },
+  "/hausarzt/bad-rappenau/anna-friederike-hund": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Anna Friederike Hund",
+      "street": "Einsteinstraße 2",
+      "plz": "74906",
+      "city": "Bad Rappenau",
+      "phone": "07066 7001"
+    }
+  },
+  "/hausarzt/eisleben/luminita-gutu-fachrztin-fr-inner-medizin-hausrztin-eisleben": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Luminita Gutu Fachärztin für Inner Medizin / Hausärztin",
+      "street": "Freistraße 1-3 ",
+      "plz": "06295",
+      "city": "Eisleben",
+      "phone": "03475 711677"
+    }
+  },
+  "/hausarzt/erfurt/dipl-med-heike-hanke-fachaerztin-f-allgemeinmedizin-3347": {
+    "legacy": {
+      "error": "HTTP 404 bei https://xn--rzte-online-k8a.org/hausarzt/erfurt/dipl-med-heike-hanke-fachaerztin-f-allgemeinmedizin-3347",
+      "legacy_url": "https://rzte-online.vercel.app/hausarzt/erfurt/dipl-med-heike-hanke-fachaerztin-f-allgemeinmedizin-3347"
+    },
+    "status": "NO_LEGACY_DATA"
+  },
+  "/hausarzt/flensburg/frau-dr-med-ingrid-muhs-flensburg": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Frau Dr. med. Ingrid Muhs",
+      "street": "Südermarkt 1 ",
+      "plz": "24937",
+      "city": "Flensburg",
+      "phone": "0461 17511"
+    },
+    "target": {
+      "navoria_id": "469256f2-adfe-4588-b47f-42e84140d2b6",
+      "name": "Dres. Oelsner, Muhs und Partner",
+      "address": "Südermarkt 1, 24937 Flensburg-Altstadt",
+      "canonical": "https://navoria.de/praxis/flensburg/dres-oelsner-muhs-und-partner-hUfxSE",
+      "phone": "0461 17511"
+    }
+  },
+  "/arzt/bernau-bei-berlin/frau-dipl-med-carola-becher": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dipl.-Med. Carola Becher",
+      "street": "Ladeburger Str. 21",
+      "plz": "16321",
+      "city": "Bernau bei Berlin",
+      "phone": "03338 38409"
+    }
+  },
+  "/hausarzt/bramsche/herr-dr-medic-imf-klausenburg-gavrila-urlea-albert-bramsche": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. medic. (IMF Klausenburg) Gavrila Urlea-Albert",
+      "street": "Lutterdamm 13A ",
+      "plz": "49565",
+      "city": "Bramsche",
+      "phone": "05461 3933"
+    }
+  },
+  "/hausarzt/frankfurt/frau-dr-med-gabriele-federlein-frankfurt": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Gabriele Federlein",
+      "street": "Baumschulenweg 1C ",
+      "plz": "15236",
+      "city": "Frankfurt",
+      "phone": "0335 504626"
+    }
+  },
+  "/hausarzt/bruehl/frau-eugenie-peters-brhl": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Eugenie Peters",
+      "street": "Uhlstraße 59 ",
+      "plz": "50321",
+      "city": "Brühl",
+      "phone": "02232 42800"
+    }
+  },
+  "/hausarzt/coswig/dipl-med-maren-schumann-coswig": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dipl.-Med. Maren Schumann",
+      "street": "Puschkinstraße 37 ",
+      "plz": "06869",
+      "city": "Coswig",
+      "phone": "034903 599600"
+    }
+  },
+  "/hausarzt/quakenbrueck/frau-dorothee-otte-bick-quakenbrck": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dorothee Otte-Bick",
+      "street": "Lange Str. 29 ",
+      "plz": "49610",
+      "city": "Quakenbrück",
+      "phone": "05431 5550"
+    }
+  },
+  "/zahnarzt/asslar/herr-dr-ulrich-muskat-alar": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. Ulrich Muskat",
+      "street": "Schulstraße 52 ",
+      "plz": "35614",
+      "city": "Aßlar",
+      "phone": "06441 88285"
+    }
+  },
+  "/zahnarzt/langelsheim/frau-dr-iris-westermann-langelsheim": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. Iris Westermann",
+      "street": "August-Grotehenne-Straße 17 ",
+      "plz": "38685",
+      "city": "Langelsheim",
+      "phone": "05326 8062"
+    }
+  },
+  "/hausarzt/blankenburg-harz/dipl-med-rene-giesel-5452": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dipl.-Med. Rene Giesel",
+      "street": "Ludwig-Rudolf-Straße 2",
+      "plz": "38889",
+      "city": "Blankenburg (Harz)",
+      "phone": "03944 364972"
+    }
+  },
+  "/hausarzt/hilchenbach/frau-angela-hartnack-hilchenbach": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Angela Hartnack",
+      "street": "Bruchstraße 10 ",
+      "plz": "57271",
+      "city": "Hilchenbach",
+      "phone": "02733 4040"
+    }
+  },
+  "/arzt/landau/dr-med-bettina-eckhardt-landau": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Bettina Eckhardt",
+      "street": "Marienpl. 11 ",
+      "plz": "94405",
+      "city": "Landau",
+      "phone": "09951 6900410"
+    }
+  },
+  "/hausarzt/borken/drmed-pler-bernhard-borken": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Päßler Bernhard",
+      "street": "Brinkstraße 16 ",
+      "plz": "46325",
+      "city": "Borken",
+      "phone": "02861 65044"
+    }
+  },
+  "/hausarzt/braunschweig/dr-med-saman-c-atugoda-braunschweig": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr. med. Saman C. Atugoda",
+      "street": "Dessaustraße 7 ",
+      "plz": "38124",
+      "city": "Braunschweig",
+      "phone": "0531 18770"
+    },
+    "target": {
+      "navoria_id": "93b0495c-940a-40bf-9ef1-b61245f57d52",
+      "name": "Hautarztpraxis Dr. Atugoda",
+      "address": "Dessaustraße 7, 38124 Braunschweig",
+      "canonical": "https://navoria.de/praxis/braunschweig/hautarztpraxis-dr-atugoda-WMJVjQ",
+      "phone": "0531 18770"
+    }
+  },
+  "/hausarzt/altdorf/internistische-praxis-dr-brix-fischer-und-langer-altdorf": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Internistische Praxis Dr. Brix Fischer und Langer",
+      "street": "Röderstraße 6 ",
+      "plz": "90518",
+      "city": "Altdorf",
+      "phone": "09187 951050"
+    }
+  },
+  "/zahnarzt/ansbach/dr-med-dent-hubert-gradl-ansbach": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. dent. Hubert Gradl",
+      "street": "Johann-Sebastian-Bach-Platz 7 ",
+      "plz": "91522",
+      "city": "Ansbach",
+      "phone": "0981 2449"
+    }
+  },
+  "/hausarzt/oehringen/dr-maria-arabela-lupu": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Maria-Arabela Lupu ",
+      "street": "Karlsvorstadt 10",
+      "plz": "74613",
+      "city": "Öhringen",
+      "phone": "07941 7838"
+    }
+  },
+  "/hausarzt/angermuende/frau-dr-med-ursel-jarchow-angermnde": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Frau Dr. med. Ursel Jarchow",
+      "street": "Am Friedenspark 1 ",
+      "plz": "16278",
+      "city": "Angermünde",
+      "phone": "03331 298168"
+    }
+  },
+  "/hausarzt/herzogenrath/dr-med-gabriele-schmeitz-herzogenrath": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Gabriele Schmeitz",
+      "street": "Markt 22 ",
+      "plz": "52134",
+      "city": "Herzogenrath",
+      "phone": "02407 4888"
+    }
+  },
+  "/hausarzt/bobingen/hausarzt-praxis-herr-alexander-eisinger-9087": {
+    "legacy": {
+      "error": "HTTP 404 bei https://xn--rzte-online-k8a.org/hausarzt/bobingen/hausarzt-praxis-herr-alexander-eisinger-9087",
+      "legacy_url": "https://rzte-online.vercel.app/hausarzt/bobingen/hausarzt-praxis-herr-alexander-eisinger-9087"
+    },
+    "status": "NO_LEGACY_DATA"
+  },
+  "/hausarzt/frankenbergsachsen/herr-dr-med-bernd-hckel-frankenbergsachsen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Bernd Häckel",
+      "street": "Äußere Freiberger Str. 2 ",
+      "plz": "09669",
+      "city": "Frankenberg/Sachsen",
+      "phone": "037206 880891"
+    }
+  },
+  "/hausarzt/froendenbergruhr/herr-herbert-constapel-frndenbergruhr": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Herbert Constapel",
+      "street": "Im Stift 14 ",
+      "plz": "58730",
+      "city": "Fröndenberg/Ruhr",
+      "phone": "02373 70089"
+    }
+  },
+  "/hausarzt/bad-wildungen/dr-med-anneli-freitag-schickram": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Anneli Freitag-Schickram",
+      "street": "Brunnenallee 8",
+      "plz": "34537",
+      "city": "Bad Wildungen",
+      "phone": "05621 4551"
+    }
+  },
+  "/hausarzt/herne/kerstin-fritz-herne": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Kerstin Fritz",
+      "street": "Gerichtsstraße 8 ",
+      "plz": "44649",
+      "city": "Herne",
+      "phone": "02325 795462"
+    },
+    "target": {
+      "navoria_id": "f3470fef-6ebd-4043-b5eb-1614d71e18a1",
+      "name": "Kerstin Fritz",
+      "address": "Gerichtsstraße 8, 44649 Herne-Wanne-Eickel",
+      "canonical": "https://navoria.de/praxis/herne/kerstin-fritz-pmtR3g",
+      "phone": "02325 795462"
+    }
+  },
+  "/arzt/finsterwalde/dr-med-astrid-knfel-finsterwalde": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Astrid Knöfel",
+      "street": "August-Bebel-Straße 2 ",
+      "plz": "03238",
+      "city": "Finsterwalde",
+      "phone": "03531 3119"
+    }
+  },
+  "/hausarzt/boeblingen/dr-iavorschi-bblingen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Iavorschi",
+      "street": "Berliner Str. 35 ",
+      "plz": "71034",
+      "city": "Böblingen",
+      "phone": "07031 25083"
+    }
+  },
+  "/hausarzt/loerrach/allgemeinpraxis-clas-lrrach": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Allgemeinpraxis Clas",
+      "street": "Tumringer Str. 192 ",
+      "plz": "79539",
+      "city": "Lörrach",
+      "phone": "07621 44600"
+    }
+  },
+  "/arzt/esslingen-am-neckar/herr-dr-med-stefan-waldenmaier": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Herr Dr. med. Stefan Waldenmaier",
+      "street": "Katharinenstraße 44",
+      "plz": "73728",
+      "city": "Esslingen am Neckar",
+      "phone": "0711 313800"
+    },
+    "target": {
+      "navoria_id": "041ee4c0-8d0d-46e0-9b3d-2aad71f462ee",
+      "name": "Herr Dr. med. Stefan Waldenmaier",
+      "address": "Katharinenstraße 44, 73728 Esslingen am Neckar",
+      "canonical": "https://navoria.de/praxis/esslingen-am-neckar/herr-dr-med-stefan-waldenmaier-Uv3Zls",
+      "phone": "0711 313800"
+    }
+  },
+  "/hausarzt/cloppenburg/drmed-holger-laing-cloppenburg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Holger Laing",
+      "street": "Am Capitol 6 ",
+      "plz": "49661",
+      "city": "Cloppenburg",
+      "phone": "04471 3571"
+    }
+  },
+  "/hausarzt/biedenkopf/olessja-mrz-praxis-fr-allgemeinmedizin-biedenkopf": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Olessja März Praxis für Allgemeinmedizin",
+      "street": "Lindenstraße 2 ",
+      "plz": "35216",
+      "city": "Biedenkopf",
+      "phone": "06461 5711"
+    }
+  },
+  "/hausarzt/geilenkirchen/herr-dr-med-mathias-jansen-geilenkirchen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Mathias Jansen",
+      "street": "Gerhard-Schümmer-Straße 4 ",
+      "plz": "52511",
+      "city": "Geilenkirchen",
+      "phone": "02451 7844"
+    }
+  },
+  "/zahnarzt/bad/herr-dr-ernst-georg-schwerdtfeger-bad": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. Ernst-Georg Schwerdtfeger",
+      "street": "Bahnhofstraße 11 ",
+      "plz": "34454",
+      "city": "Bad Arolsen",
+      "phone": "05691 4973"
+    }
+  },
+  "/zahnarzt/frankenbergsachsen/dr-med-dent-sybille-wetzig-frankenbergsachsen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. dent. Sybille Wetzig",
+      "street": "Albert-Schweitzer-Straße 23 ",
+      "plz": "09669",
+      "city": "Frankenberg/Sachsen",
+      "phone": "037206 889880"
+    }
+  },
+  "/hausarzt/plochingen/dr-kathrin-herre-plochingen": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Kathrin Herre",
+      "street": "Am Fischbrunnen 2 ",
+      "plz": "73207",
+      "city": "Plochingen",
+      "phone": "07153 21775"
+    }
+  },
+  "/arzt/gaggenau/herr-dr-med-till-grtschla-gaggenau": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Till Grötschla",
+      "street": "Murgtalstraße 26 ",
+      "plz": "76571",
+      "city": "Gaggenau",
+      "phone": "07225 97370"
+    }
+  },
+  "/augenarzt/weisswasseroberlausitz/dr-med-birgit-mder-weiwasseroberlausitz": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. med. Birgit Mäder",
+      "street": "Tiergartenstraße 1 ",
+      "plz": "02943",
+      "city": "Weißwasser/Oberlausitz",
+      "phone": "03576 28440"
+    }
+  },
+  "/hausarzt/jueterbog/dr-kerstin-hckert-jterbog": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr. Kerstin Höckert",
+      "street": "Pferdestraße 38 ",
+      "plz": "14913",
+      "city": "Jüterbog",
+      "phone": "03372 405412"
+    }
+  },
+  "/arzt/katzhuette/drmed-gudrun-kolitsch-fachrztin-fr-innere-medizin-und-rheumatologie-katzhtte": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Dr.med. Gudrun Kolitsch Fachärztin für Innere Medizin und Rheumatologie",
+      "street": "Oelzer Str. 12 ",
+      "plz": "98746",
+      "city": "Katzhütte",
+      "phone": "036781 31111"
+    }
+  },
+  "/frauenarzt/muenster/drmed-jens-quakernack-facharzt-fr-frauenheilkunde-geburtshilfe-mnster": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Dr.med. Jens Quakernack Facharzt für Frauenheilkunde Geburtshilfe",
+      "street": "Hohenzollernring 59 ",
+      "plz": "48145",
+      "city": "Münster",
+      "phone": "0251 393024"
+    },
+    "target": {
+      "navoria_id": "2f817b0c-98e1-4c0b-90a9-3c6a49530472",
+      "name": "Dr.med. Jens Quakernack Facharzt für Frauenheilkunde Geburtshilfe",
+      "address": "Hohenzollernring 59, 48145 Münster",
+      "canonical": "https://navoria.de/praxis/muenster/drmed-jens-quakernack-facharzt-fuer-frauenheilkunde-geburtshilfe-y5UVVU",
+      "phone": "0251 393024"
+    }
+  },
+  "/hausarzt/esslingen-am-neckar/frau-dr-med-elena-samorej-1107": {
+    "status": "MATCHED",
+    "reason": "street+plz+name",
+    "legacy": {
+      "name": "Frau Dr. med. Elena Samorej",
+      "street": "Schurwaldstraße 19",
+      "plz": "73734",
+      "city": "Esslingen am Neckar",
+      "phone": "0711 3451444"
+    },
+    "target": {
+      "navoria_id": "4b50b60c-4e35-4570-8b90-118a60597f14",
+      "name": "Frau Dr. med. Elena Samorej",
+      "address": "Schurwaldstraße 19, 73734 Esslingen am Neckar-Berkheim",
+      "canonical": "https://navoria.de/praxis/esslingen-am-neckar/frau-dr-med-elena-samorej-52oldo",
+      "phone": "0711 3451444"
+    }
+  },
+  "/hausarzt/heinsberg/herr-dr-med-ekkehart-walter-heinsberg": {
+    "status": "NOT_FOUND",
+    "legacy": {
+      "name": "Herr Dr. med. Ekkehart Walter",
+      "street": "Gangolfusstraße 34 ",
+      "plz": "52525",
+      "city": "Heinsberg",
+      "phone": "02452 5094"
+    }
+  }
+}
