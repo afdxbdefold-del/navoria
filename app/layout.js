@@ -188,6 +188,13 @@ export default async function RootLayout({ children }) {
         {!isHomepageMode && <NavShellTop />}
         {!isHomepageMode ? (
           <div className="mx-auto w-full max-w-[970px] px-4 lg:px-0">
+            {/* Billboard 970x250 – über allen Seiten (Ezoic Placeholder-ID 102).
+                Nur ab lg sichtbar, da Content ab lg vollbreit läuft. */}
+            <div className="hidden pt-6 lg:block">
+              <div className="mx-auto w-[970px] min-h-[250px] overflow-hidden rounded-lg bg-slate-50 flex items-center justify-center">
+                <EzoicAd id={102} className="w-full" label="Anzeige" />
+              </div>
+            </div>
             <div className="lg:flex lg:gap-[30px]">
               <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 lg:w-[640px]">{children}</main>
               <aside className="hidden w-[300px] shrink-0 pt-6 lg:block" aria-label="Sidebar">
