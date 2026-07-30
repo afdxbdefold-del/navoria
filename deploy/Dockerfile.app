@@ -4,8 +4,8 @@
 FROM node:20-bookworm-slim AS deps
 WORKDIR /app
 RUN corepack enable && corepack prepare yarn@1.22.22 --activate
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --production=false --network-timeout 600000
+COPY package.json yarn.lock* ./
+RUN yarn install --production=false --network-timeout 600000
 
 # ---------- Stage 2: Build ----------
 FROM node:20-bookworm-slim AS builder
