@@ -14,6 +14,9 @@
   --background: 0 0% 100%;
   --foreground: 222 47% 11%;
 
+  /* Navoria Content-Breite (Header ausgenommen) */
+  --nv-content-max: 970px;
+
   /* Navoria Palette (solid) */
   --color-navy: #073B5C;
   --color-navy-dark: #052F49;
@@ -237,4 +240,23 @@ body {
   }
   .input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(8, 117, 201, 0.15); }
   .label { @apply text-xs font-semibold uppercase tracking-wide; color: var(--color-text-muted); }
+}
+
+
+/* ---------------------------------------------------------------------------
+   Content-Breite 970px — greift NUR im <main>, damit Header außen breit bleibt.
+   Kappt alle typischen Page-Container-Klassen, ohne kleine Kartenlayouts
+   (max-w-md, max-w-lg, max-w-xl, max-w-2xl) anzufassen.
+--------------------------------------------------------------------------- */
+main .max-w-3xl,
+main .max-w-4xl,
+main .max-w-5xl,
+main .max-w-6xl,
+main .max-w-7xl,
+main .max-w-\[1200px\],
+main .max-w-\[1280px\],
+main .max-w-screen-lg,
+main .max-w-screen-xl,
+main .max-w-screen-2xl {
+  max-width: var(--nv-content-max) !important;
 }

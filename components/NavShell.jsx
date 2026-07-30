@@ -141,7 +141,7 @@ function Footer() {
       className="navoria-chrome mt-20"
       style={{ background: 'var(--color-primary)', color: '#ffffff' }}
     >
-      <div className="mx-auto max-w-[1200px] px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[970px] px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-3 lg:grid-cols-5">
           {/* Brand-Column */}
           <div className="lg:col-span-2">
