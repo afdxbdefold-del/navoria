@@ -202,9 +202,9 @@ export default async function RootLayout({ children }) {
             (keine Navoria-Chrome im DOM, auch nicht versteckt). */}
         {!isHomepageMode && <NavShellTop />}
         {showBillboard && (
-          <div className="hidden bg-white lg:block">
+          <div className="hidden lg:block">
             <div className="mx-auto w-[970px] py-4">
-              <div className="min-h-[250px] w-[970px] overflow-hidden rounded-lg bg-slate-50 flex items-center justify-center">
+              <div className="min-h-[250px] w-[970px] overflow-hidden flex items-center justify-center">
                 <EzoicAd id={102} className="w-full" label="Anzeige" />
               </div>
             </div>
