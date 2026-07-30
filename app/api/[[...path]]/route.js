@@ -1697,11 +1697,12 @@ async function handlePost(request, pathParts) {
   //   body: { doctors: [ ... ], mode?: 'merge' | 'replace' }
   //   - merge (default): upsert by google_place_id, manual_overrides respektieren
   //   - replace: erst löschen, dann neu einspielen (nur mit force=true erlaubt)
+  //   Bulk-basiert (500er-Batches), robust für ≥100k Einträge.
   if (pathParts[0] === 'admin' && pathParts[1] === 'import') {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
     const { doctors, mode = 'merge', force = false } = body || {};
     if (!Array.isArray(doctors)) return json({ error: 'doctors[] erforderlich' }, { status: 400 });
-    if (doctors.length > 20000) return json({ error: 'Zu viele Einträge (>20.000)' }, { status: 400 });
+    if (doctors.length > 200000) return json({ error: 'Zu viele Einträge (>200.000)' }, { status: 400 });
 
     const doctorsCol = await getCollection('doctor_places');
     let inserted = 0, updated = 0, skipped = 0;
@@ -1712,41 +1713,67 @@ async function handlePost(request, pathParts) {
       await doctorsCol.deleteMany({});
     }
 
+    // Existierende gid → manual_overrides Map einmalig aufbauen (statt N mal findOne)
+    const gids = doctors.map((d) => d?.google_place_id).filter(Boolean);
+    const existingMap = new Map();
+    const CHUNK = 500;
+    for (let i = 0; i < gids.length; i += CHUNK) {
+      const slice = gids.slice(i, i + CHUNK);
+      const found = await doctorsCol.find(
+        { google_place_id: { $in: slice } },
+        { projection: { google_place_id: 1, manual_overrides: 1, created_at: 1, _id: 0 } },
+      ).toArray();
+      for (const e of found) existingMap.set(e.google_place_id, e);
+    }
+
+    // Bulk-Writes in 500er-Batches
+    const now = new Date();
+    let bulkOps = [];
+    const flush = async () => {
+      if (!bulkOps.length) return;
+      try {
+        const res = await doctorsCol.bulkWrite(bulkOps, { ordered: false });
+        inserted += res.upsertedCount || 0;
+        updated += res.modifiedCount || 0;
+      } catch (err) {
+        errors.push({ error: String(err.message || err) });
+      }
+      bulkOps = [];
+    };
+
     for (const raw of doctors) {
       try {
         if (!raw || !raw.google_place_id) { skipped += 1; continue; }
-        // Date-Felder zurück konvertieren (kamen als ISO-Strings über JSON)
         const doc = { ...raw };
         delete doc._id;
         for (const k of ['created_at', 'updated_at', 'last_synced_at', 'last_external_sync_at', 'verified_at', 'website_checked_at']) {
           if (doc[k] && typeof doc[k] === 'string') doc[k] = new Date(doc[k]);
         }
-        const existing = await doctorsCol.findOne({ google_place_id: doc.google_place_id });
+        const existing = existingMap.get(doc.google_place_id);
         if (existing) {
           const setFields = { ...doc };
           delete setFields.id;
           delete setFields.created_at;
-          // Manuelle Overrides der lokalen Kopie respektieren
           const overrides = existing.manual_overrides || {};
           for (const field of Object.keys(overrides)) {
             if (overrides[field] != null) delete setFields[field];
           }
-          setFields.updated_at = new Date();
-          await doctorsCol.updateOne({ google_place_id: doc.google_place_id }, { $set: setFields });
-          updated += 1;
+          setFields.updated_at = now;
+          bulkOps.push({ updateOne: { filter: { google_place_id: doc.google_place_id }, update: { $set: setFields } } });
         } else {
           doc.id = doc.id || uuidv4();
-          doc.created_at = doc.created_at || new Date();
-          doc.updated_at = new Date();
+          doc.created_at = doc.created_at || now;
+          doc.updated_at = now;
           doc.manual_overrides = doc.manual_overrides || {};
           doc.data_conflicts = doc.data_conflicts || [];
-          await doctorsCol.insertOne(doc);
-          inserted += 1;
+          bulkOps.push({ updateOne: { filter: { google_place_id: doc.google_place_id }, update: { $setOnInsert: doc }, upsert: true } });
         }
+        if (bulkOps.length >= CHUNK) await flush();
       } catch (err) {
         errors.push({ gid: raw?.google_place_id, error: String(err.message || err) });
       }
     }
+    await flush();
 
     return json({ ok: true, inserted, updated, skipped, errors: errors.slice(0, 20), total_processed: doctors.length });
   }

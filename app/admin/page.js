@@ -215,14 +215,34 @@ function Dashboard({ token, onLogout }) {
       const parsed = JSON.parse(text);
       const doctors = Array.isArray(parsed) ? parsed : (parsed.doctors || parsed.items || []);
       if (!Array.isArray(doctors) || doctors.length === 0) throw new Error('Keine Praxen in der Datei gefunden');
-      const r = await fetch('/api/admin/import', {
-        method: 'POST', headers: authHeaders,
-        body: JSON.stringify({ doctors, mode: importForce ? 'replace' : 'merge', force: importForce }),
-      });
-      const data = await r.json();
-      if (!r.ok) throw new Error(data.error || 'Import fehlgeschlagen');
-      setImportReport(data);
-      toast.success(`Import fertig: ${data.inserted} neu, ${data.updated} aktualisiert, ${data.skipped} übersprungen`);
+
+      // Chunking: Bei großen Datenmengen (>3000) in 3000er-Batches senden,
+      // damit weder Browser-Fetch-Body noch Server-JSON-Parser über den Heap-Limit gehen.
+      const CHUNK = 3000;
+      const totals = { inserted: 0, updated: 0, skipped: 0, total_processed: 0, errors: [] };
+      const batches = Math.ceil(doctors.length / CHUNK);
+
+      // Bei REPLACE-Mode: erster Batch macht das delete, alle folgenden nur upsert
+      for (let i = 0; i < batches; i += 1) {
+        const slice = doctors.slice(i * CHUNK, (i + 1) * CHUNK);
+        const isFirst = i === 0;
+        const batchMode = importForce && isFirst ? 'replace' : 'merge';
+        const batchForce = importForce && isFirst;
+        toast.message(`Batch ${i + 1}/${batches} … (${slice.length} Einträge)`, { duration: 2500 });
+        const r = await fetch('/api/admin/import', {
+          method: 'POST', headers: authHeaders,
+          body: JSON.stringify({ doctors: slice, mode: batchMode, force: batchForce }),
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(`Batch ${i + 1}/${batches}: ${data.error || 'Import fehlgeschlagen'}`);
+        totals.inserted += data.inserted || 0;
+        totals.updated += data.updated || 0;
+        totals.skipped += data.skipped || 0;
+        totals.total_processed += data.total_processed || 0;
+        if (Array.isArray(data.errors)) totals.errors.push(...data.errors);
+      }
+      setImportReport(totals);
+      toast.success(`Import fertig: ${totals.inserted} neu, ${totals.updated} aktualisiert, ${totals.skipped} übersprungen`);
       await loadAll();
     } catch (err) { toast.error(String(err.message || err)); }
     setImporting2(false);
