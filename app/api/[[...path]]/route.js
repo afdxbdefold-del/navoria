@@ -1743,34 +1743,50 @@ async function handlePost(request, pathParts) {
 
     for (const raw of doctors) {
       try {
-        if (!raw || !raw.google_place_id) { skipped += 1; continue; }
+        if (!raw) { skipped += 1; continue; }
         const doc = { ...raw };
         delete doc._id;
         for (const k of ['created_at', 'updated_at', 'last_synced_at', 'last_external_sync_at', 'verified_at', 'website_checked_at']) {
           if (doc[k] && typeof doc[k] === 'string') doc[k] = new Date(doc[k]);
         }
-        const existing = existingMap.get(doc.google_place_id);
-        if (existing) {
-          const setFields = { ...doc };
-          delete setFields.id;
-          delete setFields.created_at;
-          const overrides = existing.manual_overrides || {};
-          for (const field of Object.keys(overrides)) {
-            if (overrides[field] != null) delete setFields[field];
+
+        // Zwei Upsert-Pfade:
+        //   1) google_place_id (Standard – aus Places-Importen)
+        //   2) id (UUID) – für Migrations-/Review-Profile ohne place_id
+        if (doc.google_place_id) {
+          const existing = existingMap.get(doc.google_place_id);
+          if (existing) {
+            const setFields = { ...doc };
+            delete setFields.id;
+            delete setFields.created_at;
+            const overrides = existing.manual_overrides || {};
+            for (const field of Object.keys(overrides)) {
+              if (overrides[field] != null) delete setFields[field];
+            }
+            setFields.updated_at = now;
+            bulkOps.push({ updateOne: { filter: { google_place_id: doc.google_place_id }, update: { $set: setFields } } });
+          } else {
+            doc.id = doc.id || uuidv4();
+            doc.created_at = doc.created_at || now;
+            doc.updated_at = now;
+            doc.manual_overrides = doc.manual_overrides || {};
+            doc.data_conflicts = doc.data_conflicts || [];
+            bulkOps.push({ updateOne: { filter: { google_place_id: doc.google_place_id }, update: { $setOnInsert: doc }, upsert: true } });
           }
-          setFields.updated_at = now;
-          bulkOps.push({ updateOne: { filter: { google_place_id: doc.google_place_id }, update: { $set: setFields } } });
-        } else {
-          doc.id = doc.id || uuidv4();
+        } else if (doc.id) {
+          // ID-basierter Upsert (Migrations-/Review-Profile ohne place_id)
           doc.created_at = doc.created_at || now;
           doc.updated_at = now;
           doc.manual_overrides = doc.manual_overrides || {};
           doc.data_conflicts = doc.data_conflicts || [];
-          bulkOps.push({ updateOne: { filter: { google_place_id: doc.google_place_id }, update: { $setOnInsert: doc }, upsert: true } });
+          bulkOps.push({ updateOne: { filter: { id: doc.id }, update: { $setOnInsert: doc }, upsert: true } });
+        } else {
+          skipped += 1;
+          continue;
         }
         if (bulkOps.length >= CHUNK) await flush();
       } catch (err) {
-        errors.push({ gid: raw?.google_place_id, error: String(err.message || err) });
+        errors.push({ gid: raw?.google_place_id || raw?.id, error: String(err.message || err) });
       }
     }
     await flush();
