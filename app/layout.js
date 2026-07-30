@@ -204,9 +204,7 @@ export default async function RootLayout({ children }) {
         {showBillboard && (
           <div className="hidden lg:block">
             <div className="mx-auto w-[970px] py-4">
-              <div className="min-h-[250px] w-[970px] overflow-hidden flex items-center justify-center">
-                <EzoicAd id={102} className="w-full" label="Anzeige" />
-              </div>
+              <EzoicAd id={102} className="w-[970px]" label="" />
             </div>
           </div>
         )}
@@ -216,7 +214,7 @@ export default async function RootLayout({ children }) {
               <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 lg:w-[640px]">{children}</main>
               <aside className="hidden w-[300px] shrink-0 pt-6 lg:block" aria-label="Sidebar">
                 <div className="space-y-4">
-                  <EzoicAd id={101} />
+                  <EzoicAd id={101} label="" />
                 </div>
               </aside>
             </div>
