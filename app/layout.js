@@ -187,13 +187,15 @@ export default async function RootLayout({ children }) {
             (keine Navoria-Chrome im DOM, auch nicht versteckt). */}
         {!isHomepageMode && <NavShellTop />}
         {!isHomepageMode ? (
-          <div className="mx-auto flex w-full max-w-[1300px] gap-6 px-4 lg:gap-8 lg:px-6">
-            <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 lg:max-w-[970px]">{children}</main>
-            <aside className="hidden w-[300px] shrink-0 pt-6 lg:block" aria-label="Sidebar">
-              <div className="sticky top-24 space-y-4">
-                <EzoicAd id={101} />
-              </div>
-            </aside>
+          <div className="mx-auto w-full max-w-[970px] px-4 lg:px-0">
+            <div className="lg:flex lg:gap-[30px]">
+              <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 lg:w-[640px]">{children}</main>
+              <aside className="hidden w-[300px] shrink-0 pt-6 lg:block" aria-label="Sidebar">
+                <div className="sticky top-24 space-y-4">
+                  <EzoicAd id={101} />
+                </div>
+              </aside>
+            </div>
           </div>
         ) : (
           <main id="main-content" tabIndex={-1}>{children}</main>
