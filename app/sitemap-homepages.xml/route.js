@@ -7,6 +7,7 @@
 import { getCollection } from '@/lib/mongodb';
 import { getPraxisHomepageUrl } from '@/lib/subdomains';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 3600;
 
 export async function GET() {
