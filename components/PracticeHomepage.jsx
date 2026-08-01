@@ -7,6 +7,7 @@ import { getTemplateForSpecialty } from '@/lib/homepageTemplates';
 import { toSchemaOpeningHours } from '@/lib/openingHours';
 import { getEffectiveEmail } from '@/lib/emailGenerator';
 import { getBaseUrlSync } from '@/lib/baseUrl';
+import { getPraxisHomepageUrl } from '@/lib/subdomains';
 
 /**
  * @param {object} doctor doctor_places Dokument (bereits stripped)
@@ -362,40 +363,35 @@ function normalizeOpeningHours(hours) {
 }
 
 function buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone }) {
-  const base = getBaseUrlSync();
-  const url = doctor.homepage_slug
-    ? `${base}/${doctor.homepage_slug}`
-    : `${base}/praxis/${doctor.city_slug}/${doctor.slug}`;
+  // URL: Bei aktivem Homepage-Modus IMMER die Praxis-Subdomain als kanonische Adresse,
+  // sonst Directory-URL. Verhindert @id-Mismatch mit <link rel="canonical">.
+  const url = (doctor.homepage_mode === true && doctor.homepage_slug)
+    ? getPraxisHomepageUrl(doctor.homepage_slug)
+    : `${getBaseUrlSync()}/praxis/${doctor.city_slug}/${doctor.slug}`;
 
-  // Effektive E-Mail (manuell oder generiert)
   const email = getEffectiveEmail(doctor);
-
-  // Google Business Profile Deep-Link via place_id (falls vorhanden)
-  const gmbUrl = doctor.google_place_id
-    ? `https://www.google.com/maps/place/?q=place_id:${doctor.google_place_id}`
-    : null;
-
-  // Fachrichtung -> medizinische Fachrichtung (freier Text, Google akzeptiert dt. Bezeichnungen)
   const specialty = doctor.specialty_guess || null;
-
-  // Strukturierte Öffnungszeiten aus Places-Daten
   const openingHoursSpec = toSchemaOpeningHours(
     doctor.regular_opening_hours || doctor.opening_hours_json || doctor.opening_hours
   );
 
-  // Zahlungsmethoden aus Places-Daten
   const paymentList = [];
   if (doctor.payment_options?.acceptsCreditCards) paymentList.push('Kreditkarte');
   if (doctor.payment_options?.acceptsDebitCards) paymentList.push('EC-/Debitkarte');
   if (doctor.payment_options?.acceptsCashOnly) paymentList.push('Barzahlung');
   if (doctor.payment_options?.acceptsNfc) paymentList.push('Kontaktloses Bezahlen');
 
-  // sameAs: Google Business Profile + optional externe Website (falls in DB)
+  // sameAs: NUR echte Profile.
+  //   - google_maps_url ist der offizielle GBP-Deep-Link (mit CID) — nicht eine ?q=place_id-Suche.
+  //   - Externe Website nur, wenn nicht schon auf Navoria.
   const sameAs = [];
-  if (gmbUrl) sameAs.push(gmbUrl);
-  if (doctor.website_url) sameAs.push(doctor.website_url);
+  if (doctor.google_maps_url && doctor.google_maps_url.includes('maps.google.com')) {
+    sameAs.push(doctor.google_maps_url);
+  }
+  if (doctor.website_url && !/navoria\.de/i.test(doctor.website_url)) {
+    sameAs.push(doctor.website_url);
+  }
 
-  // Address-Block wiederverwendbar
   const addressLd = {
     '@type': 'PostalAddress',
     streetAddress: street || undefined,
@@ -409,30 +405,27 @@ function buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone })
     ? { '@type': 'GeoCoordinates', latitude: doctor.latitude, longitude: doctor.longitude }
     : null;
 
-  // Physician-Entität mit vollem Kontext – Google's präferierter Typ für Ärzt:innen.
-  // Wir kombinieren Physician mit MedicalBusiness via multi-type Array, damit Google die
-  // Praxis sowohl als Arzt-Entität als auch als Geschäftsstandort erkennt (Local SEO).
-  const physicianEntity = {
-    '@type': ['Physician', 'MedicalBusiness'],
-    '@id': `${url}#physician`,
+  // Nur eine Entität: MedicalBusiness (schema.org-Subtyp von LocalBusiness).
+  // Kein Physician-Multi-Type (semantisch falsch bei Praxen), kein separates
+  // Organization/WebSite (redundant, warnt in Rich-Results-Test).
+  const business = {
+    '@context': 'https://schema.org',
+    '@type': 'MedicalBusiness',
+    '@id': `${url}#business`,
     name,
     url,
-    mainEntityOfPage: url,
     telephone: phone || undefined,
-    email: email || undefined,
+    ...(email && { email }),
     address: addressLd,
     ...(geoLd && { geo: geoLd }),
     ...(specialty && { medicalSpecialty: specialty }),
     ...(sameAs.length && { sameAs }),
-    ...(gmbUrl && { hasMap: gmbUrl }),
     ...(openingHoursSpec?.length && { openingHoursSpecification: openingHoursSpec }),
     ...(paymentList.length && { paymentAccepted: paymentList.join(', ') }),
-    // Praxen rechnen i.d.R. mit gesetzlicher & privater Krankenversicherung ab – Standardwert.
-    priceRange: 'Kassen- und Privatabrechnung',
-    areaServed: city ? { '@type': 'City', name: city } : undefined,
-    parentOrganization: { '@id': `${url}#organization` },
+    ...(city && { areaServed: { '@type': 'City', name: city } }),
     inLanguage: 'de-DE',
-    ...(doctor.rating != null && doctor.user_rating_count > 0 && {
+    // aggregateRating nur bei ≥ 5 Bewertungen — sonst warnt Google Rich Results.
+    ...(doctor.rating != null && Number(doctor.user_rating_count) >= 5 && {
       aggregateRating: {
         '@type': 'AggregateRating',
         ratingValue: Number(doctor.rating).toFixed(1),
@@ -443,33 +436,5 @@ function buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone })
     }),
   };
 
-  // Wir emittieren einen JSON-LD-Graph mit drei Entitäten:
-  // - Organization: die Praxis als juristische Einheit (Impressum-Verantwortlicher)
-  // - WebSite: diese Homepage als eigenständige Website (nicht Navoria)
-  // - Physician/MedicalBusiness: die medizinische Praxis-Entität mit voller Local-SEO-Info
-  // Google interpretiert das kombiniert als "eigenständige Praxis-Website".
-  return {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'Organization',
-        '@id': `${url}#organization`,
-        name,
-        url,
-        telephone: phone || undefined,
-        email: email || undefined,
-        address: addressLd,
-        ...(sameAs.length && { sameAs }),
-      },
-      {
-        '@type': 'WebSite',
-        '@id': `${url}#website`,
-        url,
-        name,
-        inLanguage: 'de-DE',
-        publisher: { '@id': `${url}#organization` },
-      },
-      physicianEntity,
-    ],
-  };
+  return business;
 }
