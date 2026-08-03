@@ -14,27 +14,19 @@
 import { NextResponse } from 'next/server';
 import { extractPraxisSubdomain, isRootDomain, isPreviewHost, MAIN_DOMAIN } from '@/lib/subdomains';
 
-// -- Legacy Referrer Rescue: statischer Pattern-Redirect (edge-safe, keine DB) --
+// -- Legacy Referrer Rescue: reicht Alt-Pfad an /api/legacy-rescue durch --
 const LEGACY_REFERER_RE = /(xn--rzte-online-k8a|rzte-online\.vercel|%C3%A4rzte-online)/i;
-const LEGACY_SPECIALTIES = new Set([
-  'hausarzt', 'zahnarzt', 'augenarzt', 'hautarzt', 'orthopaede',
-  'frauenarzt', 'kinderarzt', 'hno-arzt',
-]);
-function tryLegacyRescueRedirect(refererStr) {
+function extractLegacyPath(refererStr) {
   if (!refererStr) return null;
   if (!LEGACY_REFERER_RE.test(refererStr)) return null;
   let u;
   try { u = new URL(refererStr); } catch { return null; }
-  const parts = u.pathname.replace(/^\/+/, '').split('/').filter(Boolean);
-  if (!parts.length) return null;
-  const specialty = decodeURIComponent(parts[0]).toLowerCase();
-  const rawCity = parts[1] ? decodeURIComponent(parts[1]).toLowerCase() : null;
-  const city = rawCity ? rawCity.replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') : null;
-  // Nicht-Fachrichtungs-Pfade (impressum, robots.txt, bild-URLs) ignorieren
-  if (specialty === 'arzt') return city ? `/aerzte/${city}` : '/aerzte';
-  if (!LEGACY_SPECIALTIES.has(specialty)) return null;
-  if (city) return `/aerzte/${city}/${specialty}`;
-  return `/aerzte/fachrichtung/${specialty}`;
+  const path = u.pathname || '';
+  // Uninteressante Pfade ignorieren (Startseite, Impressum, robots.txt, Bilder)
+  if (!path || path === '/' || path.length < 3) return null;
+  if (/\.(png|jpg|jpeg|gif|webp|svg|ico|css|js|txt|xml|pdf)$/i.test(path)) return null;
+  if (/^\/(impressum|datenschutz|agb|kontakt|robots\.txt|favicon)/i.test(path)) return null;
+  return path;
 }
 
 // Reservierte Root-Slugs, die statische Routen sind (kein Homepage-Modus)
@@ -62,13 +54,15 @@ export function middleware(request) {
   // ===== Legacy-Referrer-Rescue =====
   // Wenn User auf navoria.de/ landen und der Referer eine URL von der alten Domain
   // "ärzte-online.org" (xn--rzte-online-k8a.org) oder rzte-online.vercel.app ist,
-  // parsen wir den Alt-Pfad aus dem Referer und leiten zur passenden Navoria-Kategorie.
-  // Rettet Traffic der bisher auf der Startseite verpufft ist (≈ 2900/Tag).
+  // reichen wir den Alt-Pfad an /api/legacy-rescue durch. Dort wird per DB-Lookup
+  // die konkrete Praxis gefunden (Deep-Match), sonst Fallback auf Kategorie.
   if (pathname === '/' || pathname === '') {
     const referer = request.headers.get('referer') || '';
-    const rescue = tryLegacyRescueRedirect(referer);
-    if (rescue) {
-      return NextResponse.redirect(new URL(rescue, request.url), { status: 302, headers: { 'X-Navoria-Legacy-Rescue': '1' } });
+    const legacyPath = extractLegacyPath(referer);
+    if (legacyPath) {
+      const rescueUrl = new URL('/api/legacy-rescue', request.url);
+      rescueUrl.searchParams.set('path', legacyPath);
+      return NextResponse.redirect(rescueUrl, { status: 302, headers: { 'X-Navoria-Legacy-Rescue': 'lookup' } });
     }
   }
 
