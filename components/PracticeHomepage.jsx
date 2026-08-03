@@ -4,10 +4,9 @@
 
 import { getKammerForPractice } from '@/lib/aerztekammern';
 import { getTemplateForSpecialty } from '@/lib/homepageTemplates';
-import { toSchemaOpeningHours } from '@/lib/openingHours';
 import { getEffectiveEmail } from '@/lib/emailGenerator';
-import { getBaseUrlSync } from '@/lib/baseUrl';
 import { getPraxisHomepageUrl } from '@/lib/subdomains';
+import { buildDoctorSchema } from '@/lib/schemaBuilder';
 
 /**
  * @param {object} doctor doctor_places Dokument (bereits stripped)
@@ -35,12 +34,15 @@ export default function PracticeHomepage({ doctor }) {
 
   const openHours = normalizeOpeningHours(doctor.opening_hours);
 
-  const jsonLd = buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone, openHours });
+  const jsonLd = buildDoctorSchema(doctor, {
+    canonicalUrl: doctor.homepage_slug ? getPraxisHomepageUrl(doctor.homepage_slug) : `https://navoria.de/praxis/${doctor.city_slug}/${doctor.slug}`,
+  });
   const pagePath = doctor.homepage_slug
     ? `/${doctor.homepage_slug}`
     : `/praxis/${doctor.city_slug}/${doctor.slug}`;
-  const pageUrl = `${getBaseUrlSync()}${pagePath}`;
+  const pageUrl = jsonLd?.url || pagePath;
   const initials = getInitials(name);
+  const heroImage = jsonLd?.image || null;
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800">
@@ -80,7 +82,7 @@ export default function PracticeHomepage({ doctor }) {
       {/* Hero */}
       <section id="top" className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-white to-teal-50" aria-hidden="true" />
-        <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24 lg:py-28">
+        <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 sm:py-24 md:grid-cols-[1.4fr_1fr] md:items-center lg:py-28">
           <div className="max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-widest text-emerald-800">{template.tagline} · {city}</p>
             <h1 className="mt-4 text-4xl font-semibold leading-tight text-slate-900 sm:text-5xl lg:text-6xl">{template.hero_headline}</h1>
@@ -97,8 +99,26 @@ export default function PracticeHomepage({ doctor }) {
             </div>
           </div>
 
-          {/* Quick-Info Karten */}
-          <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Sichtbares Profilbild – identisch zum Bild im JSON-LD (schema:image).
+              Wichtig für Google Rich Results: Bild muss sichtbar UND im Schema stehen. */}
+          {heroImage && (
+            <figure className="relative mx-auto w-full max-w-sm">
+              <img
+                src={heroImage}
+                alt={`${name} – ${berufsbezeichnung.short || 'Arztpraxis'} in ${city}`}
+                width={1200}
+                height={900}
+                loading="eager"
+                className="h-auto w-full rounded-2xl border border-emerald-100 bg-white shadow-lg"
+              />
+              <figcaption className="sr-only">{name}, {berufsbezeichnung.short || 'Arztpraxis'} in {city}</figcaption>
+            </figure>
+          )}
+        </div>
+
+        {/* Quick-Info Karten */}
+        <div className="relative mx-auto max-w-6xl px-4 pb-16 sm:px-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <QuickCard label="Adresse" value={[street, `${postalCode} ${city}`.trim()].filter(Boolean).join(', ')} />
             {phone && <QuickCard label="Telefon" value={phone} />}
             <QuickCard label="Fachrichtung" value={berufsbezeichnung.short || 'Arztpraxis'} />
@@ -189,27 +209,26 @@ export default function PracticeHomepage({ doctor }) {
         </div>
       </section>
 
-      {/* Impressum */}
-      <section id="impressum" className="border-t border-slate-200 bg-white py-20" itemScope itemType="https://schema.org/Physician">
+      {/* Impressum – strukturierte Daten stehen ausschließlich im zentralen JSON-LD oben. */}
+      <section id="impressum" className="border-t border-slate-200 bg-white py-20">
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
           <p className="text-sm font-semibold uppercase tracking-widest text-emerald-800">Rechtliches</p>
           <h2 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-4xl">Impressum</h2>
 
           <div className="mt-10 space-y-8 text-sm text-slate-700 sm:text-base">
             <ImpressumSection title="Angaben gemäß § 5 DDG">
-              <p itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
-                <strong itemProp="name">{name}</strong><br />
+              <p>
+                <strong>{name}</strong><br />
                 {berufsbezeichnung.full}<br />
-                <span itemProp="streetAddress">{street}</span><br />
-                <span itemProp="postalCode">{postalCode}</span> <span itemProp="addressLocality">{city}</span>
-                <meta itemProp="addressCountry" content="DE" />
+                {street}<br />
+                {postalCode} {city}
               </p>
             </ImpressumSection>
 
             <ImpressumSection title="Kontakt">
-              {phone && <p>Telefon: <a href={`tel:${phoneLink}`} className="text-emerald-700 underline underline-offset-2" itemProp="telephone">{phone}</a></p>}
+              {phone && <p>Telefon: <a href={`tel:${phoneLink}`} className="text-emerald-700 underline underline-offset-2">{phone}</a></p>}
               {email && (
-                <p>E-Mail: <a href={`mailto:${email}`} className="text-emerald-700 underline underline-offset-2" itemProp="email">{email}</a></p>
+                <p>E-Mail: <a href={`mailto:${email}`} className="text-emerald-700 underline underline-offset-2">{email}</a></p>
               )}
               {!email && (
                 <p className="text-slate-500">Anfragen bitte telefonisch. Eine E-Mail-Adresse wird auf Wunsch der Praxis nicht öffentlich hinterlegt.</p>
@@ -218,7 +237,7 @@ export default function PracticeHomepage({ doctor }) {
 
             <ImpressumSection title="Berufsbezeichnung und berufsrechtliche Regelungen">
               <ul className="space-y-1">
-                <li><strong>Berufsbezeichnung:</strong> <span itemProp="medicalSpecialty">{berufsbezeichnung.full}</span> (verliehen in der Bundesrepublik Deutschland)</li>
+                <li><strong>Berufsbezeichnung:</strong> {berufsbezeichnung.full} (verliehen in der Bundesrepublik Deutschland)</li>
                 {kammer ? (
                   <>
                     <li><strong>Zuständige Kammer:</strong> {kammer.name}, {kammer.address}</li>
@@ -362,79 +381,4 @@ function normalizeOpeningHours(hours) {
   });
 }
 
-function buildPhysicianJsonLd({ doctor, name, city, street, postalCode, phone }) {
-  // URL: Bei aktivem Homepage-Modus IMMER die Praxis-Subdomain als kanonische Adresse,
-  // sonst Directory-URL. Verhindert @id-Mismatch mit <link rel="canonical">.
-  const url = (doctor.homepage_mode === true && doctor.homepage_slug)
-    ? getPraxisHomepageUrl(doctor.homepage_slug)
-    : `${getBaseUrlSync()}/praxis/${doctor.city_slug}/${doctor.slug}`;
-
-  const email = getEffectiveEmail(doctor);
-  const specialty = doctor.specialty_guess || null;
-  const openingHoursSpec = toSchemaOpeningHours(
-    doctor.regular_opening_hours || doctor.opening_hours_json || doctor.opening_hours
-  );
-
-  const paymentList = [];
-  if (doctor.payment_options?.acceptsCreditCards) paymentList.push('Kreditkarte');
-  if (doctor.payment_options?.acceptsDebitCards) paymentList.push('EC-/Debitkarte');
-  if (doctor.payment_options?.acceptsCashOnly) paymentList.push('Barzahlung');
-  if (doctor.payment_options?.acceptsNfc) paymentList.push('Kontaktloses Bezahlen');
-
-  // sameAs: NUR echte Profile.
-  //   - google_maps_url ist der offizielle GBP-Deep-Link (mit CID) — nicht eine ?q=place_id-Suche.
-  //   - Externe Website nur, wenn nicht schon auf Navoria.
-  const sameAs = [];
-  if (doctor.google_maps_url && doctor.google_maps_url.includes('maps.google.com')) {
-    sameAs.push(doctor.google_maps_url);
-  }
-  if (doctor.website_url && !/navoria\.de/i.test(doctor.website_url)) {
-    sameAs.push(doctor.website_url);
-  }
-
-  const addressLd = {
-    '@type': 'PostalAddress',
-    streetAddress: street || undefined,
-    postalCode: postalCode || undefined,
-    addressLocality: city || undefined,
-    addressRegion: doctor.state || undefined,
-    addressCountry: 'DE',
-  };
-
-  const geoLd = (doctor.latitude != null && doctor.longitude != null)
-    ? { '@type': 'GeoCoordinates', latitude: doctor.latitude, longitude: doctor.longitude }
-    : null;
-
-  // Nur eine Entität: MedicalBusiness (schema.org-Subtyp von LocalBusiness).
-  // Kein Physician-Multi-Type (semantisch falsch bei Praxen), kein separates
-  // Organization/WebSite (redundant, warnt in Rich-Results-Test).
-  const business = {
-    '@context': 'https://schema.org',
-    '@type': 'MedicalBusiness',
-    '@id': `${url}#business`,
-    name,
-    url,
-    telephone: phone || undefined,
-    ...(email && { email }),
-    address: addressLd,
-    ...(geoLd && { geo: geoLd }),
-    ...(specialty && { medicalSpecialty: specialty }),
-    ...(sameAs.length && { sameAs }),
-    ...(openingHoursSpec?.length && { openingHoursSpecification: openingHoursSpec }),
-    ...(paymentList.length && { paymentAccepted: paymentList.join(', ') }),
-    ...(city && { areaServed: { '@type': 'City', name: city } }),
-    inLanguage: 'de-DE',
-    // aggregateRating nur bei ≥ 5 Bewertungen — sonst warnt Google Rich Results.
-    ...(doctor.rating != null && Number(doctor.user_rating_count) >= 5 && {
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: Number(doctor.rating).toFixed(1),
-        reviewCount: Number(doctor.user_rating_count),
-        bestRating: '5',
-        worstRating: '1',
-      },
-    }),
-  };
-
-  return business;
-}
+function buildPhysicianJsonLd() { return null; /* deprecated – siehe lib/schemaBuilder.js */ }

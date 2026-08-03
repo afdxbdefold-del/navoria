@@ -20,6 +20,7 @@ import { buildProfileText } from '@/lib/profileText';
 import { buildFaqs } from '@/lib/faqBuilder';
 import { SPECIALTIES } from '@/lib/specialties';
 import { getBaseUrl } from '@/lib/baseUrl';
+import { buildDoctorSchema } from '@/lib/schemaBuilder';
 
 async function loadDoctor(slug) {
   const col = await getCollection('doctor_places');
@@ -222,54 +223,23 @@ export default async function ProfilePage({ params }) {
   if (d.parking_options?.paidParkingLot) amenityFeatures.push({ '@type': 'LocationFeatureSpecification', name: 'Kostenpflichtige Parkplätze', value: true });
   if (d.parking_options?.freeStreetParking) amenityFeatures.push({ '@type': 'LocationFeatureSpecification', name: 'Kostenloses Straßenparken', value: true });
 
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': typeFor(d.primary_type),
-    '@id': `${profileUrl}#medicalbusiness`,
-    name: displayName,
-    url: profileUrl,
-    mainEntityOfPage: profileUrl,
-    image: `${profileUrl}/opengraph-image${lastSynced ? `?v=${new Date(lastSynced).getTime()}` : ''}`,
-    logo: `${base}/icon.svg`,
-    ...(specialty && { medicalSpecialty: specialty }),
-    ...(d.website_url && { sameAs: [d.website_url] }),
-    ...(d.formatted_address && {
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: d.street || undefined,
-        postalCode: d.postal_code || undefined,
-        addressLocality: d.city || undefined,
-        addressRegion: d.state || undefined,
-        addressCountry: 'DE',
-      },
-    }),
-    ...(phone && { telephone: phone }),
-    ...(d.latitude != null && d.longitude != null && {
-      geo: { '@type': 'GeoCoordinates', latitude: d.latitude, longitude: d.longitude },
-    }),
-    ...(openingHoursSpec?.length && { openingHoursSpecification: openingHoursSpec }),
-    ...(d.city && { areaServed: { '@type': 'City', name: d.city } }),
-    ...(paymentAccepted.length && { paymentAccepted: paymentAccepted.join(', ') }),
-    ...(amenityFeatures.length && { amenityFeature: amenityFeatures }),
-    ...(d.rating != null && d.user_rating_count > 0 && {
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: Number(d.rating).toFixed(1),
-        reviewCount: Number(d.user_rating_count),
-        bestRating: '5',
-        worstRating: '1',
-      },
-    }),
-    ...(d.is_verified && d.verified_at && {
-      identifier: {
+  // Zentraler Schema-Builder – produziert GENAU eine medizinische Hauptentität
+  // (Physician / MedicalClinic / MedicalBusiness) mit @id gebunden an profileUrl.
+  const schema = buildDoctorSchema(d, { canonicalUrl: profileUrl });
+  // Zusatzfelder, die nur auf der Directory-Seite Sinn machen
+  if (schema) {
+    schema.mainEntityOfPage = profileUrl;
+    schema.logo = `${base}/icon.svg`;
+    schema.publisher = { '@id': `${base}#organization` };
+    if (amenityFeatures.length) schema.amenityFeature = amenityFeatures;
+    if (d.is_verified && d.verified_at) {
+      schema.identifier = {
         '@type': 'PropertyValue',
         propertyID: 'navoria:verified',
         value: `verified:${new Date(d.verified_at).toISOString().slice(0, 10)}`,
-      },
-    }),
-    publisher: { '@id': `${base}#organization` },
-    inLanguage: 'de-DE',
-  };
+      };
+    }
+  }
 
   const breadcrumb = {
     '@context': 'https://schema.org',
@@ -306,9 +276,7 @@ export default async function ProfilePage({ params }) {
     name: `${displayName}${specialty ? ` – ${specialty}` : ''} in ${city}`,
     inLanguage: 'de-DE',
     isPartOf: { '@type': 'WebSite', url: base, name: 'Navoria' },
-    about: { '@id': `${profileUrl}#medicalbusiness` },
-    // Reine @id-Referenz auf die separat emittierte BreadcrumbList – KEIN @type wiederholen,
-    // sonst interpretiert Google das als eigene (leere) BreadcrumbList ohne itemListElement.
+    ...(schema?.['@id'] && { about: { '@id': schema['@id'] } }),
     breadcrumb: { '@id': `${profileUrl}#breadcrumb` },
   };
 
@@ -318,7 +286,7 @@ export default async function ProfilePage({ params }) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 pb-24 sm:px-6 sm:py-10 md:pb-10">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+      {schema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPage) }} />
       {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
