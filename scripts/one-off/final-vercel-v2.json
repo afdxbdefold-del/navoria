@@ -1,0 +1,1294 @@
+{
+  "redirects": [
+    {
+      "source": "/arzt/annaberg-buchholz/diplmed-mario-meinig-annaberg-buchholz",
+      "destination": "https://navoria.de/praxis/annaberg-buchholz/dipl-med-mario-meinig-lXFjWM",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/annaberg-buchholz/herr-dr-med-jrgen-schulze-annaberg-buchholz",
+      "destination": "https://navoria.de/praxis/annaberg-buchholz/herr-dr-med-juergen-schulze-xkrJNM",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/apolda/dr-med-stefan-teweleit-fa-innere-medizin-apolda",
+      "destination": "https://navoria.de/praxis/apolda/dr-med-stefan-teweleit-fa-innere-medizin-YIympU",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/backnang/martina-aggensteiner-backnang",
+      "destination": "https://navoria.de/praxis/backnang/martina-aggensteiner-0HrXA4",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/bautzen/dr-med-markus-hentschel-bautzen",
+      "destination": "https://navoria.de/praxis/bautzen/dr-med-markus-hentschel-0QxrAE",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/bernau-bei-berlin/frau-dipl-med-carola-becher",
+      "destination": "https://navoria.de/praxis/bernau-bei-berlin/frau-dipl-med-carola-becher-UPP0w8",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/burgwedel/drmed-dorothee-kiwit-putzer-burgwedel",
+      "destination": "https://navoria.de/praxis/burgwedel/dr-med-dorothee-kiwit-putzer-FUxm70",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/coburg/dr-jaweed-abo-shawish",
+      "destination": "https://navoria.de/praxis/coburg/aboshawish-jaweed-ZkDo6c",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/duesseldorf/dr-med-jrg-wienke-dsseldorf",
+      "destination": "https://navoria.de/praxis/duesseldorf/dr-med-joerg-wienke-Wb875s",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/eberbach/dr-dietger-schwittayy-eberbach",
+      "destination": "https://navoria.de/praxis/eberbach/dr-dietger-schwittay-HQG9tg",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/erkner/thorsten-kruse-facharzt-fuer-innere-medizin-8836",
+      "destination": "https://navoria.de/praxis/woltersdorf/thorsten-kruse-facharzt-fuer-innere-medizin-RuEqb8",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/erkrath/frau-dr-med-maria-rita-langhorst-erkrath",
+      "destination": "https://navoria.de/praxis/erkrath/frau-dr-med-maria-rita-langhorst-7S8DHQ",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/erndtebrueck/praxis-said-moshref-erndtebrck",
+      "destination": "https://navoria.de/praxis/erndtebrueck/praxis-said-moshref-HJwZYc",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/eschwege/herr-dr-med-roman-ergang-eschwege",
+      "destination": "https://navoria.de/praxis/eschwege/herr-dr-med-roman-ergang-ILZ3D8",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/esslingen-am-neckar/herr-dr-med-georg-mayer",
+      "destination": "https://navoria.de/praxis/esslingen-am-neckar/herr-dr-med-georg-mayer-AbyyC0",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/esslingen-am-neckar/herr-dr-med-stefan-waldenmaier",
+      "destination": "https://navoria.de/praxis/esslingen-am-neckar/herr-dr-med-stefan-waldenmaier-Uv3Zls",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/finsterwalde/dr-med-astrid-knfel-finsterwalde",
+      "destination": "https://navoria.de/praxis/finsterwalde/dr-med-astrid-knoefel-rBKyB0",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/flensburg/drcarolin-langhanke-dr-christina-brombacher-flensburg",
+      "destination": "https://navoria.de/praxis/flensburg/drcarolin-langhanke-dr-christina-brombacher-1phW1o",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/freiberg/herr-dr-med-thomas-morgner-freiberg",
+      "destination": "https://navoria.de/praxis/freiberg/herr-dr-med-thomas-morgner-pbcWJk",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/gaggenau/herr-dr-med-till-grtschla-gaggenau",
+      "destination": "https://navoria.de/praxis/gaggenau/herr-dr-med-till-groetschla-ZTjwIs",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/geilenkirchen/dr-kian-tajrobehkar-geilenkirchen",
+      "destination": "https://navoria.de/praxis/geilenkirchen/dr-kian-tajrobehkar-5cgcJ8",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/holzgerlingen/dr-med-dagmar-hofsss-bock-holzgerlingen",
+      "destination": "https://navoria.de/praxis/holzgerlingen/dr-med-dagmar-hofsaess-bock-i8xtEk",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/katzhuette/drmed-gudrun-kolitsch-fachrztin-fr-innere-medizin-und-rheumatologie-katzhtte",
+      "destination": "https://navoria.de/praxis/katzhuette/dr-med-gudrun-kolitsch-fachaerztin-fuer-innere-medizin-und-rheumatolog",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/korbach/herr-walter-brggemann-korbach",
+      "destination": "https://navoria.de/praxis/korbach/herr-walter-brueggemann-kJR5SI",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/landau/dr-med-bettina-eckhardt-landau",
+      "destination": "https://navoria.de/praxis/landau-an-der-isar/dr-med-bettina-eckhardt-Dvgffs",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/loebau/dipl-med-anke-siegert-lbau",
+      "destination": "https://navoria.de/praxis/loebau/dipl-med-anke-siegert-86f3vU",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/loebau/herr-dipl-med-helmer-hache-lbau",
+      "destination": "https://navoria.de/praxis/loebau/herr-dipl-med-helmer-hache-0sYbv4",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/lohr/herr-dr-med-dirk-trautvetter-lohr",
+      "destination": "https://navoria.de/praxis/lohr-am-main/herr-dr-med-dirk-trautvetter-832ebM",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/luedenscheid/herr-dr-med-dietrich-kmpfe-ldenscheid",
+      "destination": "https://navoria.de/praxis/luedenscheid/herr-dr-med-dietrich-kaempfe-oPVGPA",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/munster/dr-susanne-hrter-munster",
+      "destination": "https://navoria.de/praxis/munster/dr-susanne-haerter-8IoPqI",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/schwalmstadt/drmed-frank-hellmann-schwalmstadt",
+      "destination": "https://navoria.de/praxis/schwalmstadt/dr-med-frank-hellmann-52lD0s",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/schwedtoder/praxisgemeinschaft-fr-urologie-zenk-roszyk-schwedtoder",
+      "destination": "https://navoria.de/praxis/schwedt-oder/praxisgemeinschaft-fuer-urologie-zenk-roszyk-YZMp4o",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/sondershausen/dr-clemens-witzenhausen-sondershausen",
+      "destination": "https://navoria.de/praxis/sondershausen/dr-clemens-witzenhausen-i8yqLI",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/tharandt/myriam-mller-tharandt",
+      "destination": "https://navoria.de/praxis/tharandt/myriam-mueller-pT_7_g",
+      "permanent": true
+    },
+    {
+      "source": "/augenarzt/aschersleben/augenarztpraxis-bredehorn-mayr-aschersleben",
+      "destination": "https://navoria.de/praxis/aschersleben/augenarztpraxis-bredehorn-mayr-re4915b",
+      "permanent": true
+    },
+    {
+      "source": "/augenarzt/balve/dr-med-theodor-vorhoff-balve",
+      "destination": "https://navoria.de/praxis/balve/dr-med-theodor-vorhoff-4L_Q4k",
+      "permanent": true
+    },
+    {
+      "source": "/augenarzt/eggenfelden/dr-med-jan-wacker-eggenfelden",
+      "destination": "https://navoria.de/praxis/eggenfelden/mvz-simbach-filiale-eggenfelden-bUjgfc",
+      "permanent": true
+    },
+    {
+      "source": "/augenarzt/frankenbergsachsen/dr-ute-hunger-frankenbergsachsen",
+      "destination": "https://navoria.de/praxis/frankenberg-sachsen/dr-ute-hunger-f7mTjE",
+      "permanent": true
+    },
+    {
+      "source": "/augenarzt/frankfurt/dr-med-c-hofmann-frankfurt",
+      "destination": "https://navoria.de/praxis/frankfurt-am-main/dr-med-c-hofmann-sHk8sU",
+      "permanent": true
+    },
+    {
+      "source": "/augenarzt/fritzlar/drmed-jrg-bgeholz-fritzlar",
+      "destination": "https://navoria.de/praxis/fritzlar/dr-med-joerg-boegeholz-Px37n8",
+      "permanent": true
+    },
+    {
+      "source": "/augenarzt/montabaur/dr-med-christhoper-hagelauer-montabaur",
+      "destination": "https://navoria.de/praxis/montabaur/dr-hagelauer-augenarzt-montabaur-38hS8I",
+      "permanent": true
+    },
+    {
+      "source": "/augenarzt/neutraubling/drmed-bernhard-roesen-neutraubling",
+      "destination": "https://navoria.de/praxis/neutraubling/drmed-bernhard-roesen-tmMPvY",
+      "permanent": true
+    },
+    {
+      "source": "/augenarzt/schneeberg/herr-dr-med-thomas-windisch-schneeberg",
+      "destination": "https://navoria.de/praxis/schneeberg/herr-dr-med-thomas-windisch-jh7Cqg",
+      "permanent": true
+    },
+    {
+      "source": "/augenarzt/versmold/dr-nicola-buch-pleitner-versmold",
+      "destination": "https://navoria.de/praxis/versmold/dr-nicola-buch-pleitner-Vi4TDw",
+      "permanent": true
+    },
+    {
+      "source": "/augenarzt/weisswasseroberlausitz/dr-med-birgit-mder-weiwasseroberlausitz",
+      "destination": "https://navoria.de/praxis/weisswasser-oberlausitz/dr-med-birgit-maeder-g8I2kk",
+      "permanent": true
+    },
+    {
+      "source": "/frauenarzt/landau/frauenarztpraxis-natalya-klassen-landau",
+      "destination": "https://navoria.de/praxis/landau-an-der-isar/frauenarztpraxis-natalya-klassen-v_zQC8",
+      "permanent": true
+    },
+    {
+      "source": "/frauenarzt/muenster/drmed-jens-quakernack-facharzt-fr-frauenheilkunde-geburtshilfe-mnster",
+      "destination": "https://navoria.de/praxis/muenster/drmed-jens-quakernack-facharzt-fuer-frauenheilkunde-geburtshilfe-y5UVVU",
+      "permanent": true
+    },
+    {
+      "source": "/frauenarzt/oberndorf/ildiko-husar-fachrztin-fr-frauenheilkunde-und-geburtshilfe-oberndorf",
+      "destination": "https://navoria.de/praxis/oberndorf-am-neckar/ildiko-husar-fachaerztin-fuer-frauenheilkunde-und-geburtshilfe-Ndm_KY",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/ahaus/dr-barbara-tielkes-ahaus",
+      "destination": "https://navoria.de/praxis/ahaus/dr-barbara-tielkes-4DQfWc",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/ahlen/herr-dr-med-rolf-wermes-ahlen",
+      "destination": "https://navoria.de/praxis/ahlen/herr-dr-med-rolf-wermes-_0T6ak",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/altdorf/internistische-praxis-dr-brix-fischer-und-langer-altdorf",
+      "destination": "https://navoria.de/praxis/altdorf-bei-nuernberg/internistische-praxis-dr-brix-fischer-und-langer-BB9BB4",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/angermuende/frau-dr-med-ursel-jarchow-angermnde",
+      "destination": "https://navoria.de/praxis/angermuende/frau-dr-med-ursel-jarchow-kWArS0",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/ansbach/dr-med-ulrike-may-ansbach",
+      "destination": "https://navoria.de/praxis/ansbach/dr-med-ulrike-may-Hy90mE",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/bad-muenstereifel/dr-thomas-kleinfeld-7663",
+      "destination": "https://navoria.de/praxis/bad-muenstereifel/dr-thomas-kleinfeld-6WtcwI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/bad-rappenau/anna-friederike-hund",
+      "destination": "https://navoria.de/praxis/bad-rappenau/anna-friederike-hund-brT0YE",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/bad-waldsee/herr-dr-hc-ulf-michael-deckers",
+      "destination": "https://navoria.de/praxis/bad-waldsee/herr-dr-h-c-ulf-michael-deckers-BQP1Gk",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/bad-wildungen/dr-med-anneli-freitag-schickram",
+      "destination": "https://navoria.de/praxis/bad-wildungen/dr-med-anneli-freitag-schickram-vLu2l0",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/bad-wurzach/dr-bernd-lindenmaier-bad",
+      "destination": "https://navoria.de/praxis/bad-wurzach/dr-bernd-lindenmaier-7oSaKU",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/bad/herr-dr-med-rainer-eisele-bad",
+      "destination": "https://navoria.de/praxis/bad-waldsee/herr-dr-med-rainer-eisele-i_f_ko",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/bargteheide/drmedsandra-nagel-bargteheide",
+      "destination": "https://navoria.de/praxis/bargteheide/dr-med-sandra-nagel-0jegy0",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/baunatal/michael-frlich-baunatal",
+      "destination": "https://navoria.de/praxis/baunatal/drmed-michaela-jahn-mNzKj4",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/bautzen/dr-med-ekkehard-seeliger-facharzt-fuer-allgemeinmedizin",
+      "destination": "https://navoria.de/praxis/bautzen/dr-med-ekkehard-seeliger-facharzt-fuer-allgemeinmedizin-WuWyu4",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/beckum/dr-med-hans-thomas-thompson",
+      "destination": "https://navoria.de/praxis/beckum/dr-med-hans-thomas-thompson-LpEESo",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/beelitz/frau-dipl-med-ramona-wendland-beelitz",
+      "destination": "https://navoria.de/praxis/beelitz/frau-dipl-med-ramona-wendland-Ic8OZw",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/bergisch-gladbach/dr-annette-knoll-9721",
+      "destination": "https://navoria.de/praxis/bergisch-gladbach/dr-annette-knoll-ryMrJ4",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/berlin/dr-mehdi-rafii-berlin",
+      "destination": "https://navoria.de/praxis/berlin/dr-mehdi-rafii-hWB6jo",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/betzdorf/drmed-rainer-banzhaf-facharzt-fr-allgemeinmedizin-betzdorf",
+      "destination": "https://navoria.de/praxis/betzdorf/dr-med-rainer-banzhaf-facharzt-fuer-allgemeinmedizin-mpkUns",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/biedenkopf/olessja-mrz-praxis-fr-allgemeinmedizin-biedenkopf",
+      "destination": "https://navoria.de/praxis/biedenkopf/olessja-maerz-praxis-fuer-allgemeinmedizin-YNGO9k",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/blankenburg-harz/dipl-med-rene-giesel-5452",
+      "destination": "https://navoria.de/praxis/blankenburg-harz/dipl-med-rene-giesel-dVofIA",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/bobingen/hausarzt-praxis-herr-alexander-eisinger-9087",
+      "destination": "https://navoria.de/praxis/bobingen/hausarzt-praxis-herr-alexander-eisinger-NB78xI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/bochum/herr-dr-med-clemens-seifert-bochum",
+      "destination": "https://navoria.de/praxis/bochum/herr-dr-med-clemens-seifert-aR5Szo",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/boeblingen/dr-iavorschi-bblingen",
+      "destination": "https://navoria.de/praxis/boeblingen/dr-iavorschi-fYt1pQ",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/borken-hessen/dr-med-sabine-hess-fachaerztin-f-allgemeinmedizin-2076",
+      "destination": "https://navoria.de/praxis/borken-hessen/dr-med-sabine-hess-fachaerztin-f-allgemeinmedizin-aakgnQ",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/borken/drmed-pler-bernhard-borken",
+      "destination": "https://navoria.de/praxis/borken/dr-med-paessler-bernhard-1lddbE",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/bramsche/herr-dr-medic-imf-klausenburg-gavrila-urlea-albert-bramsche",
+      "destination": "https://navoria.de/praxis/bramsche/herr-dr-medic-imf-klausenburg-gavrila-urlea-albert-TT8Mw0",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/braunschweig/dr-med-saman-c-atugoda-braunschweig",
+      "destination": "https://navoria.de/praxis/braunschweig/hautarztpraxis-dr-atugoda-WMJVjQ",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/bruehl/frau-eugenie-peters-brhl",
+      "destination": "https://navoria.de/praxis/bruehl/frau-eugenie-peters-htV5b0",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/buchen-odenwald/herr-helmut-koenig-5360",
+      "destination": "https://navoria.de/praxis/buchen-odenwald/herr-helmut-koenig-kSYPy8",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/bueren/dr-pikrun-bren",
+      "destination": "https://navoria.de/praxis/bueren/dr-pikrun-WNIwrI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/burghausen/herr-dr-med-christian-schweinberger-burghausen",
+      "destination": "https://navoria.de/praxis/burghausen/herr-dr-med-christian-schweinberger-Te6A1s",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/castrop-rauxel/andrey-nefedev-julia-carolin-nefedev-castrop-rauxel",
+      "destination": "https://navoria.de/praxis/castrop-rauxel/andrey-nefedev-julia-carolin-nefedev-Q2apQk",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/celle/frau-dr-med-gisela-winterhoff-celle",
+      "destination": "https://navoria.de/praxis/celle/frau-dr-med-gisela-winterhoff-WDOhbg",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/clausthal-zellerfeld/frau-dr-med-friederike-bahr-clausthal-zellerfeld",
+      "destination": "https://navoria.de/praxis/clausthal-zellerfeld/frau-dr-med-friederike-bahr-ffb0nI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/cloppenburg/arztpraxis-tatjana-tissen-und-katharina-inomjonov-cloppenburg",
+      "destination": "https://navoria.de/praxis/cloppenburg/arztpraxis-tatjana-tissen-und-katharina-inomjonov-BkiuXw",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/cloppenburg/drmed-holger-laing-cloppenburg",
+      "destination": "https://navoria.de/praxis/cloppenburg/dr-med-holger-laing-QBvQmk",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/coswig/dipl-med-maren-schumann-coswig",
+      "destination": "https://navoria.de/praxis/coswig-anhalt/dipl-med-maren-schumann-kofDnI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/cottbus/herr-dr-med-andreas-pietzko-cottbus",
+      "destination": "https://navoria.de/praxis/cottbus/herr-dr-med-andreas-pietzko-jSzg7c",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/crailsheim/gemeinschaftspraxis-ulrich-rupp-florian-setzer",
+      "destination": "https://navoria.de/praxis/crailsheim/gemeinschaftspraxis-ulrich-rupp-florian-setzer-XTt3zQ",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/crailsheim/herr-dr-gerhard-slavetinsky",
+      "destination": "https://navoria.de/praxis/crailsheim/herr-dr-gerhard-slavetinsky-RyO8HE",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/cuxhaven/herr-dr-med-roland-hartwig-cuxhaven",
+      "destination": "https://navoria.de/praxis/cuxhaven/herr-dr-med-roland-hartwig-HvFjtw",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/delitzsch/dr-med-gerald-eckhardt-delitzsch",
+      "destination": "https://navoria.de/praxis/delitzsch/pneumologenzentrum-dr-med-gerald-eckhardt-AKgefI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/dorsten/herr-dr-med-georg-haase-dorsten",
+      "destination": "https://navoria.de/praxis/dorsten/herr-dr-med-georg-haase-r66a3d4",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/dresden/frau-dr-med-antje-rahrisch-dresden",
+      "destination": "https://navoria.de/praxis/dresden/frau-dr-med-antje-rahrisch-lkJiWU",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/dueren/herr-dr-med-axel-storch-dren",
+      "destination": "https://navoria.de/praxis/dueren/herr-dr-med-axel-storch-Iojlrk",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/duisburg/herr-matthias-mahle-duisburg",
+      "destination": "https://navoria.de/praxis/duisburg/herr-matthias-mahle-Giz2S4",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/ebersbach/frau-dr-med-danijela-arizanovic-ebersbach",
+      "destination": "https://navoria.de/praxis/ebersbach-an-der-fils/frau-dr-med-danijela-arizanovic-6KhZnQ",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/eberswalde/dr-med-konstantin-zellmer-eberswalde",
+      "destination": "https://navoria.de/praxis/eberswalde/dr-med-konstantin-zellmer--QT_Nw",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/ehingen-donau/goetz-kitzig-2066",
+      "destination": "https://navoria.de/praxis/ehingen-donau/goetz-kitzig-6urE2Q",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/eichstaett/dr-med-margret-bauer-eichsttt",
+      "destination": "https://navoria.de/praxis/eichstaett/dr-med-margret-bauer-L1fwKw",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/eisenach/gemeinschaftspraxis-dr-med-katja-heim-dr-med-univ-neusatz-aleksandar-griesser-aleksic-eisenach",
+      "destination": "https://navoria.de/praxis/eisenach/gemeinschaftspraxis-dr-med-katja-heim-dr-med-univ-neusatz-aleksandar-g",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/eisleben/luminita-gutu-fachrztin-fr-inner-medizin-hausrztin-eisleben",
+      "destination": "https://navoria.de/praxis/eisleben/luminita-gutu-fachaerztin-fuer-inner-medizin-hausaerztin-RvATyw",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/emmerich/herr-dariusz-markowski-emmerich",
+      "destination": "https://navoria.de/praxis/emmerich-am-rhein/herr-dariusz-markowski-miiwGY",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/erfurt/dipl-med-heike-hanke-fachaerztin-f-allgemeinmedizin-3347",
+      "destination": "https://navoria.de/praxis/erfurt/dipl-med-heike-hanke-fachaerztin-f-allgemeinmedizin-5H8hSg",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/erfurt/praxis-fr-allgemeinmedizin-wolfgang-arand-erfurt",
+      "destination": "https://navoria.de/praxis/erfurt/praxis-fuer-allgemeinmedizin-wolfgang-arand-phytEU",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/erkelenz/praxis-dr-beate-abuzahra-2652",
+      "destination": "https://navoria.de/praxis/moenchengladbach/praxis-dr-beate-abuzahra-yxMXx4",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/erlangen/drmed-christian-dbig-erlangen",
+      "destination": "https://navoria.de/praxis/erlangen/drmed-christian-doebig-a1NHSI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/eschborn/doctor-ivona-djoric-eschborn",
+      "destination": "https://navoria.de/praxis/eschborn/doctor-ivona-djoric-4sa4zU",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/esslingen-am-neckar/frau-dr-med-elena-samorej-1107",
+      "destination": "https://navoria.de/praxis/esslingen-am-neckar/frau-dr-med-elena-samorej-52oldo",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/esslingen-am-neckar/herr-dr-imf-klausenburg-roland-henrich",
+      "destination": "https://navoria.de/praxis/esslingen-am-neckar/herr-dr-imf-klausenburg-roland-henrich-H1TAQc",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/euskirchen/dr-med-elsbeth-brammertz-euskirchen",
+      "destination": "https://navoria.de/praxis/euskirchen/dr-med-maximilian-brammertz-yQyDyo",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/falkensee/hausarztpraxis-daniel-bernau-facharzt-fr-allgemeinmedizin-falkensee",
+      "destination": "https://navoria.de/praxis/falkensee/hausarztpraxis-daniel-bernau-facharzt-fuer-allgemeinmedizin-21_qSU",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/felsberg/frau-dr-med-karin-schte-felsberg",
+      "destination": "https://navoria.de/praxis/felsberg/frau-dr-med-karin-schuete-xuJJG0",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/flensburg/frau-dr-med-ingrid-muhs-flensburg",
+      "destination": "https://navoria.de/praxis/flensburg/dres-oelsner-muhs-und-partner-hUfxSE",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/frankenberg-eder/dr-ulrike-ursula-eckel",
+      "destination": "https://navoria.de/praxis/frankenberg-eder/dr-ulrike-ursula-eckel-a4KkQQ",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/frankenbergsachsen/herr-dr-med-bernd-hckel-frankenbergsachsen",
+      "destination": "https://navoria.de/praxis/frankenberg-sachsen/herr-dr-med-bernd-haeckel-HlWNpY",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/frankenthal/dr-med-duc-chung-bui-facharzt-fuer-allgemeinmedizin-notfallmedizin",
+      "destination": "https://navoria.de/praxis/frankenthal/duc-chung-bui-allgemeinmedizin-notfallmedizin-r714243",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/frankfurt/dr-med-cpanijel-rath-fachrztin-f-allgemeinmedizin-frankfurt",
+      "destination": "https://navoria.de/praxis/frankfurt-am-main/dr-med-c-panijel-rath-fachaerztin-f-allgemeinmedizin-XB3Tgc",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/frankfurt/frau-dr-med-gabriele-federlein-frankfurt",
+      "destination": "https://navoria.de/praxis/frankfurt-oder/frau-dr-med-gabriele-federlein-ORckKc",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/freiberg/herr-dr-med-sigurd-bochmann-freiberg",
+      "destination": "https://navoria.de/praxis/freiberg/herr-dr-med-sigurd-bochmann-1s1PHE",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/freiburg/dr-med-christoph-reuss-freiburg",
+      "destination": "https://navoria.de/praxis/freiburg-im-breisgau/dr-med-christoph-reuss--zyR6s",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/freiburg/dr-med-stefan-rahner-freiburg",
+      "destination": "https://navoria.de/praxis/freiburg-im-breisgau/dr-med-stefan-rahner-5UBS1c",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/freital/dipl-med-kerstin-steinbach-freital",
+      "destination": "https://navoria.de/praxis/freital/dipl-med-kerstin-steinbach-IYP0wQ",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/froendenbergruhr/herr-herbert-constapel-frndenbergruhr",
+      "destination": "https://navoria.de/praxis/froendenberg-ruhr/herr-herbert-constapel-p4N2Yg",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/fuerstenwaldespree/frau-dr-med-brnig-frstenwaldespree",
+      "destination": "https://navoria.de/praxis/fuerstenwalde-spree/frau-dr-med-bruenig-HL14xw",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/gardelegen/diplmed-andreas-brendtner-gardelegen",
+      "destination": "https://navoria.de/praxis/gardelegen/dipl-med-andreas-brendtner-5qiJQA",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/geilenkirchen/herr-dr-med-mathias-jansen-geilenkirchen",
+      "destination": "https://navoria.de/praxis/geilenkirchen/herr-dr-med-mathias-jansen-yOSCPU",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/geisenheim/dr-karin-pogorzalek-schibalski-geisenheim",
+      "destination": "https://navoria.de/praxis/geisenheim/dr-karin-pogorzalek-schibalski-0qDruk",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/gelnhausen/dr-med-rdiger-werner-fass-gelnhausen",
+      "destination": "https://navoria.de/praxis/gelnhausen/dr-med-ruediger-werner-fass-VlUdws",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/gera/drmed-susanna-remmler-gera",
+      "destination": "https://navoria.de/praxis/gera/drmed-susanna-remmler-L-GLcI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/geseke/frau-dr-med-ulrike-kleine-geseke",
+      "destination": "https://navoria.de/praxis/geseke/frau-dr-med-ulrike-kleine-vHpZDw",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/giengen/praxis-dr-softic-giengen",
+      "destination": "https://navoria.de/praxis/giengen-an-der-brenz/praxis-dr-softic-zncvVc",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/giessen/herr-dr-med-jrgen-fhrer-gieen",
+      "destination": "https://navoria.de/praxis/giessen/herr-dr-med-juergen-fuehrer-BuRgI8",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/goerlitz/frau-dr-med-elisabeth-domsgen-grlitz",
+      "destination": "https://navoria.de/praxis/goerlitz/frau-dr-med-elisabeth-domsgen-9DBXYI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/goslar/herr-dr-med-andreas-eisenhardt-goslar",
+      "destination": "https://navoria.de/praxis/goslar/herr-dr-med-andreas-eisenhardt-6TW36Y",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/greifswald/drmed-mathias-meyer-facharzt-fr-allgemeinmedizin-greifswald",
+      "destination": "https://navoria.de/praxis/greifswald/dr-med-mathias-meyer-facharzt-fuer-allgemeinmedizin-cZkaYk",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/grevenbroich/frau-monika-plug-gnther-grevenbroich",
+      "destination": "https://navoria.de/praxis/grevenbroich/frau-monika-plug-guenther-fc1ixw",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/gruenberg/herr-dr-med-christian-becker-grnberg",
+      "destination": "https://navoria.de/praxis/gruenberg/herr-dr-med-christian-becker-33F81A",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/gruenstadt/dr-med-carsten-blume-grnstadt",
+      "destination": "https://navoria.de/praxis/gruenstadt/dr-med-carsten-blume-SZxIx0",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/gummersbach/dr-med-christiane-sieber-gummersbach",
+      "destination": "https://navoria.de/praxis/gummersbach/dr-med-christiane-sieber-O3eCwk",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/gummersbach/hausarztpraxis-dr-medicina-d-toma-gummersbach",
+      "destination": "https://navoria.de/praxis/gummersbach/hausarztpraxis-dr-medicina-d-toma-yfOEVA",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/hagen/dr-med-m-farsab-hagen",
+      "destination": "https://navoria.de/praxis/hagen/dr-med-m-farsab-Hz_8uU",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/haseluenne/drmed-andreas-euler-haselnne",
+      "destination": "https://navoria.de/praxis/haseluenne/dr-med-andreas-euler-1Hz-ys",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/heinsberg/herr-dr-med-ekkehart-walter-heinsberg",
+      "destination": "https://navoria.de/praxis/heinsberg/herr-dr-med-ekkehart-walter-gc5jFk",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/hennef/drmed-manfred-maylahn-praktischer-arzt-hennef",
+      "destination": "https://navoria.de/praxis/hennef-sieg/dr-med-manfred-maylahn-praktischer-arzt-pUBSeY",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/herne/kerstin-fritz-herne",
+      "destination": "https://navoria.de/praxis/herne/kerstin-fritz-pmtR3g",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/herzogenrath/dr-med-gabriele-schmeitz-herzogenrath",
+      "destination": "https://navoria.de/praxis/herzogenrath/dr-med-gabriele-schmeitz-ICrF_w",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/herzogenrath/dr-med-oliver-fensky-herzogenrath",
+      "destination": "https://navoria.de/praxis/herzogenrath/dr-med-oliver-fensky-rc5e173",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/hilchenbach/frau-angela-hartnack-hilchenbach",
+      "destination": "https://navoria.de/praxis/hilchenbach/frau-angela-hartnack-xBjFDU",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/hofgeismar/gemeinschaftspraxis-trendelburg-hofgeismar",
+      "destination": "https://navoria.de/praxis/hofgeismar/gemeinschaftspraxis-trendelburg-8JNv7Y",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/holzgerlingen/dr-med-annemarie-trost-holzgerlingen",
+      "destination": "https://navoria.de/praxis/holzgerlingen/dr-med-annemarie-trost-Ppyf1Y",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/homberg/drsmed-volker-dittschar-und-andr-otto-homberg",
+      "destination": "https://navoria.de/praxis/homberg-efze/drs-med-volker-dittschar-und-andr-otto-g9LPew",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/hueckelhoven/hausarztpraxis-baal-hckelhoven",
+      "destination": "https://navoria.de/praxis/hueckelhoven/hausarztpraxis-baal-rsh4Jg",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/itzehoe/hausarztpraxis-aust-itzehoe",
+      "destination": "https://navoria.de/praxis/itzehoe/hausarztpraxis-aust-CociwM",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/jena/praxis-dr-med-karsten-gneist-jena",
+      "destination": "https://navoria.de/praxis/jena/praxis-dr-med-karsten-gneist-2ErPAY",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/jessen/dr-med-stefan-kluge-dr-med-dirk-stanitz-jessen",
+      "destination": "https://navoria.de/praxis/jessen-elster/dr-med-stefan-kluge-dr-med-dirk-stanitz-dFozRY",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/jever/hausarztpraxis-am-schlo-jever",
+      "destination": "https://navoria.de/praxis/jever/hausarztpraxis-am-schloss-pzW9KM",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/jueterbog/dr-kerstin-hckert-jterbog",
+      "destination": "https://navoria.de/praxis/jueterbog/dr-kerstin-hoeckert-BKmhPY",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/kassel/frau-charlotte-lehnert",
+      "destination": "https://navoria.de/praxis/kassel/frau-charlotte-lehnert-F5pRDI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/koblenz/herr-dr-med-uwe-barnikel-koblenz",
+      "destination": "https://navoria.de/praxis/koblenz/herr-dr-med-uwe-barnikel-EZI9ko",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/landau/praxis-dr-manfred-lehmann-landau",
+      "destination": "https://navoria.de/praxis/landau-an-der-isar/praxis-dr-manfred-lehmann-F4npTc",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/landsberg/frau-dr-med-doreen-langer-landsberg",
+      "destination": "https://navoria.de/praxis/landsberg/frau-dr-med-doreen-langer-KbaKO4",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/lehrte/dr-med-martin-schick-lehrte",
+      "destination": "https://navoria.de/praxis/lehrte/dr-med-martin-schick-1mX1hg",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/leipzig/frau-dr-med-katja-khn-leipzig",
+      "destination": "https://navoria.de/praxis/leipzig/frau-dr-med-katja-kuehn-jCuV-A",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/loebau/praxis-gries-mudr-ohera-lbau",
+      "destination": "https://navoria.de/praxis/loebau/praxis-gries-mudr-ohera-pTimIQ",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/loeningen/medizinisches-versorgungszhasetal-lningen-lningen",
+      "destination": "https://navoria.de/praxis/loeningen/medizinisches-versorgungsz-hasetal-loeningen-MaE68M",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/loerrach/allgemeinpraxis-clas-lrrach",
+      "destination": "https://navoria.de/praxis/loerrach/allgemeinpraxis-clas-SUv_CM",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/ludwigsburg/frau-dr-med-ute-jesse-ludwigsburg",
+      "destination": "https://navoria.de/praxis/ludwigsburg/frau-dr-med-ute-jesse-kd3wKI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/luedenscheid/herr-dr-med-volker-budde-ldenscheid",
+      "destination": "https://navoria.de/praxis/luedenscheid/herr-dr-med-volker-budde-kodJp4",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/luenen/herr-dr-med-ulrich-hning-lnen",
+      "destination": "https://navoria.de/praxis/luenen/herr-dr-med-ulrich-huening-9ImhnM",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/mainburg/dr-luitpold-kistler-mainburg",
+      "destination": "https://navoria.de/praxis/mainburg/dr-luitpold-kistler-tH5Vuk",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/mannheim/prof-dr-med-manfred-hensel-mannheim",
+      "destination": "https://navoria.de/praxis/mannheim/prof-dr-med-manfred-hensel-HWInMc",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/melsungen/drmed-ulrike-jehle-sinning-melsungen",
+      "destination": "https://navoria.de/praxis/melsungen/dr-med-ulrike-jehle-sinning-LSeZ9s",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/mittweida/dr-steffen-schreiber-mittweida",
+      "destination": "https://navoria.de/praxis/mittweida/dr-steffen-schreiber-EFSN-Y",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/muenchen/praxis-dr-med-qassim-al-saadawi-mnchen",
+      "destination": "https://navoria.de/praxis/muenchen/praxis-dr-med-qassim-al-saadawi-s9uZ34",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/muensingen/drmed-martin-brndle-mnsingen",
+      "destination": "https://navoria.de/praxis/muensingen/dr-med-martin-braendle-JrOOuo",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/muenster/prof-dr-med-dr-hc-michael-zitzmann-mnster",
+      "destination": "https://navoria.de/praxis/muenster/prof-dr-med-dr-hc-michael-zitzmann-b3cEWU",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/netphen/kinderarztpraxis-turian-westphal-ehemals-koch-netphen",
+      "destination": "https://navoria.de/praxis/netphen/kinderarztpraxis-turian-westphal-ehemals-koch-TQkuvA",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/neuberg/drmed-peter-rdiger-tippe-facharzt-fr-allgemeinmedizin-neuberg",
+      "destination": "https://navoria.de/praxis/neuberg/dr-med-peter-ruediger-tippe-facharzt-fuer-allgemeinmedizin-8z8CGk",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/neubrandenburg/gemeinschaftspraxis-dr-sren-dreler-dr-gunnar-zinapold-neubrandenburg",
+      "destination": "https://navoria.de/praxis/neubrandenburg/gemeinschaftspraxis-dr-soeren-dressler-dr-gunnar-zinapold-Sgd9cM",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/oberndorf/herr-m-d-univ-damaskus-leon-darwisch-oberndorf",
+      "destination": "https://navoria.de/praxis/oberndorf-am-neckar/herr-m-d-univ-damaskus-leon-darwisch-P2MiNk",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/oehringen/dr-maria-arabela-lupu",
+      "destination": "https://navoria.de/praxis/oehringen/hausarzt-praxis-doctor-medic-maria-arabela-lupu-fachaerztin-fuer-allge",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/offenbach/dr-med-r-kappus-offenbach",
+      "destination": "https://navoria.de/praxis/offenbach-am-main/dr-med-r-kappus-0CTdkI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/offenbach/frau-dr-med-gabriele-frey-offenbach",
+      "destination": "https://navoria.de/praxis/offenbach-am-main/frau-dr-med-gabriele-frey-_DD4Z4",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/paderborn/frau-dr-med-carla-gottschalg-paderborn",
+      "destination": "https://navoria.de/praxis/paderborn/frau-dr-med-carla-gottschalg-cnimxs",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/pattensen/frau-claudia-timm-pattensen",
+      "destination": "https://navoria.de/praxis/pattensen/herr-dr-schaefer-BXPBbE",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/petersberg/herr-dr-med-michael-harre-petersberg",
+      "destination": "https://navoria.de/praxis/petersberg/herr-dr-med-michael-harre-HxA9mY",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/philippsburg/frau-dr-med-annette-weik-scheurer-philippsburg",
+      "destination": "https://navoria.de/praxis/philippsburg/frau-dr-med-annette-weik-scheurer-O-Q4es",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/pinneberg/frau-dr-med-mechthild-tammen-pinneberg",
+      "destination": "https://navoria.de/praxis/pinneberg/frau-dr-med-mechthild-tammen-sQJDQ4",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/plochingen/dr-kathrin-herre-plochingen",
+      "destination": "https://navoria.de/praxis/plochingen/dr-kathrin-herre-HFdqaI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/quakenbrueck/frau-dorothee-otte-bick-quakenbrck",
+      "destination": "https://navoria.de/praxis/quakenbrueck/frau-dorothee-otte-bick-Tlm98s",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/ravensburg/dr-med-ingrid-schubert-ravensburg",
+      "destination": "https://navoria.de/praxis/ravensburg/dr-med-ingrid-schubert-xjxXp0",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/reutlingen/herr-dr-med-till-reckert-reutlingen",
+      "destination": "https://navoria.de/praxis/reutlingen/herr-dr-med-till-reckert-SWBpFs",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/rheda-wiedenbrueck/praxis-m-abou-zeidan-rheda-wiedenbrck",
+      "destination": "https://navoria.de/praxis/rheda-wiedenbrueck/praxis-m-abou-zeidan-t-Sdxs",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/rostock/frau-dipl-med-susanne-decker-rostock",
+      "destination": "https://navoria.de/praxis/rostock/praxis-drmed-susanne-markmann-fachaerztin-f-frauenheilkunde-und-geburtshilfe-iTCmLI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/rottenburg/herr-dr-med-matthias-ehrt-rottenburg",
+      "destination": "https://navoria.de/praxis/rottenburg-am-neckar/herr-dr-med-matthias-ehrt-IkuNfo",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/schwerin/dr-med-torsten-dahlmann-schwerin",
+      "destination": "https://navoria.de/praxis/schwerin/dr-med-torsten-dahlmann-eblp8Y",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/schwerin/herr-dipl-med-karsten-reininghaus-schwerin",
+      "destination": "https://navoria.de/praxis/schwerin/herr-dipl-med-karsten-reininghaus-nrdYJQ",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/sendenhorst/dr-udo-hecke-sendenhorst",
+      "destination": "https://navoria.de/praxis/sendenhorst/dr-udo-hecke-Ob9Q5Y",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/siegen/dr-med-martin-mansfeld-siegen",
+      "destination": "https://navoria.de/praxis/siegen/dr-med-martin-mansfeld-byTxlg",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/soest/dr-med-barbara-knollmann-soest",
+      "destination": "https://navoria.de/praxis/soest/dr-med-barbara-knollmann-fsXC1c",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/solingen/drmed-hans-peter-holbeck-solingen",
+      "destination": "https://navoria.de/praxis/solingen/drmed-hans-peter-holbeck-mTPUdI",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/sulzbach-rosenberg/claudius-rothbauer-sulzbach-rosenberg",
+      "destination": "https://navoria.de/praxis/sulzbach-rosenberg/gemeinschaftspraxis-rothbauer-dr-heil-Ck50J8",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/troisdorf/dr-heeg-troisdorf",
+      "destination": "https://navoria.de/praxis/troisdorf/dr-heeg-2u3K8w",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/ulm/dr-med-frank-riederle-ulm",
+      "destination": "https://navoria.de/praxis/ulm/dr-med-frank-riederle-OVfBD4",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/versmold/herr-alexander-sinica-versmold",
+      "destination": "https://navoria.de/praxis/versmold/herr-alexander-sinica-wtM2XE",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/wanzleben-boerde/herr-dr-med-ernst-schoof-wanzleben-brde",
+      "destination": "https://navoria.de/praxis/wanzleben-boerde/herr-dr-med-ernst-schoof-WMTM2w",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/weimar/dr-med-heiko-filz-weimar",
+      "destination": "https://navoria.de/praxis/weimar/dr-med-heiko-filz-C2Q6c0",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/wiesbaden/herr-olav-heringer-wiesbaden",
+      "destination": "https://navoria.de/praxis/wiesbaden/onkologe-olav-heringer-dTi4j8",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/wismar/dr-romy-kujat-wismar",
+      "destination": "https://navoria.de/praxis/wismar/dr-romy-kujat-xsJ0aE",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/witten/dr-berg-witten",
+      "destination": "https://navoria.de/praxis/witten/dr-berg-8qwF7k",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/zossen/herr-andreas-leese-zossen",
+      "destination": "https://navoria.de/praxis/zossen/herr-andreas-leese-jQabTU",
+      "permanent": true
+    },
+    {
+      "source": "/hautarzt/annaberg-buchholz/diana-demmler-fachrztin-fr-haut-und-geschlechtskrankheiten-annaberg-buchholz",
+      "destination": "https://navoria.de/praxis/annaberg-buchholz/diana-demmler-fachaerztin-fuer-haut-und-geschlechtskrankheiten-hH_Oek",
+      "permanent": true
+    },
+    {
+      "source": "/hautarzt/bad-segeberg/herr-dr-med-stefan-peker-6982",
+      "destination": "https://navoria.de/praxis/bad-segeberg/herr-dr-med-stefan-peker-7Uh34Y",
+      "permanent": true
+    },
+    {
+      "source": "/hautarzt/baunatal/frau-dr-med-regina-hahn-baunatal",
+      "destination": "https://navoria.de/praxis/baunatal/frau-dr-med-regina-hahn-3F01ZI",
+      "permanent": true
+    },
+    {
+      "source": "/hautarzt/berlin/hautarztpraxis-rahaf-ali",
+      "destination": "https://navoria.de/praxis/berlin/hautarztpraxis-rahaf-ali-oNKqJ0",
+      "permanent": true
+    },
+    {
+      "source": "/hno-arzt/lorsch/hno-praxis-lorsch-dr-med-sabine-weiss-lorsch",
+      "destination": "https://navoria.de/praxis/lorsch/hno-praxis-lorsch-dr-med-sabine-weiss-cS9LlY",
+      "permanent": true
+    },
+    {
+      "source": "/kinderarzt/erbach/frau-dr-med-romy-schreck-erbach",
+      "destination": "https://navoria.de/praxis/erbach/frau-dr-med-romy-schreck-tlbRLc",
+      "permanent": true
+    },
+    {
+      "source": "/kinderarzt/isny/dr-med-alexander-moch-isny",
+      "destination": "https://navoria.de/praxis/isny-im-allgaeu/dr-med-alexander-moch-bGyXkY",
+      "permanent": true
+    },
+    {
+      "source": "/orthopaede/frankenbergsachsen/drmed-ellen-barth-frankenbergsachsen",
+      "destination": "https://navoria.de/praxis/frankenberg-sachsen/dr-med-ellen-barth-59-KWw",
+      "permanent": true
+    },
+    {
+      "source": "/orthopaede/frankenbergsachsen/herr-dr-med-dirk-harlos-frankenbergsachsen",
+      "destination": "https://navoria.de/praxis/frankenberg-sachsen/herr-dr-med-dirk-harlos-aMJLQo",
+      "permanent": true
+    },
+    {
+      "source": "/orthopaede/luckenwalde/dr-med-bettina-kuehne",
+      "destination": "https://navoria.de/praxis/luckenwalde/dr-med-bettina-kuehne-2lEqAM",
+      "permanent": true
+    },
+    {
+      "source": "/orthopaede/olsberg/dr-med-bernd-j-kamitter-olsberg",
+      "destination": "https://navoria.de/praxis/olsberg/dr-med-bernd-j-kamitter-0_qtAI",
+      "permanent": true
+    },
+    {
+      "source": "/orthopaede/ottweiler/drmed-axel-wolf-facharzt-fr-orthopdie-ottweiler",
+      "destination": "https://navoria.de/praxis/ottweiler/dr-med-axel-wolf-facharzt-fuer-orthopaedie-0aZa_g",
+      "permanent": true
+    },
+    {
+      "source": "/orthopaede/selb/herr-dr-med-detlef-phlmann-selb",
+      "destination": "https://navoria.de/praxis/selb/herr-dr-med-detlef-poehlmann-RcmGeU",
+      "permanent": true
+    },
+    {
+      "source": "/orthopaede/wernigerode/dr-med-christian-gottwald-wernigerode",
+      "destination": "https://navoria.de/praxis/wernigerode/dr-med-christian-gottwald-kUPbmc",
+      "permanent": true
+    },
+    {
+      "source": "/zahnarzt/ansbach/dr-med-dent-hubert-gradl-ansbach",
+      "destination": "https://navoria.de/praxis/ansbach/dr-med-dent-hubert-gradl-g5fB54",
+      "permanent": true
+    },
+    {
+      "source": "/zahnarzt/asslar/herr-dr-ulrich-muskat-alar",
+      "destination": "https://navoria.de/praxis/asslar/herr-dr-ulrich-muskat-Lo5K60",
+      "permanent": true
+    },
+    {
+      "source": "/zahnarzt/bad/herr-dr-ernst-georg-schwerdtfeger-bad",
+      "destination": "https://navoria.de/praxis/bad-arolsen/herr-dr-ernst-georg-schwerdtfeger-MdHcA0",
+      "permanent": true
+    },
+    {
+      "source": "/zahnarzt/frankenbergsachsen/dr-med-dent-sybille-wetzig-frankenbergsachsen",
+      "destination": "https://navoria.de/praxis/frankenberg-sachsen/dr-med-dent-sybille-wetzig-tWOAQo",
+      "permanent": true
+    },
+    {
+      "source": "/zahnarzt/landau/frau-prof-dr-med-dent-claudia-reicheneder-landau",
+      "destination": "https://navoria.de/praxis/landau-an-der-isar/kieferorthopaedie-landau-prof-dr-claudia-reicheneder-XVt15E",
+      "permanent": true
+    },
+    {
+      "source": "/zahnarzt/langelsheim/frau-dr-iris-westermann-langelsheim",
+      "destination": "https://navoria.de/praxis/langelsheim/frau-dr-iris-westermann-rc75038",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/:city/:slug*",
+      "destination": "https://navoria.de/aerzte/:city/hausarzt",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt/:city",
+      "destination": "https://navoria.de/aerzte/:city/hausarzt",
+      "permanent": true
+    },
+    {
+      "source": "/hausarzt",
+      "destination": "https://navoria.de/aerzte/fachrichtung/hausarzt",
+      "permanent": true
+    },
+    {
+      "source": "/zahnarzt/:city/:slug*",
+      "destination": "https://navoria.de/aerzte/:city/zahnarzt",
+      "permanent": true
+    },
+    {
+      "source": "/zahnarzt/:city",
+      "destination": "https://navoria.de/aerzte/:city/zahnarzt",
+      "permanent": true
+    },
+    {
+      "source": "/zahnarzt",
+      "destination": "https://navoria.de/aerzte/fachrichtung/zahnarzt",
+      "permanent": true
+    },
+    {
+      "source": "/augenarzt/:city/:slug*",
+      "destination": "https://navoria.de/aerzte/:city/augenarzt",
+      "permanent": true
+    },
+    {
+      "source": "/augenarzt/:city",
+      "destination": "https://navoria.de/aerzte/:city/augenarzt",
+      "permanent": true
+    },
+    {
+      "source": "/augenarzt",
+      "destination": "https://navoria.de/aerzte/fachrichtung/augenarzt",
+      "permanent": true
+    },
+    {
+      "source": "/hautarzt/:city/:slug*",
+      "destination": "https://navoria.de/aerzte/:city/hautarzt",
+      "permanent": true
+    },
+    {
+      "source": "/hautarzt/:city",
+      "destination": "https://navoria.de/aerzte/:city/hautarzt",
+      "permanent": true
+    },
+    {
+      "source": "/hautarzt",
+      "destination": "https://navoria.de/aerzte/fachrichtung/hautarzt",
+      "permanent": true
+    },
+    {
+      "source": "/orthopaede/:city/:slug*",
+      "destination": "https://navoria.de/aerzte/:city/orthopaede",
+      "permanent": true
+    },
+    {
+      "source": "/orthopaede/:city",
+      "destination": "https://navoria.de/aerzte/:city/orthopaede",
+      "permanent": true
+    },
+    {
+      "source": "/orthopaede",
+      "destination": "https://navoria.de/aerzte/fachrichtung/orthopaede",
+      "permanent": true
+    },
+    {
+      "source": "/frauenarzt/:city/:slug*",
+      "destination": "https://navoria.de/aerzte/:city/frauenarzt",
+      "permanent": true
+    },
+    {
+      "source": "/frauenarzt/:city",
+      "destination": "https://navoria.de/aerzte/:city/frauenarzt",
+      "permanent": true
+    },
+    {
+      "source": "/frauenarzt",
+      "destination": "https://navoria.de/aerzte/fachrichtung/frauenarzt",
+      "permanent": true
+    },
+    {
+      "source": "/kinderarzt/:city/:slug*",
+      "destination": "https://navoria.de/aerzte/:city/kinderarzt",
+      "permanent": true
+    },
+    {
+      "source": "/kinderarzt/:city",
+      "destination": "https://navoria.de/aerzte/:city/kinderarzt",
+      "permanent": true
+    },
+    {
+      "source": "/kinderarzt",
+      "destination": "https://navoria.de/aerzte/fachrichtung/kinderarzt",
+      "permanent": true
+    },
+    {
+      "source": "/hno-arzt/:city/:slug*",
+      "destination": "https://navoria.de/aerzte/:city/hno-arzt",
+      "permanent": true
+    },
+    {
+      "source": "/hno-arzt/:city",
+      "destination": "https://navoria.de/aerzte/:city/hno-arzt",
+      "permanent": true
+    },
+    {
+      "source": "/hno-arzt",
+      "destination": "https://navoria.de/aerzte/fachrichtung/hno-arzt",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/:city/:slug*",
+      "destination": "https://navoria.de/aerzte/:city",
+      "permanent": true
+    },
+    {
+      "source": "/arzt/:city",
+      "destination": "https://navoria.de/aerzte/:city",
+      "permanent": true
+    },
+    {
+      "source": "/arzt",
+      "destination": "https://navoria.de/aerzte",
+      "permanent": true
+    }
+  ]
+}
