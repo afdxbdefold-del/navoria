@@ -48,6 +48,8 @@ const nextConfig = {
     return [
       // /finden Content ist jetzt die Startseite — 301 Permanent
       { source: '/finden', destination: '/', permanent: true },
+      // Manuelle Praxis-Redirects (Alt-URLs / Tippfehler)
+      { source: '/drmed-thomas-gerhard', destination: '/praxis/hagen/drmed-thomas-gerhardt-f9cCCA', permanent: true },
     ];
   },
 };
