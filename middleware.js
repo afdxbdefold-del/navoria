@@ -14,6 +14,29 @@
 import { NextResponse } from 'next/server';
 import { extractPraxisSubdomain, isRootDomain, isPreviewHost, MAIN_DOMAIN } from '@/lib/subdomains';
 
+// -- Legacy Referrer Rescue: statischer Pattern-Redirect (edge-safe, keine DB) --
+const LEGACY_REFERER_RE = /(xn--rzte-online-k8a|rzte-online\.vercel|%C3%A4rzte-online)/i;
+const LEGACY_SPECIALTIES = new Set([
+  'hausarzt', 'zahnarzt', 'augenarzt', 'hautarzt', 'orthopaede',
+  'frauenarzt', 'kinderarzt', 'hno-arzt',
+]);
+function tryLegacyRescueRedirect(refererStr) {
+  if (!refererStr) return null;
+  if (!LEGACY_REFERER_RE.test(refererStr)) return null;
+  let u;
+  try { u = new URL(refererStr); } catch { return null; }
+  const parts = u.pathname.replace(/^\/+/, '').split('/').filter(Boolean);
+  if (!parts.length) return null;
+  const specialty = decodeURIComponent(parts[0]).toLowerCase();
+  const rawCity = parts[1] ? decodeURIComponent(parts[1]).toLowerCase() : null;
+  const city = rawCity ? rawCity.replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') : null;
+  // Nicht-Fachrichtungs-Pfade (impressum, robots.txt, bild-URLs) ignorieren
+  if (specialty === 'arzt') return city ? `/aerzte/${city}` : '/aerzte';
+  if (!LEGACY_SPECIALTIES.has(specialty)) return null;
+  if (city) return `/aerzte/${city}/${specialty}`;
+  return `/aerzte/fachrichtung/${specialty}`;
+}
+
 // Reservierte Root-Slugs, die statische Routen sind (kein Homepage-Modus)
 const RESERVED = new Set([
   'admin', 'aerzte', 'praxis', 'suche', 'symptome', 'symptom', 'ratgeber',
@@ -35,6 +58,19 @@ export function middleware(request) {
   const { pathname } = request.nextUrl;
   const hostHeader = request.headers.get('x-forwarded-host') || request.headers.get('host') || '';
   const clientHost = String(hostHeader).split(',')[0].trim().toLowerCase().split(':')[0];
+
+  // ===== Legacy-Referrer-Rescue =====
+  // Wenn User auf navoria.de/ landen und der Referer eine URL von der alten Domain
+  // "ärzte-online.org" (xn--rzte-online-k8a.org) oder rzte-online.vercel.app ist,
+  // parsen wir den Alt-Pfad aus dem Referer und leiten zur passenden Navoria-Kategorie.
+  // Rettet Traffic der bisher auf der Startseite verpufft ist (≈ 2900/Tag).
+  if (pathname === '/' || pathname === '') {
+    const referer = request.headers.get('referer') || '';
+    const rescue = tryLegacyRescueRedirect(referer);
+    if (rescue) {
+      return NextResponse.redirect(new URL(rescue, request.url), { status: 302, headers: { 'X-Navoria-Legacy-Rescue': '1' } });
+    }
+  }
 
   // 410 GONE für offensichtlich kaputte Praxis-URLs mit null/undefined/leerem Slug.
   // Diese entstehen oft aus alten OG-Cache-Einträgen von Facebook/Threads oder alten Sitemaps.
