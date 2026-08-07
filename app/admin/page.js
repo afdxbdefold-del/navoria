@@ -258,6 +258,7 @@ function Dashboard({ token, onLogout }) {
         <div className="flex flex-wrap gap-2">
           <a href="/admin/kampagnen" className="btn-primary">Bulk-Kampagne</a>
           <a href="/admin/analytics" className="btn-secondary">Live-Analytics</a>
+          <a href="/admin/legacy-rescue" className="btn-secondary">Legacy Rescue</a>
           <a href="/admin/bots" className="btn-secondary">Bot-Traffic</a>
           <a href="/admin/homepages" className="btn-secondary">Aktive Homepages</a>
           <a href="/admin/beanspruchungen" className="btn-secondary">Profil-Beanspruchungen</a>

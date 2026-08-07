@@ -200,6 +200,70 @@ async function handleGet(request, pathParts) {
     return json(list.map(stripId));
   }
 
+  // GET /api/admin/legacy-rescue-stats?days=7
+  // Aggregierte Statistik über Legacy-Referrer-Rescue-Redirects.
+  if (pathParts[0] === 'admin' && pathParts[1] === 'legacy-rescue-stats') {
+    if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });
+    const days = Math.max(1, Math.min(90, parseInt(url.searchParams.get('days') || '7', 10) || 7));
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const col = await getCollection('legacy_rescues');
+    const [total, byResult, byCity, bySpecialty, recent, uniqueTargets, hourly] = await Promise.all([
+      col.countDocuments({ timestamp: { $gte: since } }),
+      col.aggregate([
+        { $match: { timestamp: { $gte: since } } },
+        { $group: { _id: '$result', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+      ]).toArray(),
+      col.aggregate([
+        { $match: { timestamp: { $gte: since }, parsed_city: { $ne: null } } },
+        { $group: { _id: '$parsed_city', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 15 },
+      ]).toArray(),
+      col.aggregate([
+        { $match: { timestamp: { $gte: since }, parsed_specialty: { $ne: null } } },
+        { $group: { _id: '$parsed_specialty', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+      ]).toArray(),
+      col.find({ timestamp: { $gte: since } }).sort({ timestamp: -1 }).limit(30).toArray(),
+      col.aggregate([
+        { $match: { timestamp: { $gte: since }, result: 'concrete' } },
+        { $group: { _id: '$redirect_target', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 15 },
+      ]).toArray(),
+      col.aggregate([
+        { $match: { timestamp: { $gte: since } } },
+        { $group: {
+            _id: { $dateToString: { format: '%Y-%m-%d', date: '$timestamp' } },
+            count: { $sum: 1 },
+            concrete: { $sum: { $cond: [{ $eq: ['$result', 'concrete'] }, 1, 0] } },
+        } },
+        { $sort: { _id: 1 } },
+      ]).toArray(),
+    ]);
+    const concreteHits = byResult.find((r) => r._id === 'concrete')?.count || 0;
+    const successRate = total > 0 ? Math.round((concreteHits / total) * 1000) / 10 : 0;
+    return json({
+      window_days: days,
+      since: since.toISOString(),
+      total_rescues: total,
+      concrete_hits: concreteHits,
+      success_rate_percent: successRate,
+      by_result: byResult.map((r) => ({ result: r._id, count: r.count })),
+      by_city: byCity.map((r) => ({ city: r._id, count: r.count })),
+      by_specialty: bySpecialty.map((r) => ({ specialty: r._id, count: r.count })),
+      top_targets: uniqueTargets.map((r) => ({ target: r._id, count: r.count })),
+      daily: hourly.map((r) => ({ day: r._id, total: r.count, concrete: r.concrete })),
+      recent: recent.map((r) => ({
+        legacy_path: r.legacy_path,
+        result: r.result,
+        redirect_target: r.redirect_target,
+        timestamp: r.timestamp,
+      })),
+    });
+  }
+
   // GET /api/admin/campaigns
   if (pathParts[0] === 'admin' && pathParts[1] === 'campaigns' && !pathParts[2]) {
     if (!(await requireAdmin(request))) return json({ error: 'Nicht autorisiert' }, { status: 401 });

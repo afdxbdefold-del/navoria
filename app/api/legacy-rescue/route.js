@@ -80,7 +80,27 @@ export async function GET(request) {
   const parsed = parseLegacyPath(rawPath);
   const origin = url.origin;
 
+  // Log-Helper — best-effort, blockiert nie
+  const logRescue = async (result, target) => {
+    try {
+      const col = await getCollection('legacy_rescues');
+      await col.insertOne({
+        legacy_path: rawPath,
+        parsed_specialty: parsed?.specialty || null,
+        parsed_city: parsed?.city || null,
+        parsed_slug: parsed?.slug || null,
+        result, // 'concrete' | 'category' | 'category_city' | 'category_specialty' | 'category_all' | 'invalid'
+        redirect_target: target,
+        referer: request.headers.get('referer') || null,
+        user_agent: (request.headers.get('user-agent') || '').slice(0, 240),
+        ip_hash: null,
+        timestamp: new Date(),
+      });
+    } catch {}
+  };
+
   if (!parsed) {
+    logRescue('invalid', '/');
     return NextResponse.redirect(new URL('/', origin), { status: 302 });
   }
 
@@ -88,6 +108,7 @@ export async function GET(request) {
   // 1) Konkrete Praxis suchen
   const concrete = await findConcretePractice({ city, slug }).catch(() => null);
   if (concrete) {
+    logRescue('concrete', concrete);
     return NextResponse.redirect(new URL(concrete, origin), {
       status: 302,
       headers: { 'X-Navoria-Legacy-Rescue': 'concrete' },
@@ -95,9 +116,18 @@ export async function GET(request) {
   }
   // 2) Fallback: Kategorie
   let target;
-  if (specialty === 'arzt') target = city ? `/aerzte/${city}` : '/aerzte';
-  else if (city) target = `/aerzte/${city}/${specialty}`;
-  else target = `/aerzte/fachrichtung/${specialty}`;
+  let resultKind;
+  if (specialty === 'arzt') {
+    target = city ? `/aerzte/${city}` : '/aerzte';
+    resultKind = city ? 'category_city' : 'category_all';
+  } else if (city) {
+    target = `/aerzte/${city}/${specialty}`;
+    resultKind = 'category_city_specialty';
+  } else {
+    target = `/aerzte/fachrichtung/${specialty}`;
+    resultKind = 'category_specialty';
+  }
+  logRescue(resultKind, target);
   return NextResponse.redirect(new URL(target, origin), {
     status: 302,
     headers: { 'X-Navoria-Legacy-Rescue': 'category' },
