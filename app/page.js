@@ -1,4 +1,5 @@
 import HomeClient from './HomeClient.jsx';
+import LegacyReferrerCatcher from '@/components/LegacyReferrerCatcher';
 import { getBaseUrl } from '@/lib/baseUrl';
 import { MAGAZINE_ARTICLES } from '@/lib/magazineArticles';
 import { getCollection } from '@/lib/mongodb';
@@ -80,6 +81,7 @@ export default async function HomePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
+      <LegacyReferrerCatcher />
       <HomeClient latestArticles={latestArticles} bigCities={bigCities} />
     </>
   );

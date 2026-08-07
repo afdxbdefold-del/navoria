@@ -238,7 +238,20 @@ export default function LegacyRescueDashboard() {
       )}
 
       {/* Aufteilung nach Kategorie */}
-      <div className="mt-8 grid gap-4 lg:grid-cols-3">
+      <div className="mt-8 grid gap-4 lg:grid-cols-4">
+        <div className="rounded-xl border border-slate-100 bg-white p-5">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">Rescue-Quelle</h3>
+          <ul className="mt-3 space-y-2">
+            {(data?.by_source || []).map((r) => (
+              <li key={r.source} className="flex items-center justify-between text-sm">
+                <span className="text-slate-700">{sourceLabel(r.source)}</span>
+                <span className="font-mono text-slate-800">{r.count}</span>
+              </li>
+            ))}
+            {!data?.by_source?.length && <li className="text-sm text-slate-400">Keine Daten</li>}
+          </ul>
+        </div>
+
         <div className="rounded-xl border border-slate-100 bg-white p-5">
           <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">Ergebnis-Verteilung</h3>
           <ul className="mt-3 space-y-2">
@@ -367,5 +380,16 @@ function resultLabel(k) {
     category_city: 'Nur Stadt',
     category_all: 'Alle Ärzte',
     invalid: 'Ungültig',
+    client_no_match: 'Client: kein Legacy-Signal',
+  }[k] || k;
+}
+
+function sourceLabel(k) {
+  if (!k) return 'unbekannt';
+  return {
+    referer: 'HTTP-Referer (Middleware)',
+    'query-param': 'URL-Parameter ?legacy=…',
+    'client-beacon': 'Client-JS-Beacon',
+    legacy: 'Vor Source-Feld',
   }[k] || k;
 }

@@ -74,13 +74,28 @@ async function findConcretePractice({ city, slug }) {
   return null;
 }
 
-export async function GET(request) {
-  const url = new URL(request.url);
-  const rawPath = url.searchParams.get('path') || '';
-  const parsed = parseLegacyPath(rawPath);
-  const origin = url.origin;
+// Legacy-Referer erkennen (Domains und Muster)
+const LEGACY_REFERER_RE = /(xn--rzte-online-k8a|rzte-online\.vercel|%C3%A4rzte-online|ärzte-online)/i;
 
-  // Log-Helper — best-effort, blockiert nie
+// Aus einem beliebigen Legacy-URL-String den Pfad extrahieren.
+function extractPathFromReferer(rawReferrer) {
+  if (!rawReferrer) return null;
+  if (!LEGACY_REFERER_RE.test(rawReferrer)) return null;
+  try {
+    const u = new URL(rawReferrer);
+    const path = u.pathname || '';
+    if (!path || path === '/' || path.length < 3) return null;
+    if (/\.(png|jpg|jpeg|gif|webp|svg|ico|css|js|txt|xml|pdf)$/i.test(path)) return null;
+    if (/^\/(impressum|datenschutz|agb|kontakt|robots\.txt|favicon)/i.test(path)) return null;
+    return path;
+  } catch {
+    return null;
+  }
+}
+
+// Kern-Logik: Rescue-Path auflösen und in DB loggen. Wird von GET und POST genutzt.
+async function resolveRescue({ rawPath, source, referrer, userAgent }) {
+  const parsed = parseLegacyPath(rawPath);
   const logRescue = async (result, target) => {
     try {
       const col = await getCollection('legacy_rescues');
@@ -89,32 +104,27 @@ export async function GET(request) {
         parsed_specialty: parsed?.specialty || null,
         parsed_city: parsed?.city || null,
         parsed_slug: parsed?.slug || null,
-        result, // 'concrete' | 'category' | 'category_city' | 'category_specialty' | 'category_all' | 'invalid'
+        result,
         redirect_target: target,
-        referer: request.headers.get('referer') || null,
-        user_agent: (request.headers.get('user-agent') || '').slice(0, 240),
-        ip_hash: null,
+        source, // 'referer' | 'query-param' | 'client-beacon'
+        referer: referrer || null,
+        user_agent: (userAgent || '').slice(0, 240),
         timestamp: new Date(),
       });
-    } catch {}
+    } catch { /* ignore */ }
   };
 
   if (!parsed) {
-    logRescue('invalid', '/');
-    return NextResponse.redirect(new URL('/', origin), { status: 302 });
+    await logRescue('invalid', '/');
+    return { target: '/', result: 'invalid' };
   }
 
   const { specialty, city, slug } = parsed;
-  // 1) Konkrete Praxis suchen
   const concrete = await findConcretePractice({ city, slug }).catch(() => null);
   if (concrete) {
-    logRescue('concrete', concrete);
-    return NextResponse.redirect(new URL(concrete, origin), {
-      status: 302,
-      headers: { 'X-Navoria-Legacy-Rescue': 'concrete' },
-    });
+    await logRescue('concrete', concrete);
+    return { target: concrete, result: 'concrete' };
   }
-  // 2) Fallback: Kategorie
   let target;
   let resultKind;
   if (specialty === 'arzt') {
@@ -127,9 +137,72 @@ export async function GET(request) {
     target = `/aerzte/fachrichtung/${specialty}`;
     resultKind = 'category_specialty';
   }
-  logRescue(resultKind, target);
+  await logRescue(resultKind, target);
+  return { target, result: resultKind };
+}
+
+export async function GET(request) {
+  const url = new URL(request.url);
+  const rawPath = url.searchParams.get('path') || '';
+  const source = url.searchParams.get('src') || 'referer';
+  const origin = url.origin;
+
+  const { target, result } = await resolveRescue({
+    rawPath,
+    source,
+    referrer: request.headers.get('referer'),
+    userAgent: request.headers.get('user-agent'),
+  });
+
   return NextResponse.redirect(new URL(target, origin), {
     status: 302,
-    headers: { 'X-Navoria-Legacy-Rescue': 'category' },
+    headers: { 'X-Navoria-Legacy-Rescue': result },
   });
+}
+
+// POST — vom client-seitigen LegacyReferrerCatcher aufgerufen. Umgeht das
+// Problem des HTTP-Referer-Strippings, da document.referrer im Browser noch
+// verfügbar sein kann selbst wenn die HTTP-Request-Header ihn nicht enthalten.
+//
+// Body: { referrer?: string, legacyPath?: string }
+// Response: { ok: true, redirect_to: '/...', result: 'concrete' | ... }
+//        oder { ok: false, reason: 'no_match' } wenn nichts erkannt wurde.
+export async function POST(request) {
+  let body = {};
+  try { body = await request.json(); } catch { body = {}; }
+  const referrer = typeof body.referrer === 'string' ? body.referrer.slice(0, 500) : '';
+  const providedPath = typeof body.legacyPath === 'string' ? body.legacyPath.slice(0, 300) : '';
+
+  // Priorität: expliziter legacyPath > extractPathFromReferer(referrer)
+  let rawPath = providedPath && providedPath.startsWith('/') ? providedPath : '';
+  if (!rawPath) {
+    rawPath = extractPathFromReferer(referrer) || '';
+  }
+
+  if (!rawPath) {
+    // Kein nutzbarer Legacy-Pfad. Trotzdem loggen (best-effort) für Diagnose.
+    try {
+      const col = await getCollection('legacy_rescues');
+      await col.insertOne({
+        legacy_path: null,
+        parsed_specialty: null, parsed_city: null, parsed_slug: null,
+        result: 'client_no_match',
+        redirect_target: null,
+        source: 'client-beacon',
+        referer: referrer || null,
+        user_agent: (request.headers.get('user-agent') || '').slice(0, 240),
+        timestamp: new Date(),
+      });
+    } catch { /* ignore */ }
+    return NextResponse.json({ ok: false, reason: 'no_match' });
+  }
+
+  const { target, result } = await resolveRescue({
+    rawPath,
+    source: 'client-beacon',
+    referrer,
+    userAgent: request.headers.get('user-agent'),
+  });
+
+  return NextResponse.json({ ok: true, redirect_to: target, result });
 }

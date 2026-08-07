@@ -335,6 +335,13 @@ async function handleGet(request, pathParts) {
       $or: [{ referer: null }, { referer: '' }, { referer: { $exists: false } }],
     }).catch(() => 0);
 
+    // Rescue-Quellen-Aufschlüsselung (Middleware-Referer vs Query-Param vs Client-Beacon)
+    const bySource = await col.aggregate([
+      { $match: { timestamp: { $gte: since } } },
+      { $group: { _id: { $ifNull: ['$source', 'legacy'] }, count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]).toArray().catch(() => []);
+
     return json({
       window_days: days,
       since: since.toISOString(),
@@ -342,6 +349,7 @@ async function handleGet(request, pathParts) {
       concrete_hits: concreteHits,
       success_rate_percent: successRate,
       by_result: byResult.map((r) => ({ result: r._id, count: r.count })),
+      by_source: bySource.map((r) => ({ source: r._id, count: r.count })),
       by_city: byCity.map((r) => ({ city: r._id, count: r.count })),
       by_specialty: bySpecialty.map((r) => ({ specialty: r._id, count: r.count })),
       top_targets: uniqueTargets.map((r) => ({ target: r._id, count: r.count })),
