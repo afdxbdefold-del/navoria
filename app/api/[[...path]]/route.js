@@ -918,8 +918,147 @@ async function handleGet(request, pathParts) {
       return { pageviews: tot?.pv || 0, sessions: tot?.sessions || 0 };
     }
 
+    // Bounce Rate: Anteil Sessions mit nur 1 Pageview.
+    // Klassische Definition — passt gut zu unserem First-Party-Tracking.
+    async function bounceStats(from, to) {
+      const [r] = await col.aggregate([
+        { $match: { timestamp: { $gte: from, $lt: to }, is_bot: { $ne: true } } },
+        { $group: { _id: '$session_id', pv_count: { $sum: 1 } } },
+        { $group: {
+          _id: null,
+          total_sessions: { $sum: 1 },
+          bounced_sessions: { $sum: { $cond: [{ $eq: ['$pv_count', 1] }, 1, 0] } },
+          multi_page_sessions: { $sum: { $cond: [{ $gte: ['$pv_count', 2] }, 1, 0] } },
+          total_pv: { $sum: '$pv_count' },
+        } },
+      ]).toArray();
+      const total = r?.total_sessions || 0;
+      const bounced = r?.bounced_sessions || 0;
+      return {
+        total_sessions: total,
+        bounced_sessions: bounced,
+        multi_page_sessions: r?.multi_page_sessions || 0,
+        pages_per_session: total > 0 ? Math.round((r.total_pv / total) * 100) / 100 : 0,
+        bounce_rate_percent: total > 0 ? Math.round((bounced / total) * 1000) / 10 : 0,
+      };
+    }
+
+    // Average Time on Page via $setWindowFields — Delta zwischen aufeinanderfolgenden
+    // Pageviews derselben Session, gekappt bei 30 Min gegen Ausreißer (Tab offen gelassen).
+    async function avgTimeOnPage(from, to) {
+      const pipeline = [
+        { $match: { timestamp: { $gte: from, $lt: to }, is_bot: { $ne: true } } },
+        { $sort: { session_id: 1, timestamp: 1 } },
+        { $setWindowFields: {
+          partitionBy: '$session_id',
+          sortBy: { timestamp: 1 },
+          output: { next_ts: { $shift: { output: '$timestamp', by: 1, default: null } } },
+        } },
+        { $match: { next_ts: { $ne: null } } },
+        { $project: { delta_ms: { $subtract: ['$next_ts', '$timestamp'] } } },
+        { $match: { delta_ms: { $gte: 0, $lte: 30 * 60 * 1000 } } }, // 0..30min
+        { $group: { _id: null, avg_ms: { $avg: '$delta_ms' }, samples: { $sum: 1 } } },
+      ];
+      try {
+        const [r] = await col.aggregate(pipeline, { allowDiskUse: true }).toArray();
+        return {
+          avg_time_on_page_seconds: r?.avg_ms ? Math.round(r.avg_ms / 1000) : 0,
+          samples: r?.samples || 0,
+        };
+      } catch {
+        // Fallback (ältere MongoDB ohne $setWindowFields): Session-Dauer / (pv - 1)
+        return { avg_time_on_page_seconds: 0, samples: 0 };
+      }
+    }
+
+    // Average Session Duration (Sekunden, für Multi-Pageview-Sessions).
+    async function avgSessionDuration(from, to) {
+      const [r] = await col.aggregate([
+        { $match: { timestamp: { $gte: from, $lt: to }, is_bot: { $ne: true } } },
+        { $group: {
+          _id: '$session_id',
+          first: { $min: '$timestamp' },
+          last: { $max: '$timestamp' },
+          pv: { $sum: 1 },
+        } },
+        { $match: { pv: { $gte: 2 } } },
+        { $project: { duration_ms: { $subtract: ['$last', '$first'] } } },
+        { $match: { duration_ms: { $lte: 60 * 60 * 1000 } } }, // <=1h cap
+        { $group: { _id: null, avg_ms: { $avg: '$duration_ms' }, samples: { $sum: 1 } } },
+      ]).toArray();
+      return {
+        avg_session_duration_seconds: r?.avg_ms ? Math.round(r.avg_ms / 1000) : 0,
+        samples: r?.samples || 0,
+      };
+    }
+
     async function botCount(from, to) {
       return col.countDocuments({ timestamp: { $gte: from, $lt: to }, is_bot: true });
+    }
+
+    // Top Bounce-Paths: Pfade mit höchster Bounce-Rate (Sessions die auf diesem Pfad
+    // gestartet UND geendet haben). Nur Pfade mit min 10 Sessions.
+    async function topBouncePaths(from, to, limit = 20) {
+      const pipeline = [
+        { $match: { timestamp: { $gte: from, $lt: to }, is_bot: { $ne: true } } },
+        // Session-Aggregation: erster/letzter Path pro Session
+        { $sort: { session_id: 1, timestamp: 1 } },
+        { $group: {
+          _id: '$session_id',
+          pv_count: { $sum: 1 },
+          first_path: { $first: '$path' },
+        } },
+        { $group: {
+          _id: '$first_path',
+          sessions: { $sum: 1 },
+          bounces: { $sum: { $cond: [{ $eq: ['$pv_count', 1] }, 1, 0] } },
+        } },
+        { $match: { sessions: { $gte: 10 } } },
+        { $project: {
+          path: '$_id',
+          sessions: 1,
+          bounces: 1,
+          bounce_rate: { $multiply: [{ $divide: ['$bounces', '$sessions'] }, 100] },
+          _id: 0,
+        } },
+        { $sort: { bounce_rate: -1, sessions: -1 } },
+        { $limit: limit },
+      ];
+      return col.aggregate(pipeline, { allowDiskUse: true }).toArray();
+    }
+
+    // Top Time-on-Page Paths: Welche Pfade halten Nutzer:innen am längsten?
+    async function topTimeOnPage(from, to, limit = 20) {
+      try {
+        const pipeline = [
+          { $match: { timestamp: { $gte: from, $lt: to }, is_bot: { $ne: true } } },
+          { $sort: { session_id: 1, timestamp: 1 } },
+          { $setWindowFields: {
+            partitionBy: '$session_id',
+            sortBy: { timestamp: 1 },
+            output: { next_ts: { $shift: { output: '$timestamp', by: 1, default: null } } },
+          } },
+          { $match: { next_ts: { $ne: null } } },
+          { $project: {
+            path: 1,
+            delta_ms: { $subtract: ['$next_ts', '$timestamp'] },
+          } },
+          { $match: { delta_ms: { $gte: 0, $lte: 30 * 60 * 1000 } } },
+          { $group: { _id: '$path', avg_ms: { $avg: '$delta_ms' }, samples: { $sum: 1 } } },
+          { $match: { samples: { $gte: 5 } } },
+          { $project: {
+            path: '$_id',
+            avg_time_seconds: { $round: [{ $divide: ['$avg_ms', 1000] }, 0] },
+            samples: 1,
+            _id: 0,
+          } },
+          { $sort: { avg_time_seconds: -1 } },
+          { $limit: limit },
+        ];
+        return await col.aggregate(pipeline, { allowDiskUse: true }).toArray();
+      } catch {
+        return [];
+      }
     }
 
     async function topPaths(from, to, limit = 50) {
@@ -1065,33 +1204,69 @@ async function handleGet(request, pathParts) {
       ]).toArray();
     }
 
+    const dayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
     const [
       today, yesterday, last7,
       todayBots, yesterdayBots,
       topPathsToday, topCitiesToday, topCountriesToday,
       devicesToday, topBotsToday, hourlyToday, hourlyYesterday,
       topDirectoryCitiesToday, topDirectorySpecialtiesToday,
+      bounceToday, bounceYesterday, bounce7d,
+      timeOnPageToday, timeOnPageYesterday, timeOnPage7d,
+      sessionDurToday, sessionDur7d,
+      topBounceToday, topTimeToday,
     ] = await Promise.all([
-      bucketStats(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
+      bucketStats(todayStart, dayEnd),
       bucketStats(yesterdayStart, todayStart),
-      bucketStats(sevenDaysStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
-      botCount(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
+      bucketStats(sevenDaysStart, dayEnd),
+      botCount(todayStart, dayEnd),
       botCount(yesterdayStart, todayStart),
-      topPaths(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000), 50),
-      topCities(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
-      topCountries(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
-      devices(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
-      topBots(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
-      hourly(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000)),
+      topPaths(todayStart, dayEnd, 50),
+      topCities(todayStart, dayEnd),
+      topCountries(todayStart, dayEnd),
+      devices(todayStart, dayEnd),
+      topBots(todayStart, dayEnd),
+      hourly(todayStart, dayEnd),
       hourly(yesterdayStart, todayStart),
-      topDirectoryCities(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000), 50),
-      topDirectorySpecialties(todayStart, new Date(todayStart.getTime() + 24 * 60 * 60 * 1000), 50),
+      topDirectoryCities(todayStart, dayEnd, 50),
+      topDirectorySpecialties(todayStart, dayEnd, 50),
+      bounceStats(todayStart, dayEnd),
+      bounceStats(yesterdayStart, todayStart),
+      bounceStats(sevenDaysStart, dayEnd),
+      avgTimeOnPage(todayStart, dayEnd),
+      avgTimeOnPage(yesterdayStart, todayStart),
+      avgTimeOnPage(sevenDaysStart, dayEnd),
+      avgSessionDuration(todayStart, dayEnd),
+      avgSessionDuration(sevenDaysStart, dayEnd),
+      topBouncePaths(sevenDaysStart, dayEnd, 15),
+      topTimeOnPage(sevenDaysStart, dayEnd, 15),
     ]);
 
     return json({
-      today: { ...today, bots: todayBots, hourly: hourlyToday },
-      yesterday: { ...yesterday, bots: yesterdayBots, hourly: hourlyYesterday },
-      last_7_days: last7,
+      today: {
+        ...today,
+        bots: todayBots,
+        hourly: hourlyToday,
+        bounce_rate_percent: bounceToday.bounce_rate_percent,
+        pages_per_session: bounceToday.pages_per_session,
+        avg_time_on_page_seconds: timeOnPageToday.avg_time_on_page_seconds,
+        avg_session_duration_seconds: sessionDurToday.avg_session_duration_seconds,
+      },
+      yesterday: {
+        ...yesterday,
+        bots: yesterdayBots,
+        hourly: hourlyYesterday,
+        bounce_rate_percent: bounceYesterday.bounce_rate_percent,
+        pages_per_session: bounceYesterday.pages_per_session,
+        avg_time_on_page_seconds: timeOnPageYesterday.avg_time_on_page_seconds,
+      },
+      last_7_days: {
+        ...last7,
+        bounce_rate_percent: bounce7d.bounce_rate_percent,
+        pages_per_session: bounce7d.pages_per_session,
+        avg_time_on_page_seconds: timeOnPage7d.avg_time_on_page_seconds,
+        avg_session_duration_seconds: sessionDur7d.avg_session_duration_seconds,
+      },
       top_paths_today: topPathsToday,
       top_cities_today: topCitiesToday,
       top_countries_today: topCountriesToday,
@@ -1099,6 +1274,8 @@ async function handleGet(request, pathParts) {
       top_bots_today: topBotsToday,
       top_directory_cities_today: topDirectoryCitiesToday,
       top_directory_specialties_today: topDirectorySpecialtiesToday,
+      top_bounce_paths_7d: topBounceToday,
+      top_time_on_page_paths_7d: topTimeToday,
       generated_at: new Date().toISOString(),
     });
   }

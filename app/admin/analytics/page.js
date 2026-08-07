@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { Activity, MapPin, Users, TrendingUp, Bot, Smartphone, Monitor, Tablet, RefreshCw, ArrowUp, ArrowDown, Minus, ExternalLink, Globe, Building2, Stethoscope, ChevronDown } from 'lucide-react';
+import { Activity, MapPin, Users, TrendingUp, Bot, Smartphone, Monitor, Tablet, RefreshCw, ArrowUp, ArrowDown, Minus, ExternalLink, Globe, Building2, Stethoscope, ChevronDown, Timer, MousePointerClick, Layers } from 'lucide-react';
 import { SPECIALTIES } from '@/lib/specialties';
 
 // City-Slug → Anzeigename (formatiert)
@@ -147,6 +147,109 @@ export default function AdminAnalytics() {
           <SmallStat label="Aufrufe gestern" value={summary?.yesterday?.pageviews ?? '—'} />
           <SmallStat label="Sessions gestern" value={summary?.yesterday?.sessions ?? '—'} />
           <SmallStat label="Aufrufe letzte 7 Tage" value={summary?.last_7_days?.pageviews ?? '—'} />
+        </div>
+      </section>
+
+      {/* Engagement-Metriken: Bounce Rate + Time on Page */}
+      <section className="mb-8">
+        <h2 className="mb-3 flex items-center gap-2 text-base font-semibold text-slate-900">
+          <MousePointerClick aria-hidden="true" className="h-4 w-4 text-sky-600" />
+          Engagement-Metriken
+        </h2>
+        <div className="grid gap-3 md:grid-cols-4">
+          <EngagementCard
+            icon={<MousePointerClick className="h-5 w-5" />}
+            label="Bounce Rate heute"
+            value={summary?.today?.bounce_rate_percent != null ? `${summary.today.bounce_rate_percent}%` : '—'}
+            delta={summary && diffPct(summary.yesterday?.bounce_rate_percent, summary.today?.bounce_rate_percent)}
+            deltaHint="niedriger = besser"
+            good={summary?.today?.bounce_rate_percent != null && summary.today.bounce_rate_percent < 60}
+            sub={`7 Tage: ${summary?.last_7_days?.bounce_rate_percent ?? '—'}%`}
+          />
+          <EngagementCard
+            icon={<Timer className="h-5 w-5" />}
+            label="Ø Zeit pro Seite"
+            value={fmtDuration(summary?.today?.avg_time_on_page_seconds)}
+            delta={summary && diffPct(summary.today?.avg_time_on_page_seconds, summary.yesterday?.avg_time_on_page_seconds)}
+            deltaHint="höher = besser"
+            good={summary?.today?.avg_time_on_page_seconds > 30}
+            sub={`7 Tage: ${fmtDuration(summary?.last_7_days?.avg_time_on_page_seconds)}`}
+          />
+          <EngagementCard
+            icon={<Layers className="h-5 w-5" />}
+            label="Seiten / Session"
+            value={summary?.today?.pages_per_session ?? '—'}
+            delta={summary && diffPct(summary.today?.pages_per_session, summary.yesterday?.pages_per_session)}
+            deltaHint="höher = besser"
+            good={summary?.today?.pages_per_session > 1.5}
+            sub={`7 Tage: ${summary?.last_7_days?.pages_per_session ?? '—'}`}
+          />
+          <EngagementCard
+            icon={<Activity className="h-5 w-5" />}
+            label="Ø Session-Dauer"
+            value={fmtDuration(summary?.today?.avg_session_duration_seconds)}
+            deltaHint="Multi-Pageview"
+            good={summary?.today?.avg_session_duration_seconds > 60}
+            sub={`7 Tage: ${fmtDuration(summary?.last_7_days?.avg_session_duration_seconds)}`}
+          />
+        </div>
+        <p className="mt-2 text-xs text-slate-500">
+          Bounce = Sessions mit nur 1 Aufruf. Zeit pro Seite = Median Delta zwischen aufeinanderfolgenden Pageviews (gekappt bei 30 Min). Bots ausgeschlossen.
+        </p>
+      </section>
+
+      {/* Top Bounce & Top Time-on-Page */}
+      <section className="mb-8 grid gap-4 lg:grid-cols-2">
+        <div className="rounded-2xl border border-slate-200 bg-white">
+          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3">
+            <h3 className="text-base font-semibold text-slate-900">Höchste Bounce-Rates (7d)</h3>
+            <span className="text-xs text-slate-500">Startseiten mit min. 10 Sessions</span>
+          </div>
+          {summary?.top_bounce_paths_7d?.length ? (
+            <ul className="divide-y divide-slate-50">
+              {summary.top_bounce_paths_7d.slice(0, 10).map((r, i) => (
+                <li key={i} className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm">
+                  <a href={r.path} target="_blank" rel="noreferrer"
+                    className="truncate text-sky-700 hover:text-sky-800">{r.path}</a>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-xs text-slate-500">{r.sessions} S.</span>
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                      r.bounce_rate >= 80 ? 'bg-red-100 text-red-800' :
+                      r.bounce_rate >= 60 ? 'bg-amber-100 text-amber-800' :
+                      'bg-emerald-100 text-emerald-800'
+                    }`}>{Math.round(r.bounce_rate)}%</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="px-5 py-6 text-sm text-slate-500">Noch keine Daten. Braucht Sessions mit min. 10 Aufrufen pro Startseite.</p>
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white">
+          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3">
+            <h3 className="text-base font-semibold text-slate-900">Höchste Zeit pro Seite (7d)</h3>
+            <span className="text-xs text-slate-500">min. 5 Übergänge · gekappt bei 30 min</span>
+          </div>
+          {summary?.top_time_on_page_paths_7d?.length ? (
+            <ul className="divide-y divide-slate-50">
+              {summary.top_time_on_page_paths_7d.slice(0, 10).map((r, i) => (
+                <li key={i} className="flex items-center justify-between gap-3 px-5 py-2.5 text-sm">
+                  <a href={r.path} target="_blank" rel="noreferrer"
+                    className="truncate text-sky-700 hover:text-sky-800">{r.path}</a>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-xs text-slate-500">{r.samples}×</span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-sky-100 px-2 py-0.5 text-xs font-medium text-sky-800">
+                      <Timer className="h-3 w-3" /> {fmtDuration(r.avg_time_seconds)}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="px-5 py-6 text-sm text-slate-500">Noch keine Daten. Braucht Sessions mit min. 2 Pageviews.</p>
+          )}
         </div>
       </section>
 
@@ -339,6 +442,32 @@ function SmallStat({ label, value }) {
       <div className="mt-0.5 text-xs text-slate-500">{label}</div>
     </div>
   );
+}
+
+function EngagementCard({ icon, label, value, delta, deltaHint, good, sub }) {
+  return (
+    <div className={`relative rounded-2xl border p-4 shadow-sm ${good ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-white'}`}>
+      <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+        <span className={good ? 'text-emerald-700' : 'text-slate-500'}>{icon}</span>
+        {label}
+      </div>
+      <div className="mt-2 flex items-baseline gap-2">
+        <span className={`text-2xl font-semibold tabular-nums ${good ? 'text-emerald-800' : 'text-slate-900'}`}>{value}</span>
+        {delta && <DeltaBadge value={delta} />}
+      </div>
+      {sub && <p className="mt-1 text-xs text-slate-500">{sub}</p>}
+      {deltaHint && <p className="mt-0.5 text-[10px] uppercase tracking-wide text-slate-400">{deltaHint}</p>}
+    </div>
+  );
+}
+
+function fmtDuration(seconds) {
+  if (seconds == null || seconds === '' || Number.isNaN(seconds)) return '—';
+  const s = Math.round(Number(seconds));
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  const rem = s % 60;
+  return rem > 0 ? `${m}m ${rem}s` : `${m}m`;
 }
 
 function ListCard({ title, icon, items, valueLabel, initialLimit = 10 }) {
