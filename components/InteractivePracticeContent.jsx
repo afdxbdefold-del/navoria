@@ -4,10 +4,11 @@
 // Kritische Informationen (Telefon, Adresse, exakte Öffnungszeiten) sind bewusst hinter
 // Klick-Interaktionen platziert. Alles unterhalb Hero erfordert scrollen oder aufklappen.
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   Star, ChevronDown, MapPin, Phone, Mail, Clock, Route, HelpCircle, Stethoscope,
-  Users, ArrowRight, ExternalLink, ChevronRight,
+  Users, ArrowRight, ExternalLink, ChevronRight, ThumbsUp, ThumbsDown, X,
+  BookOpen, Sparkles, Shield, Timer, MessageSquare,
 } from 'lucide-react';
 
 // --- GA4-Helper -----------------------------------------------------------
@@ -191,6 +192,38 @@ export default function InteractivePracticeContent({ doctor, city, similar = [] 
   const pathId = `${city_slug}/${slug}`;
   useScrollDepthTracker(pathId);
   useTimeBeacon(pathId);
+  useInstantEngagement(pathId);
+  useFirstInteractionTracker(pathId);
+
+  // Reading-Progress-Bar (top of page)
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement;
+      const total = h.scrollHeight - h.clientHeight;
+      if (total <= 0) return;
+      setProgress(Math.min(100, Math.round((h.scrollTop / total) * 100)));
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Live "Sie sind seit X Sekunden auf dieser Seite"-Timer
+  const [secondsOnPage, setSecondsOnPage] = useState(0);
+  useEffect(() => {
+    const start = Date.now();
+    const id = setInterval(() => setSecondsOnPage(Math.floor((Date.now() - start) / 1000)), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Exit-Intent Modal
+  const [exitModal, setExitModal] = useState(false);
+  useExitIntent(useCallback(() => {
+    if (!exitModal) {
+      setExitModal(true);
+      ga4('exit_intent_shown', { page_id: pathId });
+    }
+  }, [exitModal, pathId]));
 
   const phoneRaw = phone_international || phone_national || '';
   const phoneDisplay = phone_national || phone_international || null;
@@ -209,6 +242,22 @@ export default function InteractivePracticeContent({ doctor, city, similar = [] 
   const [reviewsExpanded, setReviewsExpanded] = useState(false);
   const [routeAddress, setRouteAddress] = useState('');
   const [routeOpen, setRouteOpen] = useState(false);
+
+  // Feedback-Widget
+  const [feedback, setFeedback] = useState(null); // 'up' | 'down' | null
+  const [feedbackReason, setFeedbackReason] = useState('');
+  const [feedbackSent, setFeedbackSent] = useState(false);
+
+  // Mini-Symptom-Check
+  const [quizStep, setQuizStep] = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState([]);
+
+  // Trust-Badges Rotation
+  const trustBadges = [
+    { icon: Shield, label: 'Öffentliche Daten' },
+    { icon: Sparkles, label: 'Aktuell geprüft' },
+    { icon: BookOpen, label: 'Redaktionell kuratiert' },
+  ];
 
   const handleFaqClick = useCallback((i) => {
     setExpandedFaq((cur) => (cur === i ? null : i));
@@ -265,8 +314,49 @@ export default function InteractivePracticeContent({ doctor, city, similar = [] 
     window.open(`https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${target}`, '_blank', 'noopener');
   }, [routeAddress, formatted_address, street, postal_code, city, pathId]);
 
+  const handleFeedback = useCallback((kind) => {
+    setFeedback(kind);
+    ga4('page_feedback', { page_id: pathId, kind });
+  }, [pathId]);
+
+  const handleFeedbackSubmit = useCallback(() => {
+    setFeedbackSent(true);
+    ga4('page_feedback_reason', { page_id: pathId, kind: feedback, reason_length: feedbackReason.length });
+  }, [feedback, feedbackReason, pathId]);
+
+  const handleQuizAnswer = useCallback((answer) => {
+    setQuizAnswers((prev) => [...prev, answer]);
+    setQuizStep((s) => s + 1);
+    ga4('symptom_quiz_step', { page_id: pathId, step: quizStep, answer });
+  }, [quizStep, pathId]);
+
+  const resetQuiz = useCallback(() => {
+    setQuizStep(0);
+    setQuizAnswers([]);
+    ga4('symptom_quiz_reset', { page_id: pathId });
+  }, [pathId]);
+
+  const closeExitModal = useCallback(() => {
+    setExitModal(false);
+    ga4('exit_intent_dismiss', { page_id: pathId });
+  }, [pathId]);
+
+  const handleStickyPhoneClick = useCallback(() => {
+    ga4('sticky_phone_click', { page_id: pathId });
+  }, [pathId]);
+
+  const handleStickyRouteClick = useCallback(() => {
+    ga4('sticky_route_click', { page_id: pathId });
+  }, [pathId]);
+
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12 pb-28 sm:pb-12">
+
+      {/* Reading-Progress-Bar (fixed top) */}
+      <div className="fixed left-0 top-0 z-40 h-1 w-full bg-slate-100" aria-hidden="true">
+        <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-600 transition-[width] duration-150 ease-out"
+          style={{ width: `${progress}%` }} />
+      </div>
 
       {/* 1. HERO – nur Name, Fachrichtung, Sterne (Vertrauen aufbauen) */}
       <section className="mb-10">
@@ -283,6 +373,15 @@ export default function InteractivePracticeContent({ doctor, city, similar = [] 
             {user_rating_count > 0 && <span>· {user_rating_count} Bewertungen</span>}
           </div>
         )}
+        {/* Trust-Badges */}
+        <div className="mt-5 flex flex-wrap gap-2">
+          {trustBadges.map((b, i) => (
+            <span key={i} className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">
+              <b.icon className="h-3.5 w-3.5 text-emerald-700" />
+              {b.label}
+            </span>
+          ))}
+        </div>
         <p className="mt-4 text-sm text-slate-500">Sie erreichen die Praxis wie unten beschrieben. Bitte scrollen Sie für Öffnungszeiten, Kontakt und Anfahrt.</p>
       </section>
 
@@ -513,6 +612,224 @@ export default function InteractivePracticeContent({ doctor, city, similar = [] 
           )}
         </div>
       </section>
+
+      {/* 11. Auch interessant – Ratgeber-Widget */}
+      <section className="mb-12 border-t border-slate-100 pt-10">
+        <h2 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
+          <BookOpen className="h-5 w-5 text-emerald-700" /> Auch interessant
+        </h2>
+        <p className="mt-2 text-sm text-slate-600">Redaktionelle Ratgeber-Artikel rund um {specialty || 'Arztbesuche'}.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {[
+            { t: `Wie finde ich den richtigen ${specialty || 'Arzt'}?`, s: '5 Kriterien für die Arztwahl', h: `/ratgeber/richtigen-${(specialty || 'arzt').toLowerCase().replace(/\s+/g,'-')}-finden` },
+            { t: 'Termin schnell bekommen', s: 'Tipps für kurzfristige Termine', h: '/ratgeber/schnell-termin-arzt' },
+            { t: 'Was Sie zum ersten Besuch mitbringen', s: 'Checkliste für Ihren Praxis-Besuch', h: '/ratgeber/erster-arztbesuch-checkliste' },
+          ].map((a, i) => (
+            <a key={i} href={a.h}
+              onClick={() => ga4('ratgeber_teaser_click', { page_id: pathId, target: a.h })}
+              className="group block rounded-xl border border-slate-100 bg-white p-4 transition hover:border-emerald-300 hover:shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700">Ratgeber</p>
+              <p className="mt-2 font-medium text-slate-900 group-hover:text-emerald-700">{a.t}</p>
+              <p className="mt-1 text-xs text-slate-500">{a.s}</p>
+              <p className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-emerald-700">
+                Weiterlesen <ArrowRight className="h-3.5 w-3.5" />
+              </p>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* 12. Mini-Symptom-Check */}
+      <section className="mb-12 border-t border-slate-100 pt-10">
+        <h2 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
+          <Sparkles className="h-5 w-5 text-emerald-700" /> Zum richtigen Facharzt in 3 Fragen
+        </h2>
+        <p className="mt-2 text-sm text-slate-600">Kurzer Check – hilft Ihnen, die passende Fachrichtung zu finden. Kein medizinischer Rat.</p>
+        <div className="mt-4 rounded-xl border border-slate-100 bg-gradient-to-br from-emerald-50 to-white p-5">
+          {quizStep === 0 && (
+            <div>
+              <p className="font-medium text-slate-900">Frage 1: Wo liegen Ihre Beschwerden?</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {['Kopf & Nerven', 'Bauch & Verdauung', 'Haut', 'Gelenke & Rücken', 'Allgemein / unklar'].map((o) => (
+                  <button key={o} type="button" onClick={() => handleQuizAnswer(o)}
+                    className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm text-emerald-800 transition hover:bg-emerald-100">{o}</button>
+                ))}
+              </div>
+            </div>
+          )}
+          {quizStep === 1 && (
+            <div>
+              <p className="font-medium text-slate-900">Frage 2: Seit wann bestehen die Beschwerden?</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {['Weniger als 3 Tage', '3 Tage bis 2 Wochen', 'Länger als 2 Wochen', 'Chronisch / dauerhaft'].map((o) => (
+                  <button key={o} type="button" onClick={() => handleQuizAnswer(o)}
+                    className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm text-emerald-800 transition hover:bg-emerald-100">{o}</button>
+                ))}
+              </div>
+            </div>
+          )}
+          {quizStep === 2 && (
+            <div>
+              <p className="font-medium text-slate-900">Frage 3: Wie akut ist es?</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {['Akut / starke Schmerzen', 'Deutlich einschränkend', 'Mild, aber lästig', 'Zur Vorsorge'].map((o) => (
+                  <button key={o} type="button" onClick={() => handleQuizAnswer(o)}
+                    className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm text-emerald-800 transition hover:bg-emerald-100">{o}</button>
+                ))}
+              </div>
+            </div>
+          )}
+          {quizStep >= 3 && (
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-widest text-emerald-700">Empfehlung</p>
+              <p className="mt-2 text-lg font-semibold text-slate-900">
+                Für Ihre Angaben passt am ehesten ein <span className="text-emerald-700">{
+                  quizAnswers[0]?.startsWith('Haut') ? 'Hautarzt' :
+                  quizAnswers[0]?.startsWith('Gelenke') ? 'Orthopäde' :
+                  quizAnswers[0]?.startsWith('Bauch') ? 'Internist / Gastroenterologe' :
+                  quizAnswers[0]?.startsWith('Kopf') ? 'Neurologe' :
+                  'Hausarzt'
+                }</span>.
+              </p>
+              <p className="mt-2 text-sm text-slate-600">Bei akuten Beschwerden zuerst Hausarzt oder ärztlichen Bereitschaftsdienst (116 117) kontaktieren.</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <a href={`/aerzte/${city_slug}`} onClick={() => ga4('quiz_cta_city', { page_id: pathId })}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800">
+                  Ärzte in {city} anzeigen <ArrowRight className="h-4 w-4" />
+                </a>
+                <button type="button" onClick={resetQuiz}
+                  className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 hover:border-emerald-300">
+                  Erneut prüfen
+                </button>
+              </div>
+            </div>
+          )}
+          {quizStep < 3 && (
+            <div className="mt-4 flex items-center gap-2">
+              {[0, 1, 2].map((s) => (
+                <span key={s} className={`h-1.5 flex-1 rounded-full ${s <= quizStep ? 'bg-emerald-500' : 'bg-slate-200'}`} />
+              ))}
+              <span className="ml-2 text-xs text-slate-500">{quizStep + 1}/3</span>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* 13. Feedback-Widget */}
+      <section className="mb-12 border-t border-slate-100 pt-10">
+        <h2 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
+          <MessageSquare className="h-5 w-5 text-emerald-700" /> War diese Praxis-Info hilfreich?
+        </h2>
+        <div className="mt-4 rounded-xl border border-slate-100 bg-white p-5">
+          {!feedback && (
+            <div className="flex flex-wrap items-center gap-3">
+              <button type="button" onClick={() => handleFeedback('up')}
+                className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100">
+                <ThumbsUp className="h-4 w-4" /> Ja, hilfreich
+              </button>
+              <button type="button" onClick={() => handleFeedback('down')}
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300">
+                <ThumbsDown className="h-4 w-4" /> Nein, verbessern
+              </button>
+            </div>
+          )}
+          {feedback && !feedbackSent && (
+            <div>
+              <p className="text-sm text-slate-700">
+                {feedback === 'up' ? 'Danke! Was war besonders hilfreich?' : 'Danke für Ihr Feedback. Was fehlt oder stört?'}
+              </p>
+              <textarea value={feedbackReason} onChange={(e) => setFeedbackReason(e.target.value)}
+                rows={3} maxLength={300}
+                placeholder="Ihre kurze Rückmeldung (optional)"
+                className="mt-3 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none" />
+              <div className="mt-3 flex gap-2">
+                <button type="button" onClick={handleFeedbackSubmit}
+                  className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800">
+                  Absenden
+                </button>
+                <button type="button" onClick={handleFeedbackSubmit}
+                  className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 hover:border-slate-300">
+                  Überspringen
+                </button>
+              </div>
+            </div>
+          )}
+          {feedbackSent && (
+            <p className="text-sm text-emerald-700">Vielen Dank! Ihre Rückmeldung hilft uns, die Seite zu verbessern.</p>
+          )}
+        </div>
+      </section>
+
+      {/* Live-Session-Timer (subtile Engagement-Anzeige) */}
+      <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-400">
+        <Timer className="h-3.5 w-3.5" />
+        Sie sind seit {secondsOnPage < 60 ? `${secondsOnPage}s` : `${Math.floor(secondsOnPage / 60)}m ${secondsOnPage % 60}s`} auf dieser Seite
+      </div>
+
+      {/* Sticky Bottom CTA Bar (mobile-first) */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur sm:hidden">
+        <div className="mx-auto flex max-w-4xl items-stretch gap-2 px-3 py-2">
+          {phoneDisplay && (
+            <a href={`tel:${phoneLink}`} onClick={handleStickyPhoneClick}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-emerald-700 px-3 py-2.5 text-sm font-semibold text-white shadow-sm active:scale-[0.99]">
+              <Phone className="h-4 w-4" /> Anrufen
+            </a>
+          )}
+          <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(formatted_address || `${street || ''} ${postal_code || ''} ${city}`.trim())}`}
+            target="_blank" rel="noopener noreferrer" onClick={handleStickyRouteClick}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-emerald-300 bg-white px-3 py-2.5 text-sm font-semibold text-emerald-800 active:scale-[0.99]">
+            <Route className="h-4 w-4" /> Route
+          </a>
+          <a href="#kontakt"
+            onClick={() => ga4('sticky_contact_click', { page_id: pathId })}
+            className="flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700">
+            <ArrowRight className="h-4 w-4" />
+          </a>
+        </div>
+      </div>
+
+      {/* Exit-Intent Modal (desktop) */}
+      {exitModal && (
+        <div className="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4 sm:flex"
+          onClick={closeExitModal}>
+          <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}>
+            <button type="button" onClick={closeExitModal} aria-label="Schließen"
+              className="absolute right-3 top-3 rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+              <X className="h-5 w-5" />
+            </button>
+            <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700">Bevor Sie gehen</p>
+            <h3 className="mt-2 text-xl font-semibold text-slate-900">Diese {specialty || 'Praxen'} in {city} könnten auch passen:</h3>
+            <div className="mt-4 space-y-2">
+              {similar.slice(0, 3).map((s, i) => (
+                <a key={i} href={`/praxis/${s.city_slug}/${s.slug}`}
+                  onClick={() => ga4('exit_intent_click', { page_id: pathId, target: `${s.city_slug}/${s.slug}` })}
+                  className="flex items-center justify-between gap-2 rounded-lg border border-slate-100 p-3 hover:border-emerald-300 hover:bg-emerald-50">
+                  <div>
+                    <p className="line-clamp-1 text-sm font-medium text-slate-900">{s.name}</p>
+                    {s.rating != null && (
+                      <p className="text-xs text-slate-500">★ {Number(s.rating).toFixed(1)} · {s.user_rating_count || 0} Bewertungen</p>
+                    )}
+                  </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+                </a>
+              ))}
+              {similar.length === 0 && (
+                <a href={`/aerzte/${city_slug}`}
+                  onClick={() => ga4('exit_intent_city_click', { page_id: pathId })}
+                  className="flex items-center justify-between gap-2 rounded-lg border border-slate-100 p-3 hover:border-emerald-300 hover:bg-emerald-50">
+                  <p className="text-sm font-medium text-slate-900">Alle Ärzte in {city} anzeigen</p>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+                </a>
+              )}
+            </div>
+            <button type="button" onClick={closeExitModal}
+              className="mt-5 w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-slate-300">
+              Auf dieser Seite bleiben
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
