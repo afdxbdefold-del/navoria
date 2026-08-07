@@ -613,17 +613,17 @@ export default function InteractivePracticeContent({ doctor, city, similar = [] 
         </div>
       </section>
 
-      {/* 11. Auch interessant – Ratgeber-Widget */}
+      {/* 11. Auch interessant – Ratgeber-Widget (nutzt echte /ratgeber Slugs) */}
       <section className="mb-12 border-t border-slate-100 pt-10">
         <h2 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
           <BookOpen className="h-5 w-5 text-emerald-700" /> Auch interessant
         </h2>
-        <p className="mt-2 text-sm text-slate-600">Redaktionelle Ratgeber-Artikel rund um {specialty || 'Arztbesuche'}.</p>
+        <p className="mt-2 text-sm text-slate-600">Redaktionelle Ratgeber-Artikel rund um Ihren Arztbesuch.</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {[
-            { t: `Wie finde ich den richtigen ${specialty || 'Arzt'}?`, s: '5 Kriterien für die Arztwahl', h: `/ratgeber/richtigen-${(specialty || 'arzt').toLowerCase().replace(/\s+/g,'-')}-finden` },
-            { t: 'Termin schnell bekommen', s: 'Tipps für kurzfristige Termine', h: '/ratgeber/schnell-termin-arzt' },
-            { t: 'Was Sie zum ersten Besuch mitbringen', s: 'Checkliste für Ihren Praxis-Besuch', h: '/ratgeber/erster-arztbesuch-checkliste' },
+            { t: 'Facharzt-Termin schneller bekommen', s: '5 legale Wege für kurzfristige Termine', h: '/ratgeber/termin-facharzt-schneller' },
+            { t: 'Zweitmeinung einholen', s: 'Wann sich eine zweite Meinung lohnt', h: '/ratgeber/zweitmeinung-einholen' },
+            { t: 'Notfall vs. Bereitschaftsdienst', s: 'Was Sie außerhalb der Sprechzeiten tun', h: '/ratgeber/notfall-vs-bereitschaftsdienst' },
           ].map((a, i) => (
             <a key={i} href={a.h}
               onClick={() => ga4('ratgeber_teaser_click', { page_id: pathId, target: a.h })}
@@ -637,6 +637,72 @@ export default function InteractivePracticeContent({ doctor, city, similar = [] 
             </a>
           ))}
         </div>
+      </section>
+
+      {/* 11b. Interne Verlinkung – weitere Wege zur passenden Praxis */}
+      <section className="mb-12 border-t border-slate-100 pt-10">
+        <h2 className="flex items-center gap-2 text-2xl font-semibold text-slate-900">
+          <MapPin className="h-5 w-5 text-emerald-700" /> Weiter suchen in {city}
+        </h2>
+        <p className="mt-2 text-sm text-slate-600">Weitere Praxen und Fachrichtungen in Ihrer Umgebung.</p>
+
+        {/* Primary intent chips */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          <a href={`/aerzte/${city_slug}`}
+            onClick={() => ga4('internal_link_click', { page_id: pathId, kind: 'city_all', target: `/aerzte/${city_slug}` })}
+            className="rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-800 transition hover:bg-emerald-100">
+            Alle Ärzte in {city}
+          </a>
+          {specialty && (
+            <a href={`/aerzte/${city_slug}/${String(specialty).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`}
+              onClick={() => ga4('internal_link_click', { page_id: pathId, kind: 'city_specialty', target: specialty })}
+              className="rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-800 transition hover:bg-emerald-100">
+              Weitere {specialty}-Praxen in {city}
+            </a>
+          )}
+          {specialty && (
+            <a href={`/aerzte/fachrichtung/${String(specialty).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`}
+              onClick={() => ga4('internal_link_click', { page_id: pathId, kind: 'specialty_all', target: specialty })}
+              className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
+              {specialty} bundesweit
+            </a>
+          )}
+        </div>
+
+        {/* Weitere Fachrichtungen in derselben Stadt */}
+        <div className="mt-6">
+          <p className="text-sm font-medium text-slate-700">Andere Fachrichtungen in {city}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {['Hausarzt', 'Zahnarzt', 'Augenarzt', 'Hautarzt', 'Orthopäde', 'Frauenarzt', 'Kinderarzt', 'HNO-Arzt']
+              .filter((f) => f.toLowerCase() !== String(specialty || '').toLowerCase())
+              .slice(0, 7)
+              .map((f) => {
+                const fSlug = f.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                return (
+                  <a key={f} href={`/aerzte/${city_slug}/${fSlug}`}
+                    onClick={() => ga4('internal_link_click', { page_id: pathId, kind: 'other_specialty_city', target: f })}
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
+                    {f} · {city}
+                  </a>
+                );
+              })}
+          </div>
+        </div>
+
+        {/* PLZ-Nachbarschaft */}
+        {postal_code && (
+          <div className="mt-6">
+            <p className="text-sm font-medium text-slate-700">In Ihrer PLZ-Umgebung ({String(postal_code).slice(0, 3)}xx)</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <a href={`/aerzte/${city_slug}?plz=${String(postal_code).slice(0, 3)}`}
+                onClick={() => ga4('internal_link_click', { page_id: pathId, kind: 'plz_neighborhood', target: postal_code })}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-emerald-300 hover:text-emerald-700">
+                <MapPin className="h-4 w-4" />
+                Praxen im PLZ-Bereich {String(postal_code).slice(0, 3)}xx anzeigen
+              </a>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* 12. Mini-Symptom-Check */}
