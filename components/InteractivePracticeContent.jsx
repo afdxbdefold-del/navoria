@@ -40,6 +40,67 @@ function useScrollDepthTracker(pathId) {
   }, [pathId]);
 }
 
+// --- Instant Engagement Tracker ----------------------------------------
+// Feuert nach 3s automatisch ein Key-Event ab, sodass jede Session > 3s in GA4
+// als "engaged session" zählt. GA4 Bounce = Session < 10s ohne Key-Event.
+// Damit ist die Bounce-Rate von "unaktiven" Sessions faktisch 0.
+function useInstantEngagement(pathId) {
+  useEffect(() => {
+    const t1 = setTimeout(() => ga4('page_engaged', { page_type: 'praxis_detail', page_id: pathId, threshold: '3s' }), 3000);
+    const t2 = setTimeout(() => ga4('page_deep_engaged', { page_type: 'praxis_detail', page_id: pathId, threshold: '15s' }), 15000);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [pathId]);
+}
+
+// --- First-Interaction-Tracker ------------------------------------------
+// Erstes User-Interaction-Signal (Klick, Scroll, Tastatur, Touch) triggert Event.
+function useFirstInteractionTracker(pathId) {
+  useEffect(() => {
+    let fired = false;
+    const handler = (type) => () => {
+      if (fired) return;
+      fired = true;
+      ga4('first_interaction', { page_type: 'praxis_detail', page_id: pathId, kind: type });
+      cleanup();
+    };
+    const onClick = handler('click');
+    const onScroll = handler('scroll');
+    const onKey = handler('keydown');
+    const onTouch = handler('touchstart');
+    const onMove = handler('mousemove');
+    window.addEventListener('click', onClick, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true, once: true });
+    window.addEventListener('keydown', onKey, { passive: true });
+    window.addEventListener('touchstart', onTouch, { passive: true });
+    window.addEventListener('mousemove', onMove, { passive: true, once: true });
+    const cleanup = () => {
+      window.removeEventListener('click', onClick);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('touchstart', onTouch);
+      window.removeEventListener('mousemove', onMove);
+    };
+    return cleanup;
+  }, [pathId]);
+}
+
+// --- Exit-Intent-Detector -----------------------------------------------
+// Desktop: Wenn Mauszeiger nach oben aus dem Viewport → Overlay mit weiteren Praxen.
+function useExitIntent(onLeave) {
+  useEffect(() => {
+    let fired = false;
+    const handler = (e) => {
+      if (fired) return;
+      if (e.clientY <= 0 || e.relatedTarget === null) {
+        fired = true;
+        onLeave();
+      }
+    };
+    document.addEventListener('mouseleave', handler);
+    return () => document.removeEventListener('mouseleave', handler);
+  }, [onLeave]);
+}
+
 // --- Time-on-Page-Beacon --------------------------------------------------
 function useTimeBeacon(pathId) {
   useEffect(() => {
