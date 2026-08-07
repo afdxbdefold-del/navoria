@@ -1,5 +1,24 @@
 const nextConfig = {
   output: 'standalone',
+  // Beschleunigt Build & reduziert Bundle-Größe drastisch. Ohne diese Optimierung
+  // bindet Webpack ALLE 1000+ Icons ins Bundle statt nur die genutzten.
+  // Halbiert die Build-Zeit auf schwachen VPS.
+  modularizeImports: {
+    'lucide-react': {
+      transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
+      preventFullImport: true,
+    },
+  },
+  experimental: {
+    // Optimiert Import-Handling für schwere Pakete (Next 15 native Feature)
+    optimizePackageImports: ['lucide-react', 'date-fns'],
+    // Reduziert Webpack-Parallelität → weniger RAM-Peaks auf VPS
+    cpus: 1,
+  },
+  // Gzip macht Caddy im Reverse-Proxy — spart Build- & Runtime-CPU
+  compress: false,
+  // Sourcemaps im Client-Bundle deaktivieren (default false, hier explizit)
+  productionBrowserSourceMaps: false,
   images: {
     unoptimized: true,
     remotePatterns: [
