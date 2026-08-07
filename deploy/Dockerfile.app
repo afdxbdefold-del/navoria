@@ -20,7 +20,11 @@ RUN corepack enable && corepack prepare yarn@1.22.22 --activate
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS='--max-old-space-size=3072'
+# Heap auf 2 GB begrenzt: paradoxerweise stabiler auf VPS mit wenig RAM,
+# weil zu großer Heap schlechteres GC-Verhalten hat und mehr swappt.
+# Falls Build weiter OOM-crasht → auf 1536 reduzieren.
+ENV NODE_OPTIONS='--max-old-space-size=2048'
+ENV NEXT_SHARP_PATH=/tmp/node_modules/sharp
 # .next-Cache über BuildKit persistieren, damit unveränderte Chunks nicht neu kompiliert werden
 RUN --mount=type=cache,target=/app/.next/cache \
     yarn build
