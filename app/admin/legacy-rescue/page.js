@@ -8,6 +8,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import {
   Rewind, CheckCircle2, AlertTriangle, TrendingUp, Clock, ExternalLink, RefreshCw, ArrowLeft,
+  Search, Info, Shield,
 } from 'lucide-react';
 
 const WINDOWS = [
@@ -103,6 +104,86 @@ export default function LegacyRescueDashboard() {
       {err && (
         <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
           <AlertTriangle className="mr-1 inline h-4 w-4" /> {err}
+        </div>
+      )}
+
+      {/* Diagnose-Panel: sofortige Ursachen-Analyse warum Rescue evtl. 0 zeigt */}
+      {data?.diagnostics && (
+        <div className="mb-6 rounded-2xl border border-sky-200 bg-sky-50/60 p-5">
+          <h2 className="flex items-center gap-2 text-base font-semibold text-slate-900">
+            <Search className="h-4 w-4 text-sky-700" /> Diagnose · Homepage-Traffic der letzten {data.window_days}&nbsp;Tage
+          </h2>
+          <div className="mt-3 grid gap-3 sm:grid-cols-4">
+            <div className="rounded-lg bg-white p-3 shadow-sm">
+              <p className="text-[10px] uppercase tracking-widest text-slate-500">Hits auf /</p>
+              <p className="mt-1 text-2xl font-semibold text-slate-900">{data.diagnostics.homepage_hits_total ?? '—'}</p>
+              <p className="text-xs text-slate-500">Nutzer (ohne Bots)</p>
+            </div>
+            <div className="rounded-lg bg-white p-3 shadow-sm">
+              <p className="text-[10px] uppercase tracking-widest text-slate-500">Ohne Referer</p>
+              <p className="mt-1 text-2xl font-semibold text-slate-900">
+                {data.diagnostics.homepage_hits_no_referer ?? '—'}
+                {data.diagnostics.homepage_hits_total > 0 && (
+                  <span className="ml-2 text-sm font-normal text-slate-500">
+                    ({Math.round((data.diagnostics.homepage_hits_no_referer / data.diagnostics.homepage_hits_total) * 100)}%)
+                  </span>
+                )}
+              </p>
+              <p className="text-xs text-slate-500">Direkt / Bookmark / stripped</p>
+            </div>
+            <div className="rounded-lg bg-white p-3 shadow-sm">
+              <p className="text-[10px] uppercase tracking-widest text-slate-500">Mit Referer</p>
+              <p className="mt-1 text-2xl font-semibold text-emerald-700">{data.diagnostics.homepage_hits_with_referer ?? 0}</p>
+              <p className="text-xs text-slate-500">Nutzbar für Rescue</p>
+            </div>
+            <div className="rounded-lg bg-white p-3 shadow-sm">
+              <p className="text-[10px] uppercase tracking-widest text-slate-500">Legacy-Signal / kein Rescue</p>
+              <p className={`mt-1 text-2xl font-semibold ${data.diagnostics.homepage_hits_with_legacy_referer_but_no_rescue > 0 ? 'text-amber-700' : 'text-slate-400'}`}>
+                {data.diagnostics.homepage_hits_with_legacy_referer_but_no_rescue ?? 0}
+              </p>
+              <p className="text-xs text-slate-500">Regex matcht, Pfad aber leer</p>
+            </div>
+          </div>
+
+          {/* Top externe Referer */}
+          <div className="mt-4">
+            <p className="text-xs font-semibold uppercase tracking-widest text-slate-600">Top externe Referer (Homepage-Landings)</p>
+            {data.diagnostics.top_external_referers?.length ? (
+              <ul className="mt-2 divide-y divide-slate-100 rounded-lg bg-white">
+                {data.diagnostics.top_external_referers.map((r, i) => (
+                  <li key={i} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+                    <div className="flex min-w-0 items-center gap-2">
+                      {r.is_legacy && <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold uppercase text-amber-800">Legacy</span>}
+                      <a href={`https://${r.host}`} target="_blank" rel="noopener noreferrer"
+                        className="truncate font-mono text-xs text-slate-700 hover:text-emerald-700">{r.host}</a>
+                    </div>
+                    <span className="tabular-nums text-slate-600">{r.count}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="mt-2 rounded-lg bg-white p-3 text-xs text-slate-500">
+                Keine externen Referer registriert. Die Wahrscheinlichste Ursache: Modernen Browsern (Chrome/Safari mit strict Referrer-Policy) senden bei cross-site Navigation nur die Origin — und das wird oft gefiltert oder ist die Praxis-Alt-Domain, die ihre <code>Referrer-Policy</code> auf <code>same-origin</code> gesetzt hat.
+              </div>
+            )}
+          </div>
+
+          {/* Interpretations-Guide */}
+          {data.diagnostics.homepage_hits_total > 0 && data.diagnostics.homepage_hits_with_referer === 0 && (
+            <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+              <Info className="mt-0.5 h-4 w-4 shrink-0" />
+              <div>
+                <p className="font-semibold">Warum steht der Rescue-Zähler auf 0?</p>
+                <p className="mt-1">Bei <strong>{data.diagnostics.homepage_hits_total}</strong> Homepage-Landings war <strong>0×</strong> ein Referer verfügbar. Ursachen:</p>
+                <ul className="mt-1 list-disc space-y-0.5 pl-4">
+                  <li><strong>Alt-Domain hat Referrer-Policy</strong> <code>no-referrer</code>/<code>same-origin</code> gesetzt — dann leiten Browser gar keinen Header weiter.</li>
+                  <li>Traffic kommt von Bookmarks, Direkteingaben, E-Mail-Clients oder Suchmaschinen-Snippets (kein Referer).</li>
+                  <li>Alte Domain nutzt Meta-Refresh statt HTTP-301 — dann sind Referer meist leer.</li>
+                </ul>
+                <p className="mt-1"><strong>Was hilft?</strong> Prüfe ob die alte Domain (rzte-online.vercel.app) einen HTTP 301-Redirect setzt <em>und</em> keine strenge Referrer-Policy. Alternative: Setze auf der Alt-Domain einen <code>?src=legacy</code>-Parameter der auf navoria.de mitgereicht wird.</p>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

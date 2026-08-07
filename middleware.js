@@ -56,13 +56,35 @@ export function middleware(request) {
   // "ärzte-online.org" (xn--rzte-online-k8a.org) oder rzte-online.vercel.app ist,
   // reichen wir den Alt-Pfad an /api/legacy-rescue durch. Dort wird per DB-Lookup
   // die konkrete Praxis gefunden (Deep-Match), sonst Fallback auf Kategorie.
+  //
+  // Zusätzlich unterstützen wir einen ?legacy=<path>-Parameter als Fallback,
+  // falls die alte Domain diesen bei der Weiterleitung mitgibt. Das umgeht das
+  // Problem, dass moderne Browser mit strict Referrer-Policy den Referer strippen.
   if (pathname === '/' || pathname === '') {
+    // 1) Bevorzugt: expliziter ?legacy=<path>-Parameter aus der Alt-Domain
+    const legacyParam = request.nextUrl.searchParams.get('legacy')
+      || request.nextUrl.searchParams.get('ref');
+    if (legacyParam && legacyParam.length >= 3 && legacyParam.startsWith('/')) {
+      const rescueUrl = new URL('/api/legacy-rescue', request.url);
+      rescueUrl.searchParams.set('path', legacyParam);
+      rescueUrl.searchParams.set('src', 'param');
+      return NextResponse.redirect(rescueUrl, {
+        status: 302,
+        headers: { 'X-Navoria-Legacy-Rescue': 'lookup-param' },
+      });
+    }
+
+    // 2) Fallback: Referer-Header prüfen (funktioniert nur wenn Browser ihn sendet)
     const referer = request.headers.get('referer') || '';
     const legacyPath = extractLegacyPath(referer);
     if (legacyPath) {
       const rescueUrl = new URL('/api/legacy-rescue', request.url);
       rescueUrl.searchParams.set('path', legacyPath);
-      return NextResponse.redirect(rescueUrl, { status: 302, headers: { 'X-Navoria-Legacy-Rescue': 'lookup' } });
+      rescueUrl.searchParams.set('src', 'referer');
+      return NextResponse.redirect(rescueUrl, {
+        status: 302,
+        headers: { 'X-Navoria-Legacy-Rescue': 'lookup-referer' },
+      });
     }
   }
 

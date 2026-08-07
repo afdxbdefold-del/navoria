@@ -207,7 +207,82 @@ async function handleGet(request, pathParts) {
     const days = Math.max(1, Math.min(90, parseInt(url.searchParams.get('days') || '7', 10) || 7));
     const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
     const col = await getCollection('legacy_rescues');
-    const [total, byResult, byCity, bySpecialty, recent, uniqueTargets, hourly] = await Promise.all([
+    const pageViews = await getCollection('page_views');
+
+    // Diagnose: Alle Hits auf "/" mit externem Referer (Homepage-Landings mit Backlink).
+    // Zeigt, ob der Legacy-Traffic überhaupt ankommt und welche Referer-Muster wir sehen.
+    const LEGACY_REGEX = /(xn--rzte-online-k8a|rzte-online\.vercel|%C3%A4rzte-online|ärzte-online)/i;
+    const homepageHitsPromise = pageViews.aggregate([
+      {
+        $match: {
+          timestamp: { $gte: since },
+          path: '/',
+          is_bot: { $ne: true },
+          referer: { $nin: [null, ''] },
+        },
+      },
+      {
+        $addFields: {
+          referer_host: {
+            $let: {
+              vars: {
+                s: { $ifNull: ['$referer', ''] },
+              },
+              in: {
+                // Extrahiere host aus "https://foo.bar.com/path"
+                $arrayElemAt: [
+                  { $split: [
+                    { $arrayElemAt: [{ $split: ['$$s', '://'] }, 1] },
+                    '/',
+                  ] },
+                  0,
+                ],
+              },
+            },
+          },
+        },
+      },
+      // Eigene Domain rausfiltern
+      {
+        $match: {
+          referer_host: { $nin: [null, ''] },
+          $expr: {
+            $and: [
+              { $not: { $regexMatch: { input: '$referer_host', regex: /navoria\.de/i } } },
+              { $not: { $regexMatch: { input: '$referer_host', regex: /localhost/i } } },
+              { $not: { $regexMatch: { input: '$referer_host', regex: /emergentagent\.com/i } } },
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$referer_host',
+          count: { $sum: 1 },
+          example_full: { $first: '$referer' },
+          is_legacy: {
+            $max: {
+              $cond: [
+                { $regexMatch: { input: { $ifNull: ['$referer', ''] }, regex: LEGACY_REGEX } },
+                1, 0,
+              ],
+            },
+          },
+        },
+      },
+      { $sort: { count: -1 } },
+      { $limit: 30 },
+    ], { allowDiskUse: true }).toArray().catch(() => []);
+
+    // Legacy-Referer-Hits die trotz Match NICHT gerescued wurden (weil path='/' im Referer)
+    const legacyHomepageHitsPromise = pageViews.countDocuments({
+      timestamp: { $gte: since },
+      path: '/',
+      is_bot: { $ne: true },
+      referer: { $regex: LEGACY_REGEX },
+    }).catch(() => 0);
+
+    const [total, byResult, byCity, bySpecialty, recent, uniqueTargets, hourly, homepageHits, legacyHomepageHits] = await Promise.all([
       col.countDocuments({ timestamp: { $gte: since } }),
       col.aggregate([
         { $match: { timestamp: { $gte: since } } },
@@ -241,9 +316,25 @@ async function handleGet(request, pathParts) {
         } },
         { $sort: { _id: 1 } },
       ]).toArray(),
+      homepageHitsPromise,
+      legacyHomepageHitsPromise,
     ]);
     const concreteHits = byResult.find((r) => r._id === 'concrete')?.count || 0;
     const successRate = total > 0 ? Math.round((concreteHits / total) * 1000) / 10 : 0;
+
+    // Homepage-Traffic-Kategorisierung für Diagnose
+    const homepageHitsTotal = await pageViews.countDocuments({
+      timestamp: { $gte: since },
+      path: '/',
+      is_bot: { $ne: true },
+    }).catch(() => 0);
+    const homepageHitsNoReferer = await pageViews.countDocuments({
+      timestamp: { $gte: since },
+      path: '/',
+      is_bot: { $ne: true },
+      $or: [{ referer: null }, { referer: '' }, { referer: { $exists: false } }],
+    }).catch(() => 0);
+
     return json({
       window_days: days,
       since: since.toISOString(),
@@ -261,6 +352,19 @@ async function handleGet(request, pathParts) {
         redirect_target: r.redirect_target,
         timestamp: r.timestamp,
       })),
+      // Diagnose-Sektion: was passiert auf der Homepage / mit welchen Referern?
+      diagnostics: {
+        homepage_hits_total: homepageHitsTotal,
+        homepage_hits_no_referer: homepageHitsNoReferer,
+        homepage_hits_with_referer: homepageHitsTotal - homepageHitsNoReferer,
+        homepage_hits_with_legacy_referer_but_no_rescue: legacyHomepageHits,
+        top_external_referers: homepageHits.map((r) => ({
+          host: r._id,
+          count: r.count,
+          example: r.example_full ? String(r.example_full).slice(0, 200) : null,
+          is_legacy: r.is_legacy === 1,
+        })),
+      },
     });
   }
 
